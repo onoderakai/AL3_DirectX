@@ -8,6 +8,8 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+//作成したクラスの読み込み
+#include "Player.h"
 
 /// <summary>
 /// ゲームシーン
@@ -48,4 +50,13 @@ private: // メンバ変数
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	
+	//プレイヤーを包含
+	Player* player_ = nullptr;
+	//モデル
+	Model* playerModel_ = nullptr;
+	//テクスチャハンドル
+	uint32_t playerTextureHandle_ = 0;
+	//ビュープロジェクション
+	ViewProjection viewProjection_;
 };
