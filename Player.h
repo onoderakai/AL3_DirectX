@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Model.h"
 #include "WorldTransform.h"
+#include "Input.h"
 
 /// <summary>
 /// 自キャラのクラス
@@ -27,6 +28,8 @@ public:
 	void Draw(ViewProjection& viewProjection);
 
 private:
+	//入力
+	Input* input_ = nullptr;
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0;
 	// ワールド変換データ
