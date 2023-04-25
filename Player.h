@@ -27,6 +27,10 @@ public:
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(ViewProjection& viewProjection);
 
+	//ゲッター
+	
+	//セッター
+
 private:
 	//入力
 	Input* input_ = nullptr;
