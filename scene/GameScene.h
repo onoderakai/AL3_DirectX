@@ -8,6 +8,7 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "DebugCamera.h"
 //作成したクラスの読み込み
 #include "Player.h"
 
@@ -51,6 +52,9 @@ private: // メンバ変数
 	/// ゲームシーン用
 	/// </summary>
 	
+	bool isDebugCamera = false;
+	DebugCamera* debugCamera_ = nullptr;
+
 	//プレイヤーを包含
 	Player* player_ = nullptr;
 	//モデル
