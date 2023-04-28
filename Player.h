@@ -2,6 +2,7 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "Input.h"
+#include "PlayerBullet.h"
 
 /// <summary>
 /// 自キャラのクラス
@@ -19,13 +20,18 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Uppdate();
+	void Update();
 
 	/// <summary>
 	/// 描画
 	/// </summary>
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(ViewProjection& viewProjection);
+
+	/// <summary>
+	/// 攻撃
+	/// </summary>
+	void Attack();
 
 	//ゲッター
 	
@@ -37,7 +43,10 @@ private:
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0;
 	// ワールド変換データ
-	WorldTransform worldTransform_;
+	WorldTransform world_;
 	// モデル情報
 	Model* model_ = nullptr;
+
+	//弾
+	PlayerBullet* bullet_ = nullptr;
 };

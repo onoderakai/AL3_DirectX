@@ -7,15 +7,14 @@ void Player::Initialeze(Model* model, uint32_t textureHandle) {
 	(assert(textureHandle));
 	model_ = model;
 	textureHandle_ = textureHandle;
-	worldTransform_.Initialize();
+	world_.Initialize();
 	input_ = Input::GetInstance();
 }
 
-void Player::Uppdate() {
+void Player::Update() {
 
 	Vector3 move = {0.0f, 0.0f, 0.0f};
 	const float kCharacterSpeed = 0.2f;
-
 
 	// 入力
 	if (input_->PushKey(DIK_LEFT)) {
@@ -29,30 +28,34 @@ void Player::Uppdate() {
 		move.y -= kCharacterSpeed;
 	}
 
+	Attack();
+	if (bullet_) {
+		bullet_->Update();
+	}
 
 	// 移動
-	worldTransform_.translation_.x += move.x;
-	worldTransform_.translation_.y += move.y;
-	worldTransform_.translation_.z += move.z;
+	world_.translation_.x += move.x;
+	world_.translation_.y += move.y;
+	world_.translation_.z += move.z;
 
+	// 旋回
+	const float matRotSpeed = 0.2f;
+	if (input_->PushKey(DIK_W)) {
+		world_.rotation_.y += matRotSpeed;
+	} else if (input_->PushKey(DIK_S)) {
+		world_.rotation_.y -= matRotSpeed;
+	}
 
 	// 当たり判定
 	float moveLimitX = 34.0f;
 	float moveLimitY = 18.0f;
 
-	worldTransform_.translation_.x = max(worldTransform_.translation_.x, -moveLimitX);
-	worldTransform_.translation_.x = min(worldTransform_.translation_.x, +moveLimitX);
-	worldTransform_.translation_.y = max(worldTransform_.translation_.y, -moveLimitY);
-	worldTransform_.translation_.y = min(worldTransform_.translation_.y, +moveLimitY);
+	world_.translation_.x = max(world_.translation_.x, -moveLimitX);
+	world_.translation_.x = min(world_.translation_.x, +moveLimitX);
+	world_.translation_.y = max(world_.translation_.y, -moveLimitY);
+	world_.translation_.y = min(world_.translation_.y, +moveLimitY);
 
-
-	// 行列更新
-	worldTransform_.matWorld_ = MakeAffineMatrix(
-	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
-
-	// 行列を定数バッファに転送
-	worldTransform_.TransferMatrix();
-
+	world_.UpdateMatrix();
 
 #ifdef DEBUG
 	// ImGui
@@ -68,5 +71,19 @@ void Player::Uppdate() {
 
 void Player::Draw(ViewProjection& viewProjection) {
 
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	model_->Draw(world_, viewProjection, textureHandle_);
+
+	if (bullet_) {
+		bullet_->Draw(viewProjection);
+	}
+}
+
+void Player::Attack() {
+	if (input_->TriggerKey(DIK_SPACE)) {
+		PlayerBullet* newBullet = new PlayerBullet();
+		newBullet->Initialeze(model_, world_.translation_);
+
+		bullet_ = newBullet;
+	}
+
 }
