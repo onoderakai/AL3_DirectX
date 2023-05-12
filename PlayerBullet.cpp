@@ -12,7 +12,7 @@ void PlayerBullet::Initialeze(Model* model, const Vector3& pos) {
 }
 
 void PlayerBullet::Update() {
-	world_.translation_.z += 1.0f;
+	//world_.translation_.z += 1.0f;
 	world_.UpdateMatrix();
 }
 
