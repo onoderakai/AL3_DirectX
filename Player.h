@@ -3,12 +3,22 @@
 #include "WorldTransform.h"
 #include "Input.h"
 #include "PlayerBullet.h"
+#include <list>
 
 /// <summary>
 /// 自キャラのクラス
 /// </summary>
 class Player {
 public:
+
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~Player() {
+		for (PlayerBullet* bullet : bullets_) {
+			delete bullet;
+		}
+	}
 
 	/// <summary>
 	/// 初期化
@@ -48,5 +58,5 @@ private:
 	Model* model_ = nullptr;
 
 	//弾
-	PlayerBullet* bullet_ = nullptr;
+	std::list<PlayerBullet*> bullets_;
 };

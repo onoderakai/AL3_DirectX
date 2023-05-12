@@ -17,20 +17,20 @@ void Player::Update() {
 	const float kCharacterSpeed = 0.2f;
 
 	// 入力
-	if (input_->PushKey(DIK_LEFT)) {
+	if (input_->PushKey(DIK_A)) {
 		move.x -= kCharacterSpeed;
-	} else if (input_->PushKey(DIK_RIGHT)) {
+	} else if (input_->PushKey(DIK_D)) {
 		move.x += kCharacterSpeed;
 	}
-	if (input_->PushKey(DIK_UP)) {
+	if (input_->PushKey(DIK_W)) {
 		move.y += kCharacterSpeed;
-	} else if (input_->PushKey(DIK_DOWN)) {
+	} else if (input_->PushKey(DIK_S)) {
 		move.y -= kCharacterSpeed;
 	}
 
 	Attack();
-	if (bullet_) {
-		bullet_->Update();
+	for (PlayerBullet* bullet : bullets_) {
+		bullet->Update();
 	}
 
 	// 移動
@@ -40,10 +40,17 @@ void Player::Update() {
 
 	// 旋回
 	const float matRotSpeed = 0.2f;
-	if (input_->PushKey(DIK_W)) {
-		world_.rotation_.y += matRotSpeed;
-	} else if (input_->PushKey(DIK_S)) {
+	if (input_->PushKey(DIK_UP)) {
+		world_.rotation_.x -= matRotSpeed;
+	}
+	else if (input_->PushKey(DIK_DOWN)) {
+		world_.rotation_.x += matRotSpeed;
+	}
+	if (input_->PushKey(DIK_RIGHT)) {
 		world_.rotation_.y -= matRotSpeed;
+	}
+	else if (input_->PushKey(DIK_LEFT)) {
+		world_.rotation_.y += matRotSpeed;
 	}
 
 	// 当たり判定
@@ -73,17 +80,21 @@ void Player::Draw(ViewProjection& viewProjection) {
 
 	model_->Draw(world_, viewProjection, textureHandle_);
 
-	if (bullet_) {
-		bullet_->Draw(viewProjection);
+	for (PlayerBullet* bullet : bullets_)
+	{
+		bullet->Draw(viewProjection);
 	}
 }
 
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
-		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialeze(model_, world_.translation_);
+		//自キャラの座標
+		Vector3 pos = world_.translation_;
 
-		bullet_ = newBullet;
+		PlayerBullet* newBullet = new PlayerBullet();
+		newBullet->Initialeze(model_, pos);
+
+		bullets_.push_back(newBullet);
 	}
 
 }
