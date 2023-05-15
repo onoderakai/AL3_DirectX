@@ -1,4 +1,5 @@
 ﻿#include "Player.h"
+#include "MathUtility.h"
 #include "ImGuiManager.h"
 #include <cassert>
 
@@ -13,9 +14,18 @@ void Player::Initialeze(Model* model, uint32_t textureHandle) {
 
 void Player::Update() {
 
-	Vector3 move = {0.0f, 0.0f, 0.0f};
-	const float kCharacterSpeed = 0.2f;
+	//デスフラグの立った弾を削除
+	bullets_.remove_if([](PlayerBullet* bullet) {
+		if (bullet->GetIsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
 
+	//移動処理
+	Vector3 move = {};
+	const float kCharacterSpeed = 0.2f;
 	// 入力
 	if (input_->PushKey(DIK_A)) {
 		move.x -= kCharacterSpeed;
@@ -27,30 +37,31 @@ void Player::Update() {
 	} else if (input_->PushKey(DIK_S)) {
 		move.y -= kCharacterSpeed;
 	}
+	// 移動
+	world_.translation_ += move;
 
+
+	// 旋回処理
+	Vector3 rotate = {};
+	const float matRotSpeed = 0.02f;
+	//入力
+	if (input_->PushKey(DIK_UP)) {
+		rotate.x = -matRotSpeed;
+	} else if (input_->PushKey(DIK_DOWN)) {
+		rotate.x = matRotSpeed;
+	}
+	if (input_->PushKey(DIK_RIGHT)) {
+		rotate.y = -matRotSpeed;
+	} else if (input_->PushKey(DIK_LEFT)) {
+		rotate.y = matRotSpeed;
+	}
+	//旋回
+	world_.rotation_ += rotate;
+
+	//攻撃処理
 	Attack();
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Update();
-	}
-
-	// 移動
-	world_.translation_.x += move.x;
-	world_.translation_.y += move.y;
-	world_.translation_.z += move.z;
-
-	// 旋回
-	const float matRotSpeed = 0.2f;
-	if (input_->PushKey(DIK_UP)) {
-		world_.rotation_.x -= matRotSpeed;
-	}
-	else if (input_->PushKey(DIK_DOWN)) {
-		world_.rotation_.x += matRotSpeed;
-	}
-	if (input_->PushKey(DIK_RIGHT)) {
-		world_.rotation_.y -= matRotSpeed;
-	}
-	else if (input_->PushKey(DIK_LEFT)) {
-		world_.rotation_.y += matRotSpeed;
 	}
 
 	// 当たり判定
@@ -80,21 +91,21 @@ void Player::Draw(ViewProjection& viewProjection) {
 
 	model_->Draw(world_, viewProjection, textureHandle_);
 
-	for (PlayerBullet* bullet : bullets_)
-	{
+	for (PlayerBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
 }
 
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
-		//自キャラの座標
+		// 自キャラの座標
 		Vector3 pos = world_.translation_;
 
 		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialeze(model_, pos);
+		Vector3 bulletVelocity = {0.0f, 0.0f, 1.0f};
+		bulletVelocity = TransformNormal(bulletVelocity, world_.matWorld_);
+		newBullet->Initialeze(model_, pos, bulletVelocity);
 
 		bullets_.push_back(newBullet);
 	}
-
 }

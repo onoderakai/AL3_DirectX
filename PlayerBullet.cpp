@@ -1,7 +1,7 @@
 ﻿#include "PlayerBullet.h"
 #include <cassert>
 
-void PlayerBullet::Initialeze(Model* model, const Vector3& pos) {
+void PlayerBullet::Initialeze(Model* model, const Vector3& pos, const Vector3& velocity) {
 	(assert(model));
 	model_ = model;
 
@@ -9,10 +9,18 @@ void PlayerBullet::Initialeze(Model* model, const Vector3& pos) {
 
 	world_.Initialize();
 	world_.translation_ = pos;
+
+	velocity_ = velocity;
 }
 
 void PlayerBullet::Update() {
-	//world_.translation_.z += 1.0f;
+	if (--deathTimer_ <= 0) {
+		isDead_ = true;
+		return;
+	}
+
+	world_.translation_ += velocity_;
+
 	world_.UpdateMatrix();
 }
 

@@ -38,11 +38,7 @@ public:
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(ViewProjection& viewProjection);
 
-	/// <summary>
-	/// 攻撃
-	/// </summary>
-	void Attack();
-
+	
 	//ゲッター
 	
 	//セッター
@@ -59,4 +55,10 @@ private:
 
 	//弾
 	std::list<PlayerBullet*> bullets_;
+
+
+	/// <summary>
+	/// 攻撃
+	/// </summary>
+	void Attack();
 };
