@@ -5,17 +5,16 @@
 #include "WorldTransform.h"
 
 /// <summary>
-/// プレイヤーの弾
+/// エネミー
 /// </summary>
-class PlayerBullet {
+class Enemy {
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="model">モデル</param>
 	/// <param name="pos">初期座標</param>
-	/// <param name="velocity">移動速度</param>
-	void Initialeze(Model* model, const Vector3& pos, const Vector3& velocity);
+	void Initialeze(Model* model, const Vector3& pos);
 
 	/// <summary>
 	/// 更新
@@ -28,28 +27,10 @@ public:
 	/// <param name="viewProjection"></param>
 	void Draw(ViewProjection& viewProjection);
 
-
-	//ゲッター
-
-	/// <summary>
-	/// 弾のデスフラグのゲッター
-	/// </summary>
-	/// <returns></returns>
-	bool GetIsDead() const { return isDead_; }
-	//セッター
-
-
 private:
 	WorldTransform world_;
 	Model* model_ = nullptr;
 	uint32_t textureHandle_ = 0;
 
 	Vector3 velocity_ = {};
-
-	//寿命(フレーム)
-	static const int32_t kLifeTime = 60 * 5;
-	//デスタイマー
-	int32_t deathTimer_ = kLifeTime;
-	//デスフラグ
-	bool isDead_ = false;
 };

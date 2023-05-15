@@ -11,6 +11,7 @@
 #include "DebugCamera.h"
 //作成したクラスの読み込み
 #include "Player.h"
+#include "Enemy.h"
 
 /// <summary>
 /// ゲームシーン
@@ -61,6 +62,13 @@ private: // メンバ変数
 	Model* playerModel_ = nullptr;
 	//テクスチャハンドル
 	uint32_t playerTextureHandle_ = 0;
+
+	//エネミーを包含
+	Enemy* enemy_ = nullptr;
+	//モデル
+	Model* enemyModel_ = nullptr;
+	Vector3 enemyGeneratePos_ = {};
+
 	//ビュープロジェクション
 	ViewProjection viewProjection_;
 };

@@ -1,62 +1,79 @@
 #include "GameScene.h"
-#include "TextureManager.h"
 #include "AxisIndicator.h"
+#include "TextureManager.h"
 #include <cassert>
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() { 
+GameScene::~GameScene() {
 	delete player_;
 	delete playerModel_;
+	delete enemy_;
+	delete enemyModel_;
+
 	delete debugCamera_;
 }
 
 void GameScene::Initialize() {
 
-	//デバッグカメラの生成
+	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(WinApp::kWindowWidth, WinApp::kWindowHeight);
-	//軸方向表示の表示を有効にする
+	// 軸方向表示の表示を有効にする
 	AxisIndicator::GetInstance()->SetVisible(true);
-	//軸方向表示が参照するビュープロジェクションを指定する（アドレス渡し）
+	// 軸方向表示が参照するビュープロジェクションを指定する（アドレス渡し）
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
-	//ビュープロジェクションの初期化
+	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
-	//プレイヤーモデルの生成
+
+	// プレイヤーモデルの生成
 	playerModel_ = Model::Create();
-	//プレイヤーのテクスチャハンドルを代入
+	// プレイヤーのテクスチャハンドルを代入
 	playerTextureHandle_ = TextureManager::Load("sample.png");
 
-	//インスタンスの生成
+	// エネミーモデルの生成
+	enemyModel_ = Model::Create();
+
+	// インスタンスの生成
+	// プレイヤー
 	player_ = new Player();
 	player_->Initialeze(playerModel_, playerTextureHandle_);
+
+	// エネミー
+	enemy_ = new Enemy();
+	enemyGeneratePos_ = {0.0f, 0.0f, 50.0f};
+	enemy_->Initialeze(enemyModel_, enemyGeneratePos_);
 }
 
-void GameScene::Update() { 
-	//デバッグカメラの処理
+void GameScene::Update() {
+	// デバッグカメラの処理
 #ifdef _DEBUG
-	//デバッグカメラのアクティブ切り替え
+	// デバッグカメラのアクティブ切り替え
 	if (input_->TriggerKey(DIK_B)) {
 		isDebugCamera = !isDebugCamera;
 	}
 
-	//デバッグカメラの処理
+	// デバッグカメラの処理
 	if (isDebugCamera) {
 		debugCamera_->Update();
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 		viewProjection_.TransferMatrix();
-	}
-	else {
+	} else {
 		viewProjection_.UpdateMatrix();
 	}
 #endif // _DEBUG
 
-	player_->Update();
+	if (player_) {
+		player_->Update();
+	}
+	if (enemy_) {
+		enemy_->Update();
+	}
 }
 
 void GameScene::Draw() {
@@ -85,7 +102,12 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	player_->Draw(viewProjection_);
+	if (player_) {
+		player_->Draw(viewProjection_);
+	}
+	if (enemy_) {
+		enemy_->Draw(viewProjection_);
+	}
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -97,7 +119,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-	
+
 	// スプライト描画後処理
 	Sprite::PostDraw();
 

@@ -6,7 +6,7 @@
 #include <list>
 
 /// <summary>
-/// 自キャラのクラス
+/// 自キャラ
 /// </summary>
 class Player {
 public:
