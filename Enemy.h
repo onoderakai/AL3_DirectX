@@ -33,4 +33,25 @@ private:
 	uint32_t textureHandle_ = 0;
 
 	Vector3 velocity_ = {};
+
+	/// <summary>
+	/// 攻撃の状態
+	/// </summary>
+	enum class AttackState {
+		APPROACH,
+		LEAVE
+	};
+
+	/// <summary>
+	/// 接近状態の更新処理
+	/// </summary>
+	void ApproachUpdate();
+
+	/// <summary>
+	/// 離脱状態の更新処理
+	/// </summary>
+	void LeaveUpdate();
+
+	//攻撃
+	AttackState state_ = AttackState::APPROACH;
 };

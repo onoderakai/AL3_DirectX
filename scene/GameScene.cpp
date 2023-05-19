@@ -45,7 +45,7 @@ void GameScene::Initialize() {
 
 	// エネミー
 	enemy_ = new Enemy();
-	enemyGeneratePos_ = {0.0f, 0.0f, 50.0f};
+	enemyGeneratePos_ = {0.0f, 3.0f, 100.0f};
 	enemy_->Initialeze(enemyModel_, enemyGeneratePos_);
 }
 
