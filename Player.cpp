@@ -51,9 +51,9 @@ void Player::Update() {
 		rotate.x = matRotSpeed;
 	}
 	if (input_->PushKey(DIK_RIGHT)) {
-		rotate.y = -matRotSpeed;
-	} else if (input_->PushKey(DIK_LEFT)) {
 		rotate.y = matRotSpeed;
+	} else if (input_->PushKey(DIK_LEFT)) {
+		rotate.y = -matRotSpeed;
 	}
 	//旋回
 	world_.rotation_ += rotate;

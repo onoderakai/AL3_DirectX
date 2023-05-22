@@ -3,12 +3,23 @@
 #include "Vector3.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "EnemyBullet.h"
+#include <list>
 
 /// <summary>
 /// エネミー
 /// </summary>
 class Enemy {
 public:
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~Enemy() {
+		for (EnemyBullet* bullet : bullets_) {
+			delete bullet;
+		}
+	}
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -54,4 +65,17 @@ private:
 
 	//攻撃
 	AttackState state_ = AttackState::APPROACH;
+
+	/// <summary>
+	/// 攻撃処理
+	/// </summary>
+	void Attack();
+
+	//攻撃間隔
+	int attackInterval = 30;
+	//攻撃間隔をカウント
+	int attackCount = 0;
+
+	//弾の包含
+	std::list<EnemyBullet*> bullets_;
 };
