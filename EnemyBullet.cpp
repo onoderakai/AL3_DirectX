@@ -16,7 +16,7 @@ void EnemyBullet::Update() {
 		return;
 	}
 
-	world_.translation_ -= velocity_;
+	world_.translation_ += velocity_;
 
 	world_.UpdateMatrix();
 }

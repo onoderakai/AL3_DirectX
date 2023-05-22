@@ -5,6 +5,7 @@
 #include "WorldTransform.h"
 #include "EnemyBullet.h"
 #include <list>
+class Player;
 
 /// <summary>
 /// エネミー
@@ -37,6 +38,18 @@ public:
 	/// </summary>
 	/// <param name="viewProjection"></param>
 	void Draw(ViewProjection& viewProjection);
+
+	/// <summary>
+	/// 座標のゲッター
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetWorldPosition() { return world_.translation_; }
+
+	/// <summary>
+	/// プレイヤーのセッター
+	/// </summary>
+	/// <param name="player"></param>
+	void SetPlayer(Player* player) { player_ = player; }
 
 private:
 	WorldTransform world_;
@@ -78,4 +91,6 @@ private:
 
 	//弾の包含
 	std::list<EnemyBullet*> bullets_;
+	//プレイヤー
+	Player* player_ = nullptr;
 };

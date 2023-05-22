@@ -1,6 +1,7 @@
 ﻿#include "Enemy.h"
 #include "MathUtility.h"
 #include <cassert>
+#include "Player.h"
 
 void Enemy::Initialeze(Model* model, const Vector3& pos) {
 	(assert(model));
@@ -12,7 +13,7 @@ void Enemy::Initialeze(Model* model, const Vector3& pos) {
 	velocity_ = {-0.3f, 0.3f, 0.0f};
 
 	//生成時に弾を攻撃処理をする
-	Attack();
+	//Attack();
 }
 
 void Enemy::Update() {
@@ -69,8 +70,18 @@ void Enemy::LeaveUpdate() { world_.translation_ += velocity_; }
 void Enemy::Attack() {
 	// 弾を生成
 	EnemyBullet* newBullet = new EnemyBullet();
-	// 弾のベクトルを設定
-	Vector3 bulletVelocity = {0.0f, 0.0f, 1.0f};
+	// 弾のベクトル
+	Vector3 bulletVelocity = {};
+	//プレイヤーの向きにする
+	bulletVelocity = player_->GetWorldPosition() - world_.translation_;
+	/*bulletVelocity.x /= 100.0f;
+	bulletVelocity.y /= 100.0f;
+	bulletVelocity.z /= 100.0f;*/
+	bulletVelocity = Normalize(bulletVelocity);
+	float bulletSpeed = 5.0f;
+	bulletVelocity.x *= bulletSpeed;
+	bulletVelocity.y *= bulletSpeed;
+	bulletVelocity.z *= bulletSpeed;
 	//bulletVelocity = TransformNormal(bulletVelocity, world_.matWorld_);
 	newBullet->Initialize(world_.translation_, bulletVelocity, model_);
 	// 生成した弾をリストに追加

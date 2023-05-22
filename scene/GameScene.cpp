@@ -47,6 +47,7 @@ void GameScene::Initialize() {
 	enemy_ = new Enemy();
 	enemyGeneratePos_ = {5.0f, 3.0f, 100.0f};
 	enemy_->Initialeze(enemyModel_, enemyGeneratePos_);
+	enemy_->SetPlayer(player_);
 }
 
 void GameScene::Update() {

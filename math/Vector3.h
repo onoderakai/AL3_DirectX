@@ -10,6 +10,12 @@ struct Vector3 final {
 };
 
 /// <summary>
+/// ベクトルの正規化
+/// </summary>
+/// <param name="v"></param>
+Vector3 Normalize(const Vector3& v);
+
+/// <summary>
 /// ベクトル同士の足し算
 /// </summary>
 /// <param name="v1"></param>

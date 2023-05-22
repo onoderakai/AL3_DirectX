@@ -41,6 +41,12 @@ public:
 	
 	//ゲッター
 	
+	/// <summary>
+	/// 座標のゲッター
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetWorldPosition();
+
 	//セッター
 
 private:

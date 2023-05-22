@@ -96,6 +96,14 @@ void Player::Draw(ViewProjection& viewProjection) {
 	}
 }
 
+Vector3 Player::GetWorldPosition() {
+	Vector3 worldPos = {};
+	worldPos.x = world_.translation_.x;
+	worldPos.y = world_.translation_.y;
+	worldPos.z = world_.translation_.z;
+	return worldPos;
+}
+
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
 		// 自キャラの座標
