@@ -85,7 +85,7 @@ private:
 	void Attack();
 
 	//攻撃間隔
-	int attackInterval = 30;
+	int attackInterval = 45;
 	//攻撃間隔をカウント
 	int attackCount = 0;
 

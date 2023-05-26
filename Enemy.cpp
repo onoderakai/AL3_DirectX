@@ -11,9 +11,6 @@ void Enemy::Initialeze(Model* model, const Vector3& pos) {
 	world_.Initialize();
 	world_.translation_ = pos;
 	velocity_ = {-0.3f, 0.3f, 0.0f};
-
-	//生成時に弾を攻撃処理をする
-	//Attack();
 }
 
 void Enemy::Update() {
@@ -25,6 +22,7 @@ void Enemy::Update() {
 		}
 		return false;
 	});
+
 	switch (state_) {
 	case Enemy::AttackState::APPROACH:
 		ApproachUpdate();
@@ -68,21 +66,19 @@ void Enemy::ApproachUpdate() {
 void Enemy::LeaveUpdate() { world_.translation_ += velocity_; }
 
 void Enemy::Attack() {
-	// 弾を生成
-	EnemyBullet* newBullet = new EnemyBullet();
-	// 弾のベクトル
-	Vector3 bulletVelocity = {};
-	//プレイヤーの向きにする
-	bulletVelocity = player_->GetWorldPosition() - world_.translation_;
-	/*bulletVelocity.x /= 100.0f;
-	bulletVelocity.y /= 100.0f;
-	bulletVelocity.z /= 100.0f;*/
+	// 弾のベクトルをプレイヤーの向きにする
+	assert(player_);
+	Vector3 bulletVelocity = player_->GetWorldPosition() - world_.translation_;
 	bulletVelocity = Normalize(bulletVelocity);
-	float bulletSpeed = 5.0f;
+	//弾の移動速度
+	float bulletSpeed = 1.0f;
 	bulletVelocity.x *= bulletSpeed;
 	bulletVelocity.y *= bulletSpeed;
 	bulletVelocity.z *= bulletSpeed;
 	//bulletVelocity = TransformNormal(bulletVelocity, world_.matWorld_);
+	
+	//弾を生成
+	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(world_.translation_, bulletVelocity, model_);
 	// 生成した弾をリストに追加
 	bullets_.push_back(newBullet);
