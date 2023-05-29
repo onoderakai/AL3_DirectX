@@ -2,6 +2,7 @@
 #include "AxisIndicator.h"
 #include "TextureManager.h"
 #include <cassert>
+#include <cmath>
 
 GameScene::GameScene() {}
 
@@ -75,6 +76,7 @@ void GameScene::Update() {
 	if (enemy_) {
 		enemy_->Update();
 	}
+	CheckAllCollision();
 }
 
 void GameScene::Draw() {
@@ -126,3 +128,67 @@ void GameScene::Draw() {
 
 #pragma endregion
 }
+
+void GameScene::CheckAllCollision() {
+	// 判定対象の座標
+	Vector3 posA = {};
+	Vector3 posB = {};
+
+	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
+	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
+
+	// 自キャラの座標
+	posA = player_->GetWorldPosition();
+
+	// 自キャラと敵弾全ての当たり判定
+	for (EnemyBullet* bullet : enemyBullets) {
+		// 敵弾の座標
+		posB = bullet->GetWorldPosition();
+
+		// 距離を求める
+		float length = Length(posA - posB);
+		// 半径同士の足し算
+		float radius = player_->GetRadius() + bullet->GetRadius();
+		if (length <= radius) {
+			player_->OnCollision();
+			bullet->OnCollision();
+		}
+	}
+
+	// 敵キャラの座標
+	posA = enemy_->GetWorldPosition();
+	// 敵キャラと自弾全ての当たり判定
+	for (PlayerBullet* bullet : playerBullets) {
+		// 自弾の座標
+		posB = bullet->GetWorldPosition();
+
+		// 距離を求める
+		float length = Length(posA - posB);
+		// 半径同士の足し算
+		float radius = enemy_->GetRadius() + bullet->GetRadius();
+		if (length <= radius) {
+			enemy_->OnCollision();
+			bullet->OnCollision();
+		}
+	}
+
+	// 自弾と敵弾の当たり判定
+	for (PlayerBullet* playerBullet : playerBullets) {
+		// 自弾の座標
+		posA = playerBullet->GetWorldPosition();
+		for (EnemyBullet* enemyBullet : enemyBullets) {
+			// 敵弾の座標
+			posB = enemyBullet->GetWorldPosition();
+			// 距離を求める
+			float length = Length(posA - posB);
+			// 半径同士の足し算
+			float radius = playerBullet->GetRadius() + enemyBullet->GetRadius();
+			if (length <= radius) {
+				playerBullet->OnCollision();
+				enemyBullet->OnCollision();
+			}
+		}	
+	}
+}
+
+float GameScene::Length(const Vector3& v) { return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z); }

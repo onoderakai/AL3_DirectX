@@ -56,6 +56,10 @@ void Enemy::Draw(ViewProjection& viewProjection) {
 	}
 }
 
+void Enemy::OnCollision() {
+
+}
+
 void Enemy::ApproachUpdate() {
 	world_.translation_.z -= 0.3f;
 	if (world_.translation_.z < 0.0f) {

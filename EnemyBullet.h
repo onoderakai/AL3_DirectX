@@ -13,10 +13,28 @@ public:
 	void Draw(ViewProjection& viewProjection);
 
 	/// <summary>
+	/// 当たり判定
+	/// </summary>
+	void OnCollision();
+	
+
+	/// <summary>
 	/// デスフラグのゲッター
 	/// </summary>
 	/// <returns></returns>
 	bool GetIsDead() { return isDead_; }
+
+	/// <summary>
+	/// 半径のゲッター
+	/// </summary>
+	/// <returns></returns>
+	const float GetRadius() { return kRadius_; }
+
+	/// <summary>
+	/// 座標のゲッター
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetWorldPosition() { return world_.translation_; }
 
 private:
 	WorldTransform world_;
@@ -24,6 +42,8 @@ private:
 	uint32_t textureHandle_ = 0;
 	Vector3 velocity_;
 
+	//弾の半径
+	const float kRadius_ = 1.0f;
 	//弾の寿命
 	const int kLifeTime = 60 * 2;
 	//デスタイマー

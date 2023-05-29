@@ -40,3 +40,7 @@ void EnemyBullet::Update() {
 void EnemyBullet::Draw(ViewProjection& viewProjection) {
 	model_->Draw(world_, viewProjection, textureHandle_);
 }
+
+void EnemyBullet::OnCollision() {
+	isDead_ = true;
+}

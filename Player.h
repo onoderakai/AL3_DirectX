@@ -38,14 +38,30 @@ public:
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(ViewProjection& viewProjection);
 
+	/// <summary>
+	/// 当たり判定
+	/// </summary>
+	void OnCollision();
 	
 	//ゲッター
 	
+	/// <summary>
+	/// 弾のゲッター
+	/// </summary>
+	/// <returns></returns>
+	const std::list<PlayerBullet*>& GetBullets() { return bullets_; }
+
 	/// <summary>
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
 	Vector3 GetWorldPosition();
+
+	/// <summary>
+	/// 半径のゲッター
+	/// </summary>
+	/// <returns></returns>
+	float GetRadius() { return radius_; }
 
 	//セッター
 
@@ -58,6 +74,8 @@ private:
 	WorldTransform world_;
 	// モデル情報
 	Model* model_ = nullptr;
+	//半径
+	float radius_ = 1.0f;
 
 	//弾
 	std::list<PlayerBullet*> bullets_;

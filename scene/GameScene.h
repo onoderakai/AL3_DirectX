@@ -71,4 +71,16 @@ private: // メンバ変数
 
 	//ビュープロジェクション
 	ViewProjection viewProjection_;
+
+	/// <summary>
+	/// 衝突判定
+	/// </summary>
+	void CheckAllCollision();
+
+	/// <summary>
+	/// ベクトルの距離を求める
+	/// </summary>
+	/// <param name="v"></param>
+	/// <returns></returns>
+	float Length(const Vector3& v);
 };

@@ -40,10 +40,27 @@ public:
 	void Draw(ViewProjection& viewProjection);
 
 	/// <summary>
+	/// 当たり判定
+	/// </summary>
+	void OnCollision();
+	
+	/// <summary>
+	/// 弾のゲッター
+	/// </summary>
+	/// <returns></returns>
+	const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
+
+	/// <summary>
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
 	Vector3 GetWorldPosition() { return world_.translation_; }
+
+	/// <summary>
+	/// 半径のゲッター
+	/// </summary>
+	/// <returns></returns>
+	float GetRadius() { return radius_; }
 
 	/// <summary>
 	/// プレイヤーのセッター
@@ -55,6 +72,7 @@ private:
 	WorldTransform world_;
 	Model* model_ = nullptr;
 	uint32_t textureHandle_ = 0;
+	float radius_ = 1.0f;
 
 	Vector3 velocity_ = {};
 
