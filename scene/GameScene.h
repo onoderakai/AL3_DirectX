@@ -12,6 +12,7 @@
 //作成したクラスの読み込み
 #include "Player.h"
 #include "Enemy.h"
+#include "Skydome.h"
 
 /// <summary>
 /// ゲームシーン
@@ -68,6 +69,11 @@ private: // メンバ変数
 	//モデル
 	Model* enemyModel_ = nullptr;
 	Vector3 enemyGeneratePos_ = {};
+
+	//天球を包含
+	Skydome* skydome_ = nullptr;
+	//モデル
+	Model* skydomeModel_ = nullptr;
 
 	//ビュープロジェクション
 	ViewProjection viewProjection_;
