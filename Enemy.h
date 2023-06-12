@@ -54,13 +54,13 @@ public:
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetWorldPosition() { return world_.translation_; }
+	Vector3 GetWorldPosition();
 
 	/// <summary>
 	/// 半径のゲッター
 	/// </summary>
 	/// <returns></returns>
-	float GetRadius() { return radius_; }
+	const float& GetRadius() { return radius_; }
 
 	/// <summary>
 	/// プレイヤーのセッター

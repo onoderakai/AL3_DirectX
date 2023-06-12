@@ -22,19 +22,19 @@ public:
 	/// デスフラグのゲッター
 	/// </summary>
 	/// <returns></returns>
-	bool GetIsDead() { return isDead_; }
+	const bool& GetIsDead() { return isDead_; }
 
 	/// <summary>
 	/// 半径のゲッター
 	/// </summary>
 	/// <returns></returns>
-	const float GetRadius() { return kRadius_; }
+	const float& GetRadius() { return kRadius_; }
 
 	/// <summary>
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetWorldPosition() { return world_.translation_; }
+	const Vector3& GetWorldPosition() { return world_.translation_; }
 
 private:
 	WorldTransform world_;

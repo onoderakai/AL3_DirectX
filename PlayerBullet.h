@@ -40,19 +40,19 @@ public:
 	/// 弾のデスフラグのゲッター
 	/// </summary>
 	/// <returns></returns>
-	bool GetIsDead() const { return isDead_; }
+	const bool& GetIsDead() const { return isDead_; }
 
 	/// <summary>
 	/// 半径のゲッター
 	/// </summary>
 	/// <returns></returns>
-	const float GetRadius() { return kRadius_; }
+	const float& GetRadius() { return kRadius_; }
 
 	/// <summary>
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetWorldPosition() { return world_.translation_; }
+	Vector3 GetWorldPosition();
 	//セッター
 
 

@@ -12,6 +12,16 @@ void Player::Initialeze(Model* model, uint32_t textureHandle) {
 	input_ = Input::GetInstance();
 }
 
+void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos) {
+	(assert(model));
+	(assert(textureHandle));
+	model_ = model;
+	textureHandle_ = textureHandle;
+	world_.Initialize();
+	input_ = Input::GetInstance();
+	world_.translation_ = pos;
+}
+
 void Player::Update() {
 
 	//デスフラグの立った弾を削除
@@ -102,16 +112,14 @@ void Player::OnCollision() {
 
 Vector3 Player::GetWorldPosition() {
 	Vector3 worldPos = {};
-	worldPos.x = world_.translation_.x;
-	worldPos.y = world_.translation_.y;
-	worldPos.z = world_.translation_.z;
+	worldPos = {world_.matWorld_.m[3][0], world_.matWorld_.m[3][1], world_.matWorld_.m[3][2]};
 	return worldPos;
 }
 
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
 		// 自キャラの座標
-		Vector3 pos = world_.translation_;
+		Vector3 pos = GetWorldPosition();
 
 		PlayerBullet* newBullet = new PlayerBullet();
 		Vector3 bulletVelocity = {0.0f, 0.0f, 1.0f};

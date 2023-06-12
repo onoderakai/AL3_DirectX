@@ -28,6 +28,14 @@ public:
 	void Initialeze(Model* model, uint32_t textureHandle);
 
 	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="model">モデル情報</param>
+	/// <param name="textureHandle">テクスチャハンドル</param>
+	/// <param name="pos">生成座標</param>
+	void Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos);
+
+	/// <summary>
 	/// 更新
 	/// </summary>
 	void Update();
@@ -61,9 +69,15 @@ public:
 	/// 半径のゲッター
 	/// </summary>
 	/// <returns></returns>
-	float GetRadius() { return radius_; }
+	const float& GetRadius() { return radius_; }
 
 	//セッター
+
+	/// <summary>
+	/// 親となるワールドトランスフォームをセット
+	/// </summary>
+	/// <param name="parent">親となるワールドトランスフォーム</param>
+	void SetParent(const WorldTransform* parent) { world_.parent_ = parent; }
 
 private:
 	//入力

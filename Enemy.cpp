@@ -60,6 +60,12 @@ void Enemy::OnCollision() {
 
 }
 
+Vector3 Enemy::GetWorldPosition() {
+	Vector3 worldPos = {};
+	worldPos = {world_.matWorld_.m[3][0], world_.matWorld_.m[3][1], world_.matWorld_.m[3][2]};
+	return worldPos;
+}
+
 void Enemy::ApproachUpdate() {
 	world_.translation_.z -= 0.3f;
 	if (world_.translation_.z < 0.0f) {

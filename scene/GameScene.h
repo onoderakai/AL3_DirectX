@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Skydome.h"
+#include "RailCamera.h"
 
 /// <summary>
 /// ゲームシーン
@@ -77,6 +78,9 @@ private: // メンバ変数
 
 	//ビュープロジェクション
 	ViewProjection viewProjection_;
+
+	//レールカメラの包含
+	RailCamera* railCamera_ = nullptr;
 
 	/// <summary>
 	/// 衝突判定

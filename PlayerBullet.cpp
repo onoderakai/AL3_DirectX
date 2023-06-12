@@ -29,5 +29,10 @@ void PlayerBullet::Draw(ViewProjection& viewProjection) {
 }
 
 void PlayerBullet::OnCollision() {
-	isDead_ = true;
+	isDead_ = true; }
+
+Vector3 PlayerBullet::GetWorldPosition() {
+	Vector3 worldPos = {};
+	worldPos = {world_.matWorld_.m[3][0], world_.matWorld_.m[3][1], world_.matWorld_.m[3][2]};
+	return worldPos;
 }

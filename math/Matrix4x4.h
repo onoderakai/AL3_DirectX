@@ -51,3 +51,10 @@ Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2);
 
 
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vector3& trans);
+
+/// <summary>
+/// 逆行列4x4
+/// </summary>
+/// <param name="matrix"></param>
+/// <returns></returns>
+Matrix4x4 Inverse(const Matrix4x4& matrix);

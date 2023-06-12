@@ -12,6 +12,7 @@ GameScene::~GameScene() {
 	delete enemy_;
 	delete enemyModel_;
 	delete skydomeModel_;
+	delete railCamera_;
 
 	delete debugCamera_;
 }
@@ -40,13 +41,14 @@ void GameScene::Initialize() {
 	// エネミーモデルの生成
 	enemyModel_ = Model::Create();
 
-	//天球のモデルを生成
+	// 天球のモデルを生成
 	skydomeModel_ = Model::CreateFromOBJ("skydome", true);
 
 	// インスタンスの生成
 	// プレイヤー
 	player_ = new Player();
-	player_->Initialeze(playerModel_, playerTextureHandle_);
+	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
+	player_->Initialeze(playerModel_, playerTextureHandle_, playerPos);
 
 	// エネミー
 	enemy_ = new Enemy();
@@ -54,9 +56,19 @@ void GameScene::Initialize() {
 	enemy_->Initialeze(enemyModel_, enemyGeneratePos_);
 	enemy_->SetPlayer(player_);
 
-	//天球
+	// 天球
 	skydome_ = new Skydome();
 	skydome_->Initialize(skydomeModel_);
+
+	// レールカメラ
+	railCamera_ = new RailCamera();
+	railCamera_->Initialize({0.0f, 0.0f, -100.0f}, {0.0f, 0.0f, 0.0f});
+
+	//親子関係を結ぶ
+	player_->SetParent(&railCamera_->GetWorldTransform());
+
+	viewProjection_.farZ = 100.0f;
+	viewProjection_.Initialize();
 }
 
 void GameScene::Update() {
@@ -73,11 +85,14 @@ void GameScene::Update() {
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 		viewProjection_.TransferMatrix();
-	} else {
-		viewProjection_.UpdateMatrix();
 	}
 #endif // _DEBUG
-
+	if (!isDebugCamera) {
+		railCamera_->Update();
+		viewProjection_.matView = railCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+		viewProjection_.TransferMatrix();
+	}
 	if (player_) {
 		player_->Update();
 	}
@@ -201,7 +216,7 @@ void GameScene::CheckAllCollision() {
 				playerBullet->OnCollision();
 				enemyBullet->OnCollision();
 			}
-		}	
+		}
 	}
 }
 
