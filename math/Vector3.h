@@ -46,3 +46,11 @@ Vector3& operator-=(Vector3& v1, const Vector3& v2);
 /// <param name="v2"></param>
 /// <returns></returns>
 Vector3 operator-(const Vector3& v1, const Vector3& v2);
+
+/// <summary>
+/// ベクトルとfloatの掛け算
+/// </summary>
+/// <param name="v"></param>
+/// <param name="value"></param>
+/// <returns></returns>
+Vector3 operator*(const Vector3& v, const float& value);

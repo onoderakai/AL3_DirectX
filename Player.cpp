@@ -1,6 +1,6 @@
 ﻿#include "Player.h"
-#include "MathUtility.h"
 #include "ImGuiManager.h"
+#include "MathUtility.h"
 #include <cassert>
 
 void Player::Initialeze(Model* model, uint32_t textureHandle) {
@@ -10,6 +10,9 @@ void Player::Initialeze(Model* model, uint32_t textureHandle) {
 	textureHandle_ = textureHandle;
 	world_.Initialize();
 	input_ = Input::GetInstance();
+
+	// 3Dレティクルの初期化
+	world3DReticle_.Initialize();
 }
 
 void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos) {
@@ -20,11 +23,14 @@ void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos
 	world_.Initialize();
 	input_ = Input::GetInstance();
 	world_.translation_ = pos;
+
+	// 3Dレティクルの初期化
+	world3DReticle_.Initialize();
 }
 
 void Player::Update() {
 
-	//デスフラグの立った弾を削除
+	// デスフラグの立った弾を削除
 	bullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->GetIsDead()) {
 			delete bullet;
@@ -33,7 +39,7 @@ void Player::Update() {
 		return false;
 	});
 
-	//移動処理
+	// 移動処理
 	Vector3 move = {};
 	const float kCharacterSpeed = 0.2f;
 	// 入力
@@ -50,11 +56,10 @@ void Player::Update() {
 	// 移動
 	world_.translation_ += move;
 
-
 	// 旋回処理
 	Vector3 rotate = {};
 	const float matRotSpeed = 0.02f;
-	//入力
+	// 入力
 	if (input_->PushKey(DIK_UP)) {
 		rotate.x = -matRotSpeed;
 	} else if (input_->PushKey(DIK_DOWN)) {
@@ -65,10 +70,10 @@ void Player::Update() {
 	} else if (input_->PushKey(DIK_LEFT)) {
 		rotate.y = -matRotSpeed;
 	}
-	//旋回
+	// 旋回
 	world_.rotation_ += rotate;
 
-	//攻撃処理
+	// 攻撃処理
 	Attack();
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Update();
@@ -82,6 +87,8 @@ void Player::Update() {
 	world_.translation_.x = min(world_.translation_.x, +moveLimitX);
 	world_.translation_.y = max(world_.translation_.y, -moveLimitY);
 	world_.translation_.y = min(world_.translation_.y, +moveLimitY);
+
+	Trans3DReticle();
 
 	world_.UpdateMatrix();
 
@@ -100,19 +107,25 @@ void Player::Update() {
 void Player::Draw(ViewProjection& viewProjection) {
 
 	model_->Draw(world_, viewProjection, textureHandle_);
-
+	model_->Draw(world3DReticle_, viewProjection);
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
 }
 
-void Player::OnCollision() {
-
-}
+void Player::OnCollision() {}
 
 Vector3 Player::GetWorldPosition() {
 	Vector3 worldPos = {};
 	worldPos = {world_.matWorld_.m[3][0], world_.matWorld_.m[3][1], world_.matWorld_.m[3][2]};
+	return worldPos;
+}
+
+Vector3 Player::Get3DReticleWorldPosition() {
+	Vector3 worldPos = {};
+	worldPos = {
+	    world3DReticle_.matWorld_.m[3][0], world3DReticle_.matWorld_.m[3][1],
+	    world3DReticle_.matWorld_.m[3][2]};
 	return worldPos;
 }
 
@@ -122,10 +135,28 @@ void Player::Attack() {
 		Vector3 pos = GetWorldPosition();
 
 		PlayerBullet* newBullet = new PlayerBullet();
-		Vector3 bulletVelocity = {0.0f, 0.0f, 1.0f};
-		bulletVelocity = TransformNormal(bulletVelocity, world_.matWorld_);
+		Vector3 bulletVelocity = Get3DReticleWorldPosition() - GetWorldPosition();
+		// 弾の移動速度
+		float bulletSpeed = 1.0f;
+		//弾の速度を正規化し速度をかける
+		bulletVelocity = Normalize(bulletVelocity) * bulletSpeed;
+
 		newBullet->Initialeze(model_, pos, bulletVelocity);
 
 		bullets_.push_back(newBullet);
 	}
+}
+
+void Player::Trans3DReticle() {
+	// 自機から3Dレティクルの距離
+	float disPlayerTo3DReticle = 50.0f;
+	//自機から3Dレティクルのオフセット
+	Vector3 offset = {0.0f, 0.0f, 1.0f};
+	//自機のワールド行列の反映
+	offset = TransformNormal(offset, world_.matWorld_);
+	//長さを整える
+	offset = Normalize(offset) * disPlayerTo3DReticle;
+
+	world3DReticle_.translation_ = GetWorldPosition() + offset;
+	world3DReticle_.UpdateMatrix();
 }

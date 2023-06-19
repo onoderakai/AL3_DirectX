@@ -65,6 +65,8 @@ public:
 	/// <returns></returns>
 	Vector3 GetWorldPosition();
 
+	Vector3 Get3DReticleWorldPosition(); 
+
 	/// <summary>
 	/// 半径のゲッター
 	/// </summary>
@@ -77,7 +79,7 @@ public:
 	/// 親となるワールドトランスフォームをセット
 	/// </summary>
 	/// <param name="parent">親となるワールドトランスフォーム</param>
-	void SetParent(const WorldTransform* parent) { world_.parent_ = parent; }
+	void SetParent(const WorldTransform* parent) { world_.parent_ = parent;}
 
 private:
 	//入力
@@ -94,9 +96,13 @@ private:
 	//弾
 	std::list<PlayerBullet*> bullets_;
 
+	//3Dレティクル
+	WorldTransform world3DReticle_;
 
 	/// <summary>
 	/// 攻撃
 	/// </summary>
 	void Attack();
+
+	void Trans3DReticle();
 };

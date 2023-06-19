@@ -46,3 +46,11 @@ Vector3 operator-(const Vector3& v1, const Vector3& v2) {
 
 	return result -= v2;
 }
+
+Vector3 operator*(const Vector3& v, const float& value) {
+	Vector3 vector = v;
+	vector.x *= value;
+	vector.y *= value;
+	vector.z *= value;
+	return vector;
+}
