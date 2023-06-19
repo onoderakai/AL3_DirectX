@@ -2,6 +2,7 @@
 #include "MathUtility.h"
 #include <cassert>
 #include "Player.h"
+#include "GameScene.h"
 
 void Enemy::Initialeze(Model* model, const Vector3& pos) {
 	(assert(model));
@@ -14,14 +15,9 @@ void Enemy::Initialeze(Model* model, const Vector3& pos) {
 }
 
 void Enemy::Update() {
-	//デスフラグがtrueの弾を削除する
-	bullets_.remove_if([](EnemyBullet* bullet) {
-		if (bullet->GetIsDead()) {
-			delete bullet;
-			return true;
-		}
-		return false;
-	});
+	if (--deathTimer_ <= 0) {
+		isDead_ = true;
+	}
 
 	switch (state_) {
 	case Enemy::AttackState::APPROACH:
@@ -40,25 +36,14 @@ void Enemy::Update() {
 		Attack();
 	}
 
-	//弾の更新処理を呼ぶ
-	for (EnemyBullet* bullet : bullets_) {
-		bullet->Update();
-	}
-
 	world_.UpdateMatrix();
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {
 	model_->Draw(world_, viewProjection, textureHandle_);
-
-	for (EnemyBullet* bullet : bullets_) {
-		bullet->Draw(viewProjection);
-	}
 }
 
-void Enemy::OnCollision() {
-
-}
+void Enemy::OnCollision() { isDead_ = true; }
 
 Vector3 Enemy::GetWorldPosition() {
 	Vector3 worldPos = {};
@@ -91,5 +76,5 @@ void Enemy::Attack() {
 	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(world_.translation_, bulletVelocity, model_);
 	// 生成した弾をリストに追加
-	bullets_.push_back(newBullet);
+	gameScene_->AddEnemyBullet(newBullet);
 }

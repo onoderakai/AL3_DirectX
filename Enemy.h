@@ -4,8 +4,9 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "EnemyBullet.h"
-#include <list>
+
 class Player;
+class GameScene;
 
 /// <summary>
 /// エネミー
@@ -15,11 +16,7 @@ public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~Enemy() {
-		for (EnemyBullet* bullet : bullets_) {
-			delete bullet;
-		}
-	}
+	//~Enemy() {}
 
 	/// <summary>
 	/// 初期化
@@ -45,12 +42,6 @@ public:
 	void OnCollision();
 	
 	/// <summary>
-	/// 弾のゲッター
-	/// </summary>
-	/// <returns></returns>
-	const std::list<EnemyBullet*>& GetBullets() { return bullets_; }
-
-	/// <summary>
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
@@ -63,10 +54,22 @@ public:
 	const float& GetRadius() { return radius_; }
 
 	/// <summary>
+	/// デスフラグのゲッター
+	/// </summary>
+	/// <returns></returns>
+	const bool& GetIsDead() { return isDead_; }
+
+	/// <summary>
 	/// プレイヤーのセッター
 	/// </summary>
 	/// <param name="player"></param>
 	void SetPlayer(Player* player) { player_ = player; }
+
+	/// <summary>
+	/// ゲームシーンのセッター
+	/// </summary>
+	/// <param name="gameScene"></param>
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 private:
 	WorldTransform world_;
@@ -102,13 +105,19 @@ private:
 	/// </summary>
 	void Attack();
 
+	//デスフラグ
+	bool isDead_ = false;
+	// デスタイマー
+	uint32_t deathTimer_ = 600;
+
 	//攻撃間隔
 	int attackInterval = 45;
 	//攻撃間隔をカウント
 	int attackCount = 0;
 
-	//弾の包含
-	std::list<EnemyBullet*> bullets_;
 	//プレイヤー
 	Player* player_ = nullptr;
+	
+	//ゲームシーン
+	GameScene* gameScene_ = nullptr;
 };

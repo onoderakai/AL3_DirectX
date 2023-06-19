@@ -9,7 +9,12 @@ GameScene::GameScene() {}
 GameScene::~GameScene() {
 	delete player_;
 	delete playerModel_;
-	delete enemy_;
+	for (Enemy* enemy : enemys_) {
+		delete enemy;
+	}
+	for (EnemyBullet* bullet : enemyBullets_) {
+		delete bullet;
+	}
 	delete enemyModel_;
 	delete skydomeModel_;
 	delete railCamera_;
@@ -51,10 +56,8 @@ void GameScene::Initialize() {
 	player_->Initialeze(playerModel_, playerTextureHandle_, playerPos);
 
 	// エネミー
-	enemy_ = new Enemy();
 	enemyGeneratePos_ = {5.0f, 3.0f, 100.0f};
-	enemy_->Initialeze(enemyModel_, enemyGeneratePos_);
-	enemy_->SetPlayer(player_);
+	AddEnemy(enemyGeneratePos_);
 
 	// 天球
 	skydome_ = new Skydome();
@@ -64,7 +67,7 @@ void GameScene::Initialize() {
 	railCamera_ = new RailCamera();
 	railCamera_->Initialize({0.0f, 0.0f, -100.0f}, {0.0f, 0.0f, 0.0f});
 
-	//親子関係を結ぶ
+	// 親子関係を結ぶ
 	player_->SetParent(&railCamera_->GetWorldTransform());
 
 	viewProjection_.farZ = 100.0f;
@@ -72,8 +75,8 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	// デバッグカメラの処理
 #ifdef _DEBUG
+	// デバッグカメラの処理
 	// デバッグカメラのアクティブ切り替え
 	if (input_->TriggerKey(DIK_B)) {
 		isDebugCamera = !isDebugCamera;
@@ -87,21 +90,60 @@ void GameScene::Update() {
 		viewProjection_.TransferMatrix();
 	}
 #endif // _DEBUG
+	railCamera_->Update();
 	if (!isDebugCamera) {
-		railCamera_->Update();
 		viewProjection_.matView = railCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
 		viewProjection_.TransferMatrix();
 	}
+
+	//敵の生成処理
+	count++;
+	if (count >= 60) {
+		count = 0;
+		AddEnemy({0.0f, 0.0f, 100.0f});
+	}
+
+	//プレイヤーの更新処理
 	if (player_) {
 		player_->Update();
 	}
-	if (enemy_) {
-		enemy_->Update();
+
+	// デスフラグがtrueの敵を削除する
+	enemys_.remove_if([](Enemy* enemy) {
+		if (enemy->GetIsDead()) {
+			delete enemy;
+			return true;
+		}
+		return false;
+	});
+
+	// 敵の更新処理を呼ぶ
+	for (Enemy* enemy : enemys_) {
+		if (enemy) {
+			enemy->Update();
+		}
 	}
+
+	// デスフラグがtrueの弾を削除する
+	enemyBullets_.remove_if([](EnemyBullet* bullet) {
+		if (bullet->GetIsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
+
+	// 弾の更新処理を呼ぶ
+	for (EnemyBullet* bullet : enemyBullets_) {
+		bullet->Update();
+	}
+
+	//天球の更新処理
 	if (skydome_) {
 		skydome_->Update();
 	}
+
 	CheckAllCollision();
 }
 
@@ -134,8 +176,13 @@ void GameScene::Draw() {
 	if (player_) {
 		player_->Draw(viewProjection_);
 	}
-	if (enemy_) {
-		enemy_->Draw(viewProjection_);
+	for (EnemyBullet* bullet : enemyBullets_) {
+		bullet->Draw(viewProjection_);
+	}
+	for (Enemy* enemy : enemys_) {
+		if (enemy) {
+			enemy->Draw(viewProjection_);
+		}
 	}
 	if (skydome_) {
 		skydome_->Draw(viewProjection_);
@@ -164,7 +211,7 @@ void GameScene::CheckAllCollision() {
 	Vector3 posB = {};
 
 	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
-	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
+	const std::list<EnemyBullet*>& enemyBullets = enemyBullets_;
 
 	// 自キャラの座標
 	posA = player_->GetWorldPosition();
@@ -184,20 +231,22 @@ void GameScene::CheckAllCollision() {
 		}
 	}
 
-	// 敵キャラの座標
-	posA = enemy_->GetWorldPosition();
-	// 敵キャラと自弾全ての当たり判定
-	for (PlayerBullet* bullet : playerBullets) {
-		// 自弾の座標
-		posB = bullet->GetWorldPosition();
+	for (Enemy* enemy : enemys_) {
+		// 敵キャラの座標
+		posA = enemy->GetWorldPosition();
+		// 敵キャラと自弾全ての当たり判定
+		for (PlayerBullet* bullet : playerBullets) {
+			// 自弾の座標
+			posB = bullet->GetWorldPosition();
 
-		// 距離を求める
-		float length = Length(posA - posB);
-		// 半径同士の足し算
-		float radius = enemy_->GetRadius() + bullet->GetRadius();
-		if (length <= radius) {
-			enemy_->OnCollision();
-			bullet->OnCollision();
+			// 距離を求める
+			float length = Length(posA - posB);
+			// 半径同士の足し算
+			float radius = enemy->GetRadius() + bullet->GetRadius();
+			if (length <= radius) {
+				enemy->OnCollision();
+				bullet->OnCollision();
+			}
 		}
 	}
 
@@ -221,3 +270,16 @@ void GameScene::CheckAllCollision() {
 }
 
 float GameScene::Length(const Vector3& v) { return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z); }
+
+void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
+	// リストに追加する
+	enemyBullets_.push_back(enemyBullet);
+}
+
+void GameScene::AddEnemy(Vector3 pos) {
+	Enemy* newEnemy = new Enemy();
+	newEnemy->Initialeze(enemyModel_, pos);
+	newEnemy->SetPlayer(player_);
+	newEnemy->SetGameScene(this);
+	enemys_.push_back(newEnemy);
+}

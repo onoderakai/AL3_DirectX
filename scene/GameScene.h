@@ -45,6 +45,18 @@ public: // メンバ関数
 	/// 描画
 	/// </summary>
 	void Draw();
+	
+	/// <summary>
+	/// 敵弾を追加する
+	/// </summary>
+	/// <param name="enemyBullet"></param>
+	void AddEnemyBullet(EnemyBullet* enemyBullet);
+
+	/// <summary>
+	/// 敵を追加する
+	/// </summary>
+	/// <param name="pos"></param>
+	void AddEnemy(Vector3 pos);
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -66,7 +78,10 @@ private: // メンバ変数
 	uint32_t playerTextureHandle_ = 0;
 
 	//エネミーを包含
-	Enemy* enemy_ = nullptr;
+	//Enemy* enemy_ = nullptr;
+	std::list<Enemy*> enemys_;
+	// 弾の包含
+	std::list<EnemyBullet*> enemyBullets_;
 	//モデル
 	Model* enemyModel_ = nullptr;
 	Vector3 enemyGeneratePos_ = {};
@@ -93,4 +108,6 @@ private: // メンバ変数
 	/// <param name="v"></param>
 	/// <returns></returns>
 	float Length(const Vector3& v);
+
+	int count = 0;
 };
