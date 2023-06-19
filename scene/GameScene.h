@@ -9,11 +9,14 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "DebugCamera.h"
+#include <sstream>
 //作成したクラスの読み込み
 #include "Player.h"
 #include "Enemy.h"
 #include "Skydome.h"
 #include "RailCamera.h"
+
+using namespace std;
 
 /// <summary>
 /// ゲームシーン
@@ -67,6 +70,12 @@ private: // メンバ変数
 	/// ゲームシーン用
 	/// </summary>
 	
+	std::stringstream enemyPopCommands;
+	//待機中のフラグ
+	bool isWait_ = false;
+	//待機中の時間
+	int32_t waitTime_ = 0;
+
 	bool isDebugCamera = false;
 	DebugCamera* debugCamera_ = nullptr;
 
@@ -109,5 +118,13 @@ private: // メンバ変数
 	/// <returns></returns>
 	float Length(const Vector3& v);
 
-	int count = 0;
+	/// <summary>
+	/// 敵の出現データを保存
+	/// </summary>
+	void LoadEnemyPopData();
+
+	/// <summary>
+	/// 敵発生コマンドの更新処理
+	/// </summary>
+	void UpdateEnemyPopCommands();
 };

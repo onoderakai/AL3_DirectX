@@ -3,6 +3,7 @@
 #include "TextureManager.h"
 #include <cassert>
 #include <cmath>
+#include <fstream>
 
 GameScene::GameScene() {}
 
@@ -72,6 +73,9 @@ void GameScene::Initialize() {
 
 	viewProjection_.farZ = 100.0f;
 	viewProjection_.Initialize();
+
+	//ファイル読み込み
+	LoadEnemyPopData();
 }
 
 void GameScene::Update() {
@@ -90,6 +94,8 @@ void GameScene::Update() {
 		viewProjection_.TransferMatrix();
 	}
 #endif // _DEBUG
+	UpdateEnemyPopCommands();
+
 	railCamera_->Update();
 	if (!isDebugCamera) {
 		viewProjection_.matView = railCamera_->GetViewProjection().matView;
@@ -97,14 +103,7 @@ void GameScene::Update() {
 		viewProjection_.TransferMatrix();
 	}
 
-	//敵の生成処理
-	count++;
-	if (count >= 60) {
-		count = 0;
-		AddEnemy({0.0f, 0.0f, 100.0f});
-	}
-
-	//プレイヤーの更新処理
+	// プレイヤーの更新処理
 	if (player_) {
 		player_->Update();
 	}
@@ -139,7 +138,7 @@ void GameScene::Update() {
 		bullet->Update();
 	}
 
-	//天球の更新処理
+	// 天球の更新処理
 	if (skydome_) {
 		skydome_->Update();
 	}
@@ -270,6 +269,72 @@ void GameScene::CheckAllCollision() {
 }
 
 float GameScene::Length(const Vector3& v) { return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z); }
+
+void GameScene::LoadEnemyPopData() {
+
+	// ファイル読み込み
+	ifstream file;
+	file.open("./Resources/enemyPop.csv");
+	assert(file.is_open());
+	// ファイルをコピー
+	enemyPopCommands << file.rdbuf();
+	// ファイルを閉じる
+	file.close();
+}
+
+void GameScene::UpdateEnemyPopCommands() {
+	//待機処理
+	if (isWait_) {
+		waitTime_--;
+		if (waitTime_ <= 0) {
+			isWait_ = false;
+		}
+		return;
+	}
+
+	//1行分の文字列を入れる変数
+	string line;
+
+	//コマンド実行ループ
+	while (getline(enemyPopCommands, line)) {
+
+		istringstream line_stream(line);
+
+		string word;
+		getline(line_stream, word, ',');
+
+		// //から始まる行はコメントのため飛ばす
+		if (word.find("//") == 0) {
+			// コメント行を飛ばす
+			continue;
+		}
+
+		if (word.find("POP") == 0) {
+			//X座標
+			getline(line_stream, word, ',');
+			float x = (float)atof(word.c_str());
+			// Y座標
+			getline(line_stream, word, ',');
+			float y = (float)atof(word.c_str());
+			// Z座標
+			getline(line_stream, word, ',');
+			float z = (float)atof(word.c_str());
+			AddEnemy({x, y, z});
+		}
+		else if (word.find("WAIT") == 0) {
+		
+			getline(line_stream, word, ',');
+
+			int32_t waitTime = atoi(word.c_str());
+
+			isWait_ = true;
+			waitTime_ = waitTime;
+
+			//コマンドループを抜ける
+			break;
+		}
+	}
+}
 
 void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 	// リストに追加する
