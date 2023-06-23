@@ -77,6 +77,9 @@ void GameScene::Initialize() {
 
 	//ファイル読み込み
 	LoadEnemyPopData();
+
+	//レティクル画像読み込み
+	TextureManager::Load("target.png");
 }
 
 void GameScene::Update() {
@@ -106,7 +109,7 @@ void GameScene::Update() {
 
 	// プレイヤーの更新処理
 	if (player_) {
-		player_->Update();
+		player_->Update(viewProjection_);
 	}
 
 	// デスフラグがtrueの敵を削除する
@@ -198,7 +201,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-
+	player_->DrawUI();
 	// スプライト描画後処理
 	Sprite::PostDraw();
 

@@ -3,6 +3,7 @@
 #include "WorldTransform.h"
 #include "Input.h"
 #include "PlayerBullet.h"
+#include "Sprite.h"
 #include <list>
 
 /// <summary>
@@ -14,18 +15,7 @@ public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~Player() {
-		for (PlayerBullet* bullet : bullets_) {
-			delete bullet;
-		}
-	}
-
-	/// <summary>
-	/// 初期化
-	/// </summary>
-	/// <param name="model">モデル情報</param>
-	/// <param name="textureHandle">テクスチャハンドル</param>
-	void Initialeze(Model* model, uint32_t textureHandle);
+	~Player();
 
 	/// <summary>
 	/// 初期化
@@ -38,13 +28,15 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(const ViewProjection& viewProjection);
 
 	/// <summary>
 	/// 描画
 	/// </summary>
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(ViewProjection& viewProjection);
+
+	void DrawUI();
 
 	/// <summary>
 	/// 当たり判定
@@ -98,6 +90,8 @@ private:
 
 	//3Dレティクル
 	WorldTransform world3DReticle_;
+	//2Dレティクル用のスプライト
+	Sprite* sprite2DReticle_ = nullptr;
 
 	/// <summary>
 	/// 攻撃
@@ -105,4 +99,6 @@ private:
 	void Attack();
 
 	void Trans3DReticle();
+
+	void WorldToScreen2DReticle(const ViewProjection& viewProjection);
 };

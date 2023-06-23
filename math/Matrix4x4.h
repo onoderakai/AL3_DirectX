@@ -43,6 +43,18 @@ Matrix4x4 MakeRotationZMatrix(float theta);
 /// <returns></returns>
 Matrix4x4 MakeTranslateMatrix(Vector3 trans);
 
+/// <summary>
+/// ビューポート行列
+/// </summary>
+/// <param name="left"></param>
+/// <param name="top"></param>
+/// <param name="width"></param>
+/// <param name="height"></param>
+/// <param name="minDepth"></param>
+/// <param name="maxDepth"></param>
+/// <returns></returns>
+Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);
+
 /// <summary>/// 代入演算子オーバーロード/// </summary>/// <param name="m1"></param>/// <param name="m2"></param>/// <returns></returns>
 Matrix4x4& operator*=(Matrix4x4& m1, const Matrix4x4& m2);
 

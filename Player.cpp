@@ -3,16 +3,11 @@
 #include "MathUtility.h"
 #include <cassert>
 
-void Player::Initialeze(Model* model, uint32_t textureHandle) {
-	(assert(model));
-	(assert(textureHandle));
-	model_ = model;
-	textureHandle_ = textureHandle;
-	world_.Initialize();
-	input_ = Input::GetInstance();
-
-	// 3Dレティクルの初期化
-	world3DReticle_.Initialize();
+Player::~Player() {
+	delete sprite2DReticle_;
+	for (PlayerBullet* bullet : bullets_) {
+		delete bullet;
+	}
 }
 
 void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos) {
@@ -26,9 +21,12 @@ void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos
 
 	// 3Dレティクルの初期化
 	world3DReticle_.Initialize();
+
+	uint32_t textureReticle = TextureManager::Load("target.png");
+	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
 }
 
-void Player::Update() {
+void Player::Update(const ViewProjection& viewProjection) {
 
 	// デスフラグの立った弾を削除
 	bullets_.remove_if([](PlayerBullet* bullet) {
@@ -89,6 +87,7 @@ void Player::Update() {
 	world_.translation_.y = min(world_.translation_.y, +moveLimitY);
 
 	Trans3DReticle();
+	WorldToScreen2DReticle(viewProjection);
 
 	world_.UpdateMatrix();
 
@@ -160,3 +159,21 @@ void Player::Trans3DReticle() {
 	world3DReticle_.translation_ = GetWorldPosition() + offset;
 	world3DReticle_.UpdateMatrix();
 }
+
+void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
+	Vector3 ReticlePos = Get3DReticleWorldPosition();
+	//ビューポート行列
+	Matrix4x4 matViewport = MakeViewportMatrix(
+		0.0f, 0.0f, float(WinApp::kWindowWidth), float(WinApp::kWindowHeight), 0.0f, 1.0f);
+
+	//ビュー行列とプロジェクション行列、ビューポート行列を合成する
+	Matrix4x4 matViewProjectionViewport =
+	    viewProjection.matView * viewProjection.matProjection * matViewport;
+
+	//ワールドからスクリーン
+	ReticlePos = Transform(ReticlePos, matViewProjectionViewport);
+
+	sprite2DReticle_->SetPosition(Vector2{ReticlePos.x, ReticlePos.y});
+}
+
+void Player::DrawUI() { sprite2DReticle_->Draw(); }
