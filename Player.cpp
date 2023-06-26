@@ -129,7 +129,11 @@ Vector3 Player::Get3DReticleWorldPosition() {
 }
 
 void Player::Attack() {
-	if (input_->TriggerKey(DIK_SPACE)) {
+	if (bulletCoolTime_ > 0) {
+		bulletCoolTime_--;
+	}
+	if (input_->PushKey(DIK_SPACE) && bulletCoolTime_ <= 0) {
+		bulletCoolTime_ = 5;
 		// 自キャラの座標
 		Vector3 pos = GetWorldPosition();
 
@@ -174,6 +178,36 @@ void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
 	ReticlePos = Transform(ReticlePos, matViewProjectionViewport);
 
 	sprite2DReticle_->SetPosition(Vector2{ReticlePos.x, ReticlePos.y});
+
+	///////マウス座標に変換/////////
+	// マウス座標
+	POINT mousePos = {};
+	GetCursorPos(&mousePos);
+	// クライアントエリア座標に変換する
+	HWND hwnd = WinApp::GetInstance()->GetHwnd();
+	ScreenToClient(hwnd, &mousePos);
+
+	sprite2DReticle_->SetPosition(Vector2{float(mousePos.x), float(mousePos.y)});
+
+	Matrix4x4 matVPV = viewProjection.matView * viewProjection.matProjection * matViewport;
+
+	Matrix4x4 matInverseVPV = Inverse(matVPV);
+
+	//スクリーン座標
+	Vector3 posNear = Vector3(float(mousePos.x), float(mousePos.y), 0.0f);
+	Vector3 posFar = Vector3(float(mousePos.x), float(mousePos.y), 1.0f);
+
+	//スクリーン座標からワールド座標に変換
+	posNear = Transform(posNear, matInverseVPV);
+	posFar = Transform(posFar, matInverseVPV);
+
+	//マウスレイの方向
+	Vector3 mouseDirection = posFar - posNear;
+	mouseDirection = Normalize(mouseDirection);
+	//カメラから照準オブジェクトの距離
+	const float kDisTestObj = 50.0f;
+	world3DReticle_.translation_ = posNear + (mouseDirection * kDisTestObj);
+	world3DReticle_.UpdateMatrix();
 }
 
 void Player::DrawUI() { sprite2DReticle_->Draw(); }

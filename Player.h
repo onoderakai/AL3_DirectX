@@ -36,6 +36,9 @@ public:
 	/// <param name="viewProjection">ビュープロジェクション</param>
 	void Draw(ViewProjection& viewProjection);
 
+	/// <summary>
+	/// UIを表示する
+	/// </summary>
 	void DrawUI();
 
 	/// <summary>
@@ -57,6 +60,10 @@ public:
 	/// <returns></returns>
 	Vector3 GetWorldPosition();
 
+	/// <summary>
+	/// 3Dレティクルのワールド座標を取得
+	/// </summary>
+	/// <returns></returns>
 	Vector3 Get3DReticleWorldPosition(); 
 
 	/// <summary>
@@ -87,18 +94,27 @@ private:
 
 	//弾
 	std::list<PlayerBullet*> bullets_;
+	//弾の発射クールタイム
+	int bulletCoolTime_ = 0;
 
 	//3Dレティクル
 	WorldTransform world3DReticle_;
 	//2Dレティクル用のスプライト
 	Sprite* sprite2DReticle_ = nullptr;
-
+	
 	/// <summary>
 	/// 攻撃
 	/// </summary>
 	void Attack();
 
+	/// <summary>
+	/// 3Dレティクルの座標をプレイヤーに追従させる
+	/// </summary>
 	void Trans3DReticle();
 
+	/// <summary>
+	/// UI画像をワールド座標からスクリーン座標に変換する
+	/// </summary>
+	/// <param name="viewProjection"></param>
 	void WorldToScreen2DReticle(const ViewProjection& viewProjection);
 };
