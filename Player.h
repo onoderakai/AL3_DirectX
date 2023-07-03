@@ -31,6 +31,12 @@ public:
 	void Update(const ViewProjection& viewProjection);
 
 	/// <summary>
+	/// 移動処理
+	/// </summary>
+	/// <param name="joyState"></param>
+	void Move(XINPUT_STATE& joyState);
+
+	/// <summary>
 	/// 描画
 	/// </summary>
 	/// <param name="viewProjection">ビュープロジェクション</param>
@@ -99,6 +105,8 @@ private:
 
 	//3Dレティクル
 	WorldTransform world3DReticle_;
+	WorldTransform world3DReticle2_;
+	WorldTransform world3DReticle3_;
 	//2Dレティクル用のスプライト
 	Sprite* sprite2DReticle_ = nullptr;
 	
@@ -113,8 +121,14 @@ private:
 	void Trans3DReticle();
 
 	/// <summary>
-	/// UI画像をワールド座標からスクリーン座標に変換する
+	/// UI画像をワールド座標からマウスのスクリーン座標に変換する
 	/// </summary>
 	/// <param name="viewProjection"></param>
 	void WorldToScreen2DReticle(const ViewProjection& viewProjection);
+
+	/// <summary>
+	/// 3Dモデルの座標をUI画像の位置に移動させる(UI画像はキーボード、ジョイスティックで移動できる)
+	/// </summary>
+	/// <param name="viewProjection"></param>
+	void ScreenToWorld2DReticle(const ViewProjection& viewProjection, XINPUT_STATE& joyState);
 };

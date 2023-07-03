@@ -12,7 +12,7 @@ void RailCamera::Initialize(Vector3 trans, Vector3 rot) {
 void RailCamera::Update() {
 
 	//world_.rotation_.z += 0.1f;
-	//world_.translation_.z += 0.1f;
+	world_.translation_.z += 0.1f;
 	ImGui::Begin("RailCamera");
 	ImGui::DragFloat3("cameraTranslate", &world_.translation_.x, 0.01f);
 	ImGui::DragFloat3("cameraRot", &world_.rotation_.x, 0.01f);
