@@ -19,6 +19,16 @@ Vector3 Normalize(const Vector3& v) {
 	return result;
 }
 
+Vector3 Lerp(const Vector3& p1, const Vector3& p2, float t) {
+	return {
+	    (1.0f - t) * p1.x + t * p2.x, (1.0f - t) * p1.y + t * p2.y, (1.0f - t) * p1.z + t * p2.z};
+}
+
+Vector3 Slerp(const Vector3& p1, const Vector3& p2, float t) {
+	return {
+	    (1.0f - t) * p1.x + t * p2.x, (1.0f - t) * p1.y + t * p2.y, (1.0f - t) * p1.z + t * p2.z};
+}
+
 Vector3& operator+=(Vector3& v1, const Vector3& v2) {
 	v1.x += v2.x;
 	v1.y += v2.y;

@@ -16,6 +16,24 @@ struct Vector3 final {
 Vector3 Normalize(const Vector3& v);
 
 /// <summary>
+/// 線形補間
+/// </summary>
+/// <param name="p1"></param>
+/// <param name="p2"></param>
+/// <param name="t"></param>
+/// <returns></returns>
+Vector3 Lerp(const Vector3& p1, const Vector3& p2, float t);
+
+/// <summary>
+/// 球面補間
+/// </summary>
+/// <param name="p1"></param>
+/// <param name="p2"></param>
+/// <param name="t"></param>
+/// <returns></returns>
+Vector3 Slerp(const Vector3& p1, const Vector3& p2, float t);
+
+/// <summary>
 /// ベクトル同士の足し算
 /// </summary>
 /// <param name="v1"></param>

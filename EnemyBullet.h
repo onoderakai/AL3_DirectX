@@ -3,6 +3,8 @@
 #include "WorldTransform.h"
 #include "ViewProjection.h"
 
+class Player;
+
 /// <summary>
 /// エネミーバレット
 /// </summary>
@@ -34,7 +36,13 @@ public:
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	const Vector3& GetWorldPosition() { return world_.translation_; }
+	Vector3 GetWorldPosition();
+
+	/// <summary>
+	/// プレイヤーのセッター
+	/// </summary>
+	/// <param name="player"></param>
+	void SetPlayer(Player* player) { player_ = player; }
 
 private:
 	WorldTransform world_;
@@ -42,10 +50,13 @@ private:
 	uint32_t textureHandle_ = 0;
 	Vector3 velocity_;
 
+	//プレイヤーの包含
+	Player* player_ = nullptr;
+
 	//弾の半径
 	const float kRadius_ = 1.0f;
 	//弾の寿命
-	const int kLifeTime = 60 * 2;
+	const int kLifeTime = 60 * 20;
 	//デスタイマー
 	int deathTimer_ = kLifeTime;
 	//デスフラグ

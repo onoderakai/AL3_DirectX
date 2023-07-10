@@ -75,6 +75,7 @@ void Enemy::Attack() {
 	//弾を生成
 	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(world_.translation_, bulletVelocity, model_);
+	newBullet->SetPlayer(player_);
 	// 生成した弾をリストに追加
 	gameScene_->AddEnemyBullet(newBullet);
 }
