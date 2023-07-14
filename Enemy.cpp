@@ -1,8 +1,8 @@
 ﻿#include "Enemy.h"
-#include "MathUtility.h"
-#include <cassert>
-#include "Player.h"
 #include "GameScene.h"
+#include "MathUtility.h"
+#include "Player.h"
+#include <cassert>
 
 void Enemy::Initialeze(Model* model, const Vector3& pos) {
 	(assert(model));
@@ -19,21 +19,42 @@ void Enemy::Update() {
 		isDead_ = true;
 	}
 
+	// デスフラグがtrueのTimeCallを削除する
+	timeCalls_.remove_if([](TimeCall* timeCall) {
+		if (timeCall->IsFinished()) {
+			delete timeCall;
+			return true;
+		}
+		return false;
+	});
+
+	for (TimeCall* timeCall : timeCalls_) {
+		timeCall->Update();
+	}
+
 	switch (state_) {
 	case Enemy::AttackState::APPROACH:
 		ApproachUpdate();
 		break;
 	case Enemy::AttackState::LEAVE:
 		LeaveUpdate();
+		timeCalls_.remove_if([](TimeCall* timeCall) {
+			delete timeCall;
+			return true;
+		});
 		break;
 	default:
 		break;
 	}
 
-	//攻撃処理
-	if (++attackCount >= attackInterval) {
-		attackCount = 0;
-		Attack();
+	////攻撃処理
+	// if (++attackCount >= attackInterval) {
+	//	attackCount = 0;
+	//	Attack();
+	// }
+	if (!test) {
+		test = true;
+		AttackReset();
 	}
 
 	world_.UpdateMatrix();
@@ -65,17 +86,25 @@ void Enemy::Attack() {
 	assert(player_);
 	Vector3 bulletVelocity = player_->GetWorldPosition() - world_.translation_;
 	bulletVelocity = Normalize(bulletVelocity);
-	//弾の移動速度
+	// 弾の移動速度
 	float bulletSpeed = 1.0f;
 	bulletVelocity.x *= bulletSpeed;
 	bulletVelocity.y *= bulletSpeed;
 	bulletVelocity.z *= bulletSpeed;
-	//bulletVelocity = TransformNormal(bulletVelocity, world_.matWorld_);
-	
-	//弾を生成
+	// bulletVelocity = TransformNormal(bulletVelocity, world_.matWorld_);
+
+	// 弾を生成
 	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(world_.translation_, bulletVelocity, model_);
 	newBullet->SetPlayer(player_);
 	// 生成した弾をリストに追加
 	gameScene_->AddEnemyBullet(newBullet);
+}
+
+void Enemy::AttackReset() {
+	// 弾を発射する
+	Attack();
+
+	// 発射タイマーをセットする
+	timeCalls_.push_back(new TimeCall(bind(&Enemy::AttackReset, this), attackInterval));
 }

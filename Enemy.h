@@ -4,6 +4,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "EnemyBullet.h"
+#include "TimeCall.h"
 
 class Player;
 class GameScene;
@@ -16,7 +17,12 @@ public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	//~Enemy() {}
+	~Enemy() {
+		timeCalls_.remove_if([](TimeCall* timeCall) {
+			delete timeCall;
+			return true;
+		});
+	}
 
 	/// <summary>
 	/// 初期化
@@ -105,6 +111,11 @@ private:
 	/// </summary>
 	void Attack();
 
+	/// <summary>
+	/// 弾を発射して発射クールタイムをリセットする
+	/// </summary>
+	void AttackReset();
+
 	//デスフラグ
 	bool isDead_ = false;
 	// デスタイマー
@@ -120,4 +131,8 @@ private:
 	
 	//ゲームシーン
 	GameScene* gameScene_ = nullptr;
+
+	//時限発動のリスト
+	list<TimeCall*> timeCalls_;
+	bool test = false;
 };
