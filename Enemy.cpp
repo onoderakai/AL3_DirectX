@@ -40,10 +40,7 @@ void Enemy::Update() {
 		break;
 	case Enemy::AttackState::LEAVE:
 		LeaveUpdate();
-		timeCalls_.remove_if([](TimeCall* timeCall) {
-			delete timeCall;
-			return true;
-		});
+		timeCalls_.clear();
 		break;
 	default:
 		break;

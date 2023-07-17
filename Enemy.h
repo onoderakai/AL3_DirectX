@@ -17,11 +17,7 @@ public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~Enemy() {
-		timeCalls_.remove_if([](TimeCall* timeCall) {
-			delete timeCall;
-			return true;
-		});
+	~Enemy() { timeCalls_.clear();
 	}
 
 	/// <summary>
