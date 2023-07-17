@@ -123,9 +123,7 @@ private:
 
 	//攻撃間隔
 	int attackInterval = 45;
-	//攻撃間隔をカウント
-	int attackCount = 0;
-
+	
 	//プレイヤー
 	Player* player_ = nullptr;
 	
@@ -134,5 +132,4 @@ private:
 
 	//時限発動のリスト
 	list<TimeCall*> timeCalls_;
-	bool test = false;
 };

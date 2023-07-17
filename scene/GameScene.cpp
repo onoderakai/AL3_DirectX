@@ -347,8 +347,8 @@ void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 
 void GameScene::AddEnemy(Vector3 pos) {
 	Enemy* newEnemy = new Enemy();
-	newEnemy->Initialeze(enemyModel_, pos);
 	newEnemy->SetPlayer(player_);
 	newEnemy->SetGameScene(this);
+	newEnemy->Initialeze(enemyModel_, pos);
 	enemys_.push_back(newEnemy);
 }

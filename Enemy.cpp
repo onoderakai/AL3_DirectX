@@ -12,6 +12,8 @@ void Enemy::Initialeze(Model* model, const Vector3& pos) {
 	world_.Initialize();
 	world_.translation_ = pos;
 	velocity_ = {-0.3f, 0.3f, 0.0f};
+
+	AttackReset();
 }
 
 void Enemy::Update() {
@@ -52,10 +54,6 @@ void Enemy::Update() {
 	//	attackCount = 0;
 	//	Attack();
 	// }
-	if (!test) {
-		test = true;
-		AttackReset();
-	}
 
 	world_.UpdateMatrix();
 }
