@@ -5,11 +5,12 @@
 #include "PlayerBullet.h"
 #include "Sprite.h"
 #include <list>
+#include "Collider.h"
 
 /// <summary>
 /// 自キャラ
 /// </summary>
-class Player {
+class Player : public Collider{
 public:
 
 	/// <summary>
@@ -50,7 +51,7 @@ public:
 	/// <summary>
 	/// 当たり判定
 	/// </summary>
-	void OnCollision();
+	void OnCollision() override;
 	
 	//ゲッター
 	
@@ -64,7 +65,7 @@ public:
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	/// <summary>
 	/// 3Dレティクルのワールド座標を取得

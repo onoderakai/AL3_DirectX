@@ -5,6 +5,7 @@
 #include "WorldTransform.h"
 #include "EnemyBullet.h"
 #include "TimeCall.h"
+#include "Collider.h"
 
 class Player;
 class GameScene;
@@ -12,7 +13,7 @@ class GameScene;
 /// <summary>
 /// エネミー
 /// </summary>
-class Enemy {
+class Enemy : public Collider{
 public:
 	/// <summary>
 	/// デストラクタ
@@ -47,7 +48,7 @@ public:
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	/// <summary>
 	/// 半径のゲッター

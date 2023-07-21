@@ -129,8 +129,6 @@ void Player::Draw(ViewProjection& viewProjection) {
 	}
 }
 
-void Player::OnCollision() {}
-
 Vector3 Player::GetWorldPosition() {
 	Vector3 worldPos = {};
 	worldPos = {world_.matWorld_.m[3][0], world_.matWorld_.m[3][1], world_.matWorld_.m[3][2]};
@@ -294,3 +292,5 @@ void Player::ScreenToWorld2DReticle(const ViewProjection& viewProjection, XINPUT
 }
 
 void Player::DrawUI() { sprite2DReticle_->Draw(); }
+
+void Player::OnCollision() {}

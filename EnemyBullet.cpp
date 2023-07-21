@@ -57,7 +57,7 @@ void EnemyBullet::Draw(ViewProjection& viewProjection) {
 }
 
 void EnemyBullet::OnCollision() {
-	//isDead_ = true;
+	isDead_ = true;
 }
 
 Vector3 EnemyBullet::GetWorldPosition() {

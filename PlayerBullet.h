@@ -3,11 +3,12 @@
 #include "Vector3.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "Collider.h"
 
 /// <summary>
 /// プレイヤーの弾
 /// </summary>
-class PlayerBullet {
+class PlayerBullet : public Collider {
 public:
 	/// <summary>
 	/// 初期化
@@ -52,7 +53,7 @@ public:
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 	//セッター
 
 

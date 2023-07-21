@@ -2,13 +2,14 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "ViewProjection.h"
+#include "Collider.h"
 
 class Player;
 
 /// <summary>
 /// エネミーバレット
 /// </summary>
-class EnemyBullet {
+class EnemyBullet : public Collider {
 public:
 	void Initialize(const Vector3& pos, const Vector3& velocity, Model* model);
 	void Update();
@@ -36,7 +37,7 @@ public:
 	/// 座標のゲッター
 	/// </summary>
 	/// <returns></returns>
-	Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition() override;
 
 	/// <summary>
 	/// プレイヤーのセッター

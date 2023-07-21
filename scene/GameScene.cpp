@@ -221,17 +221,18 @@ void GameScene::CheckAllCollision() {
 
 	// 自キャラと敵弾全ての当たり判定
 	for (EnemyBullet* bullet : enemyBullets) {
-		// 敵弾の座標
-		posB = bullet->GetWorldPosition();
+		//// 敵弾の座標
+		//posB = bullet->GetWorldPosition();
 
-		// 距離を求める
-		float length = Length(posA - posB);
-		// 半径同士の足し算
-		float radius = player_->GetRadius() + bullet->GetRadius();
-		if (length <= radius) {
-			player_->OnCollision();
-			bullet->OnCollision();
-		}
+		//// 距離を求める
+		//float length = Length(posA - posB);
+		//// 半径同士の足し算
+		//float radius = player_->GetRadius() + bullet->GetRadius();
+		//if (length <= radius) {
+		//	player_->OnCollision();
+		//	bullet->OnCollision();
+		//}
+		CheckCollisionPair(player_, bullet);
 	}
 
 	for (Enemy* enemy : enemys_) {
@@ -239,17 +240,18 @@ void GameScene::CheckAllCollision() {
 		posA = enemy->GetWorldPosition();
 		// 敵キャラと自弾全ての当たり判定
 		for (PlayerBullet* bullet : playerBullets) {
-			// 自弾の座標
-			posB = bullet->GetWorldPosition();
+			//// 自弾の座標
+			//posB = bullet->GetWorldPosition();
 
-			// 距離を求める
-			float length = Length(posA - posB);
-			// 半径同士の足し算
-			float radius = enemy->GetRadius() + bullet->GetRadius();
-			if (length <= radius) {
-				enemy->OnCollision();
-				bullet->OnCollision();
-			}
+			//// 距離を求める
+			//float length = Length(posA - posB);
+			//// 半径同士の足し算
+			//float radius = enemy->GetRadius() + bullet->GetRadius();
+			//if (length <= radius) {
+			//	enemy->OnCollision();
+			//	bullet->OnCollision();
+			//}
+			CheckCollisionPair(enemy, bullet);
 		}
 	}
 
@@ -258,17 +260,33 @@ void GameScene::CheckAllCollision() {
 		// 自弾の座標
 		posA = playerBullet->GetWorldPosition();
 		for (EnemyBullet* enemyBullet : enemyBullets) {
-			// 敵弾の座標
-			posB = enemyBullet->GetWorldPosition();
-			// 距離を求める
-			float length = Length(posA - posB);
-			// 半径同士の足し算
-			float radius = playerBullet->GetRadius() + enemyBullet->GetRadius();
-			if (length <= radius) {
-				playerBullet->OnCollision();
-				enemyBullet->OnCollision();
-			}
+			//// 敵弾の座標
+			//posB = enemyBullet->GetWorldPosition();
+			//// 距離を求める
+			//float length = Length(posA - posB);
+			//// 半径同士の足し算
+			//float radius = playerBullet->GetRadius() + enemyBullet->GetRadius();
+			//if (length <= radius) {
+			//	playerBullet->OnCollision();
+			//	enemyBullet->OnCollision();
+			//}
+			CheckCollisionPair(playerBullet, enemyBullet);
 		}
+	}
+}
+
+void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
+	//座標の保存
+	Vector3 posA = colliderA->GetWorldPosition();
+	Vector3 posB = colliderB->GetWorldPosition();
+
+	// 距離を求める
+	float length = Length(posA - posB);
+	// 半径同士の足し算
+	float radius = colliderA->GetRadius() + colliderB->GetRadius();
+	if (length <= radius) {
+		colliderA->OnCollision();
+		colliderB->OnCollision();
 	}
 }
 

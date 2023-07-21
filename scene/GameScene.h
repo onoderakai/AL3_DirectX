@@ -112,6 +112,13 @@ private: // メンバ変数
 	void CheckAllCollision();
 
 	/// <summary>
+	/// コライダー2つの衝突判定と応答
+	/// </summary>
+	/// <param name="colliderA"></param>
+	/// <param name="colliderB"></param>
+	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
+
+	/// <summary>
 	/// ベクトルの距離を求める
 	/// </summary>
 	/// <param name="v"></param>
