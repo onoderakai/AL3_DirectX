@@ -75,10 +75,10 @@ void GameScene::Initialize() {
 	viewProjection_.farZ = 100.0f;
 	viewProjection_.Initialize();
 
-	//ファイル読み込み
+	// ファイル読み込み
 	LoadEnemyPopData();
 
-	//レティクル画像読み込み
+	// レティクル画像読み込み
 	TextureManager::Load("target.png");
 }
 
@@ -209,6 +209,42 @@ void GameScene::Draw() {
 }
 
 void GameScene::CheckAllCollision() {
+	//// 自弾リストの取得
+	//const list<PlayerBullet*> pBullets = player_->GetBullets();
+	//const list<EnemyBullet*> eBullets = enemyBullets_;
+
+	//// コライダー
+	//list<Collider*> colliders;
+
+	//colliders.push_back(player_);
+
+	//for (Enemy* enemy : enemys_) {
+	//	colliders.push_back(enemy);
+	//}
+
+	//for (PlayerBullet* playerBullet : player_->GetBullets()) {
+	//	colliders.push_back(playerBullet);
+	//}
+	//for (EnemyBullet* enemyBullet : enemyBullets_) {
+	//	colliders.push_back(enemyBullet);
+	//}
+
+	//list<Collider*>::iterator itrA = colliders.begin();
+	//for (; itrA != colliders.end(); itrA++) {
+	//	Collider* A = *itrA;
+	//	list<Collider*>::iterator itrB = itrA;
+	//	itrB++;
+	//	for (; itrB != colliders.end(); itrB++) {
+	//		Collider* B = *itrB;
+	//		CheckCollisionPair(A, B);
+	//	}
+	//}
+
+	
+
+
+
+
 	// 判定対象の座標
 	Vector3 posA = {};
 	Vector3 posB = {};
@@ -221,17 +257,6 @@ void GameScene::CheckAllCollision() {
 
 	// 自キャラと敵弾全ての当たり判定
 	for (EnemyBullet* bullet : enemyBullets) {
-		//// 敵弾の座標
-		//posB = bullet->GetWorldPosition();
-
-		//// 距離を求める
-		//float length = Length(posA - posB);
-		//// 半径同士の足し算
-		//float radius = player_->GetRadius() + bullet->GetRadius();
-		//if (length <= radius) {
-		//	player_->OnCollision();
-		//	bullet->OnCollision();
-		//}
 		CheckCollisionPair(player_, bullet);
 	}
 
@@ -240,17 +265,6 @@ void GameScene::CheckAllCollision() {
 		posA = enemy->GetWorldPosition();
 		// 敵キャラと自弾全ての当たり判定
 		for (PlayerBullet* bullet : playerBullets) {
-			//// 自弾の座標
-			//posB = bullet->GetWorldPosition();
-
-			//// 距離を求める
-			//float length = Length(posA - posB);
-			//// 半径同士の足し算
-			//float radius = enemy->GetRadius() + bullet->GetRadius();
-			//if (length <= radius) {
-			//	enemy->OnCollision();
-			//	bullet->OnCollision();
-			//}
 			CheckCollisionPair(enemy, bullet);
 		}
 	}
@@ -260,23 +274,19 @@ void GameScene::CheckAllCollision() {
 		// 自弾の座標
 		posA = playerBullet->GetWorldPosition();
 		for (EnemyBullet* enemyBullet : enemyBullets) {
-			//// 敵弾の座標
-			//posB = enemyBullet->GetWorldPosition();
-			//// 距離を求める
-			//float length = Length(posA - posB);
-			//// 半径同士の足し算
-			//float radius = playerBullet->GetRadius() + enemyBullet->GetRadius();
-			//if (length <= radius) {
-			//	playerBullet->OnCollision();
-			//	enemyBullet->OnCollision();
-			//}
 			CheckCollisionPair(playerBullet, enemyBullet);
 		}
 	}
 }
 
 void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
-	//座標の保存
+	//// 衝突フィルタリング
+	//if ((colliderA->GetCollisionAttribute() != colliderB->GetCollisionMask()) ||
+	//    (colliderB->GetCollisionAttribute() != colliderA->GetCollisionMask())) {
+	//	return;
+	//}
+
+	// 座標の保存
 	Vector3 posA = colliderA->GetWorldPosition();
 	Vector3 posB = colliderB->GetWorldPosition();
 
@@ -305,7 +315,7 @@ void GameScene::LoadEnemyPopData() {
 }
 
 void GameScene::UpdateEnemyPopCommands() {
-	//待機処理
+	// 待機処理
 	if (isWait_) {
 		waitTime_--;
 		if (waitTime_ <= 0) {
@@ -314,10 +324,10 @@ void GameScene::UpdateEnemyPopCommands() {
 		return;
 	}
 
-	//1行分の文字列を入れる変数
+	// 1行分の文字列を入れる変数
 	string line;
 
-	//コマンド実行ループ
+	// コマンド実行ループ
 	while (getline(enemyPopCommands, line)) {
 
 		istringstream line_stream(line);
@@ -332,7 +342,7 @@ void GameScene::UpdateEnemyPopCommands() {
 		}
 
 		if (word.find("POP") == 0) {
-			//X座標
+			// X座標
 			getline(line_stream, word, ',');
 			float x = (float)atof(word.c_str());
 			// Y座標
@@ -342,9 +352,8 @@ void GameScene::UpdateEnemyPopCommands() {
 			getline(line_stream, word, ',');
 			float z = (float)atof(word.c_str());
 			AddEnemy({x, y, z});
-		}
-		else if (word.find("WAIT") == 0) {
-		
+		} else if (word.find("WAIT") == 0) {
+
 			getline(line_stream, word, ',');
 
 			int32_t waitTime = atoi(word.c_str());
@@ -352,7 +361,7 @@ void GameScene::UpdateEnemyPopCommands() {
 			isWait_ = true;
 			waitTime_ = waitTime;
 
-			//コマンドループを抜ける
+			// コマンドループを抜ける
 			break;
 		}
 	}

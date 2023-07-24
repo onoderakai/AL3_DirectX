@@ -1,6 +1,7 @@
 ﻿#include "Player.h"
 #include "ImGuiManager.h"
 #include "MathUtility.h"
+#include "CollisionConfig.h"
 #include <cassert>
 
 Player::~Player() {
@@ -26,6 +27,9 @@ void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos
 
 	uint32_t textureReticle = TextureManager::Load("target.png");
 	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+
+	SetCollisonAttribute(kConllisionAttributePlayer);
+	SetCollisonMask(0xffffffff - kConllisionAttributePlayer);
 }
 
 void Player::Update(const ViewProjection& viewProjection) {
