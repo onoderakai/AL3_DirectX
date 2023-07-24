@@ -2,6 +2,7 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "WorldTransform.h"
+#include <cstdint>
 
 /// <summary>
 /// 衝突判定

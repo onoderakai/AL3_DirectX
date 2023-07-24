@@ -280,11 +280,11 @@ void GameScene::CheckAllCollision() {
 }
 
 void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
-	//// 衝突フィルタリング
-	//if ((colliderA->GetCollisionAttribute() != colliderB->GetCollisionMask()) ||
-	//    (colliderB->GetCollisionAttribute() != colliderA->GetCollisionMask())) {
-	//	return;
-	//}
+	// 衝突フィルタリング
+	if ((colliderA->GetCollisionAttribute() != colliderB->GetCollisionMask()) ||
+	    (colliderB->GetCollisionAttribute() != colliderA->GetCollisionMask())) {
+		return;
+	}
 
 	// 座標の保存
 	Vector3 posA = colliderA->GetWorldPosition();
