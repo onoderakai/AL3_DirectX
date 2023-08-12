@@ -15,6 +15,9 @@
 #include "Enemy.h"
 #include "Skydome.h"
 #include "RailCamera.h"
+#include "Title.h"
+#include "Stage.h"
+#include "Scene.h"
 
 using namespace std;
 
@@ -70,6 +73,12 @@ private: // メンバ変数
 	/// ゲームシーン用
 	/// </summary>
 	
+	//シーン関連
+	SceneNum scene_ = SceneNum::TITLE;
+	Title* title_ = nullptr;
+	Stage* stage_ = nullptr;
+
+
 	std::stringstream enemyPopCommands;
 	//待機中のフラグ
 	bool isWait_ = false;

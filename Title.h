@@ -1,10 +1,13 @@
 ﻿#pragma once
+#include "Scene.h"
+#include "Input.h"
+
 class Title {
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize(SceneNum* pScene);
 
 
 	/// <summary>
@@ -19,5 +22,6 @@ public:
 	void Draw();
 
 private:
-
+	Input* input_ = nullptr;
+	SceneNum* pScene_;
 };
