@@ -57,4 +57,4 @@ SceneChange::SceneChange() {
 	loadingSprite_->SetColor(color);
 }
 
-SceneChange::~SceneChange() {}
+SceneChange::~SceneChange() { delete loadingSprite_; }
