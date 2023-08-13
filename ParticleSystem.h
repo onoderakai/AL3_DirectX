@@ -1,11 +1,10 @@
 ﻿#pragma once
-#include "Particle.h"
 #include "Model.h"
+#include "Particle.h"
 #include <list>
 
 class ParticleSystem {
 public:
-
 	~ParticleSystem();
 
 	void Initialize();
@@ -14,14 +13,14 @@ public:
 
 	void Draw(const ViewProjection& view);
 
-	void AddParticle();
-
-	void Generate(uint32_t howMany);
+	void Generate(Particle::Parameter parameter, uint32_t howMany);
 
 private:
-	//パーティクルの包含
+	// パーティクルの包含
 	std::list<Particle*> particles_;
 
-	//パーティクルのモデル
+	// パーティクルのモデル
 	Model* particleModel_ = nullptr;
+
+	void AddParticle(Particle::Parameter parameter);
 };

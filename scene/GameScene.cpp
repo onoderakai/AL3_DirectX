@@ -9,6 +9,7 @@
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
+	delete particleSystem_;
 	delete player_;
 	delete playerModel_;
 	for (Enemy* enemy : enemys_) {
@@ -42,6 +43,10 @@ void GameScene::Initialize() {
 
 	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
+
+	// パーティクルシステムの生成
+	particleSystem_ = new ParticleSystem();
+	particleSystem_->Initialize();
 
 	// プレイヤーモデルの生成
 	playerModel_ = Model::Create();
@@ -163,6 +168,9 @@ void GameScene::Update() {
 			skydome_->Update();
 		}
 
+		//パーティクルシステムの更新処理
+		particleSystem_->Update();
+
 		CheckAllCollision();
 		break;
 	default:
@@ -217,6 +225,7 @@ void GameScene::Draw() {
 		if (skydome_) {
 			skydome_->Draw(viewProjection_);
 		}
+		particleSystem_->Draw(viewProjection_);
 		break;
 	default:
 		break;
@@ -416,6 +425,7 @@ void GameScene::AddEnemy(Vector3 pos) {
 	Enemy* newEnemy = new Enemy();
 	newEnemy->SetPlayer(player_);
 	newEnemy->SetGameScene(this);
+	newEnemy->SetParticleSystem(particleSystem_);
 	newEnemy->Initialeze(enemyModel_, pos);
 	enemys_.push_back(newEnemy);
 }

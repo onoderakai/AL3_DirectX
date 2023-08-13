@@ -3,26 +3,33 @@
 #include "TextureManager.h"
 #include <cassert>
 
-void Particle::Initialize(
-    const Vector3& pos, const Vector3& velocity, Type particleType, uint32_t textureHandle, Model* model) {
+void Particle::Initialize(Parameter parameter, uint32_t textureHandle, Model* model) {
 	assert(model);
 	model_ = model;
 	textureHandle_ = textureHandle;
-	type_ = particleType;
-	world_.Initialize();
-	world_.translation_ = pos;
-	velocity_ = velocity;
+	parameter_.type_ = parameter.type_;
+	parameter_.world_.Initialize();
+	parameter_.world_.translation_ = parameter.world_.translation_;
+	parameter_.velocity_ = parameter.velocity_;
 }
 
-void Particle::Initialize(Model* model) {
+void Particle::Initialize(Parameter parameter, Model* model) {
 	assert(model);
 	model_ = model;
 	textureHandle_ = TextureManager::Load("white1x1.png");
-	velocity_.x = 1.0f;
+	parameter_.type_ = parameter.type_;
+	parameter_.world_.Initialize();
+	parameter_.world_.translation_ = parameter.world_.translation_;
+	parameter_.velocity_ = parameter.velocity_;
 }
 
 void Particle::Update() {
-	switch (type_) {
+	//デスタイマーの計測
+	if (--parameter_.deathTimer_ <= 0) {
+		isDead_ = true;
+	}
+
+	switch (parameter_.type_) {
 	case Particle::Type::CIRCLE:
 		TypeCircleUpdate();
 		break;
@@ -32,11 +39,13 @@ void Particle::Update() {
 	default:
 		break;
 	}
-	world_.UpdateMatrix();
+	parameter_.world_.UpdateMatrix();
 }
 
-void Particle::Draw(const ViewProjection& view) { model_->Draw(world_, view, textureHandle_); }
+void Particle::Draw(const ViewProjection& view) {
+	model_->Draw(parameter_.world_, view, textureHandle_);
+}
 
-void Particle::TypeCircleUpdate() { world_.translation_ += velocity_; }
+void Particle::TypeCircleUpdate() { parameter_.world_.translation_ += parameter_.velocity_; }
 
-void Particle::TypeSphereUpdate() { world_.translation_ += velocity_; }
+void Particle::TypeSphereUpdate() { parameter_.world_.translation_ += parameter_.velocity_; }

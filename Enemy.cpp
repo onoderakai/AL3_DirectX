@@ -13,7 +13,7 @@ void Enemy::Initialeze(Model* model, const Vector3& pos) {
 	world_.translation_ = pos;
 	velocity_ = {-0.3f, 0.3f, 0.0f};
 
-	AttackReset();
+	//AttackReset();
 }
 
 void Enemy::Update() {
@@ -46,12 +46,6 @@ void Enemy::Update() {
 		break;
 	}
 
-	////攻撃処理
-	// if (++attackCount >= attackInterval) {
-	//	attackCount = 0;
-	//	Attack();
-	// }
-
 	world_.UpdateMatrix();
 }
 
@@ -59,7 +53,12 @@ void Enemy::Draw(ViewProjection& viewProjection) {
 	model_->Draw(world_, viewProjection, textureHandle_);
 }
 
-void Enemy::OnCollision() { isDead_ = true; }
+void Enemy::OnCollision() {
+	Particle::Parameter para = {};
+	para.world_.translation_ = GetWorldPosition();
+	particleSystem_->Generate(para, 10);
+	isDead_ = true;
+}
 
 Vector3 Enemy::GetWorldPosition() {
 	Vector3 worldPos = {};

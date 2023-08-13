@@ -9,27 +9,42 @@ public:
 		Sphere
 	};
 
-	void Initialize(const Vector3& pos, const Vector3& velocity,Type particleType, uint32_t textureHandle, Model* model);
+	struct Parameter {
+		// パーティクルの種類
+		Type type_;
+		// 座標
+		WorldTransform world_;
+		// 速度
+		Vector3 velocity_ = {};
+		//デスタイム
+		uint32_t deathTimer_ = 60;
+	};
 
-	void Initialize(Model* model);
+	void Initialize(Parameter parameter, uint32_t textureHandle, Model* model);
+
+	void Initialize(Parameter parameter,  Model* model);
 
 	void Update();
 
 	void Draw(const ViewProjection& view);
 
+	/// <summary>
+	/// デスフラグのゲッター
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsDead() { return isDead_; }
+
 private:
-	//パーティクルの種類
-	Type type_;
+	//パラメーター
+	Parameter parameter_ = {};
 
 	//モデル
 	Model* model_ = nullptr;
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0;
-	//座標
-	WorldTransform world_;
 
-	//速度
-	Vector3 velocity_ = {};
+	//パーティクルのデスフラグ
+	bool isDead_ = false;
 
 	void TypeCircleUpdate();
 

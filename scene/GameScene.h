@@ -18,6 +18,7 @@
 #include "Title.h"
 #include "Stage.h"
 #include "Scene.h"
+#include "ParticleSystem.h"
 
 using namespace std;
 
@@ -114,6 +115,10 @@ private: // メンバ変数
 
 	//レールカメラの包含
 	RailCamera* railCamera_ = nullptr;
+
+	// パーティクルシステムの包含
+	ParticleSystem* particleSystem_ = nullptr;
+
 
 	/// <summary>
 	/// 衝突判定

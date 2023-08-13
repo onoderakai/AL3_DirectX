@@ -1,24 +1,26 @@
 ﻿#pragma once
+#include "Collider.h"
+#include "EnemyBullet.h"
 #include "Model.h"
+#include "TimeCall.h"
 #include "Vector3.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "EnemyBullet.h"
-#include "TimeCall.h"
-#include "Collider.h"
 
 class Player;
 class GameScene;
+class ParticleSystem;
 
 /// <summary>
 /// エネミー
 /// </summary>
-class Enemy : public Collider{
+class Enemy : public Collider {
 public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~Enemy() { timeCalls_.clear();
+	~Enemy() {
+		timeCalls_.clear();
 	}
 
 	/// <summary>
@@ -43,7 +45,7 @@ public:
 	/// 当たり判定
 	/// </summary>
 	void OnCollision();
-	
+
 	/// <summary>
 	/// 座標のゲッター
 	/// </summary>
@@ -73,11 +75,21 @@ public:
 	/// </summary>
 	/// <param name="gameScene"></param>
 	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
+	
+	/// <summary>
+	/// パーティクルシステムのセッター
+	/// </summary>
+	/// <param name="gameScene"></param>
+	void SetParticleSystem(ParticleSystem* particleSystem) { particleSystem_ = particleSystem; }
 
 private:
+	// 座標
 	WorldTransform world_;
+	// モデル
 	Model* model_ = nullptr;
+	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
+	// 半径
 	float radius_ = 1.0f;
 
 	Vector3 velocity_ = {};
@@ -85,10 +97,7 @@ private:
 	/// <summary>
 	/// 攻撃の状態
 	/// </summary>
-	enum class AttackState {
-		APPROACH,
-		LEAVE
-	};
+	enum class AttackState { APPROACH, LEAVE };
 
 	/// <summary>
 	/// 接近状態の更新処理
@@ -100,7 +109,7 @@ private:
 	/// </summary>
 	void LeaveUpdate();
 
-	//攻撃
+	// 攻撃
 	AttackState state_ = AttackState::APPROACH;
 
 	/// <summary>
@@ -113,20 +122,23 @@ private:
 	/// </summary>
 	void AttackReset();
 
-	//デスフラグ
+	// デスフラグ
 	bool isDead_ = false;
 	// デスタイマー
 	uint32_t deathTimer_ = 600;
 
-	//攻撃間隔
+	// 攻撃間隔
 	int attackInterval = 45;
-	
-	//プレイヤー
+
+	// プレイヤー
 	Player* player_ = nullptr;
-	
-	//ゲームシーン
+
+	// ゲームシーン
 	GameScene* gameScene_ = nullptr;
 
-	//時限発動のリスト
+	//パーティクルシステム
+	ParticleSystem* particleSystem_ = nullptr;
+
+	// 時限発動のリスト
 	list<TimeCall*> timeCalls_;
 };
