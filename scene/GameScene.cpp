@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <fstream>
+#include "ImGuiManager.h"
 
 GameScene::GameScene() {}
 
@@ -365,6 +366,21 @@ void GameScene::LoadEnemyPopData() {
 
 void GameScene::UpdateEnemyPopCommands() {
 	// 待機処理
+	if (isDefeat_) {
+		uint32_t enemyCount = 0;
+		for (Enemy* enemy : enemys_) {
+			enemy;
+			enemyCount++;
+		}
+		ImGui::Begin("enemyCount");
+		ImGui::Text("%d", enemyCount);
+		ImGui::End();
+		if (enemyCount <= 0) {
+			isDefeat_ = false;
+		}
+		return;
+	}
+
 	if (isWait_) {
 		waitTime_--;
 		if (waitTime_ <= 0) {
@@ -409,6 +425,12 @@ void GameScene::UpdateEnemyPopCommands() {
 
 			isWait_ = true;
 			waitTime_ = waitTime;
+
+			// コマンドループを抜ける
+			break;
+		} else if (word.find("DEFEAT") == 0) {
+			getline(line_stream, word, ',');
+			isDefeat_ = true;
 
 			// コマンドループを抜ける
 			break;

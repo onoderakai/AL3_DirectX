@@ -85,6 +85,8 @@ private: // メンバ変数
 	bool isWait_ = false;
 	//待機中の時間
 	int32_t waitTime_ = 0;
+	//撃破フラグ
+	bool isDefeat_ = false;
 
 	bool isDebugCamera = false;
 	DebugCamera* debugCamera_ = nullptr;
