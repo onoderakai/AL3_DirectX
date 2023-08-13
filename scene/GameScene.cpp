@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "AxisIndicator.h"
+#include "SceneChange.h"
 #include "TextureManager.h"
 #include <cassert>
 #include <cmath>
@@ -83,10 +84,11 @@ void GameScene::Initialize() {
 	// レティクル画像読み込み
 	TextureManager::Load("target.png");
 
-	//シーン関連の生成
+	// シーン関連の生成
 	title_ = new Title();
 	title_->Initialize(&scene_);
 	stage_ = new Stage();
+	stage_->Initialize(&scene_);
 }
 
 void GameScene::Update() {
@@ -165,7 +167,8 @@ void GameScene::Update() {
 		break;
 	default:
 		break;
-	}	
+	}
+	SceneChange::GetInstance()->Update();
 }
 
 void GameScene::Draw() {
@@ -197,6 +200,7 @@ void GameScene::Draw() {
 
 	switch (scene_) {
 	case SceneNum::TITLE:
+
 		break;
 	case SceneNum::STAGE:
 		if (player_) {
@@ -231,6 +235,7 @@ void GameScene::Draw() {
 	/// </summary>
 	switch (scene_) {
 	case SceneNum::TITLE:
+		title_->DrawBackground();
 		break;
 	case SceneNum::STAGE:
 		player_->DrawUI();
@@ -238,6 +243,10 @@ void GameScene::Draw() {
 	default:
 		break;
 	}
+
+	// 遷移画面の描画
+	SceneChange::GetInstance()->Draw();
+
 	// スプライト描画後処理
 	Sprite::PostDraw();
 
@@ -246,27 +255,27 @@ void GameScene::Draw() {
 
 void GameScene::CheckAllCollision() {
 	//// 自弾リストの取得
-	//const list<PlayerBullet*> pBullets = player_->GetBullets();
-	//const list<EnemyBullet*> eBullets = enemyBullets_;
+	// const list<PlayerBullet*> pBullets = player_->GetBullets();
+	// const list<EnemyBullet*> eBullets = enemyBullets_;
 
 	//// コライダー
-	//list<Collider*> colliders;
+	// list<Collider*> colliders;
 
-	//colliders.push_back(player_);
+	// colliders.push_back(player_);
 
-	//for (Enemy* enemy : enemys_) {
+	// for (Enemy* enemy : enemys_) {
 	//	colliders.push_back(enemy);
-	//}
+	// }
 
-	//for (PlayerBullet* playerBullet : player_->GetBullets()) {
+	// for (PlayerBullet* playerBullet : player_->GetBullets()) {
 	//	colliders.push_back(playerBullet);
-	//}
-	//for (EnemyBullet* enemyBullet : enemyBullets_) {
+	// }
+	// for (EnemyBullet* enemyBullet : enemyBullets_) {
 	//	colliders.push_back(enemyBullet);
-	//}
+	// }
 
-	//list<Collider*>::iterator itrA = colliders.begin();
-	//for (; itrA != colliders.end(); itrA++) {
+	// list<Collider*>::iterator itrA = colliders.begin();
+	// for (; itrA != colliders.end(); itrA++) {
 	//	Collider* A = *itrA;
 	//	list<Collider*>::iterator itrB = itrA;
 	//	itrB++;
@@ -274,12 +283,7 @@ void GameScene::CheckAllCollision() {
 	//		Collider* B = *itrB;
 	//		CheckCollisionPair(A, B);
 	//	}
-	//}
-
-	
-
-
-
+	// }
 
 	// 判定対象の座標
 	Vector3 posA = {};

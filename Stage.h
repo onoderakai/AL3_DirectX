@@ -1,11 +1,14 @@
 ﻿#pragma once
+#include "Input.h"
+#include "Scene.h"
+
 class Stage {
 
 public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize(SceneNum* pScene);
 
 	/// <summary>
 	/// 更新
@@ -18,4 +21,7 @@ public:
 	void Draw();
 
 private:
+	Input* input_ = nullptr;
+	// シーン変数のポインタ
+	SceneNum* pScene_;
 };
