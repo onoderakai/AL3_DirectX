@@ -27,7 +27,7 @@ public:
 	/// 描画
 	/// </summary>
 	/// <param name="viewProjection"></param>
-	void Draw(ViewProjection& viewProjection);
+	void Draw(const ViewProjection& viewProjection);
 
 	/// <summary>
 	/// 当たり判定

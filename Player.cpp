@@ -122,7 +122,7 @@ void Player::Move(XINPUT_STATE& joyState) {
 	world_.rotation_ += rotate;
 }
 
-void Player::Draw(ViewProjection& viewProjection) {
+void Player::Draw(const ViewProjection& viewProjection) {
 
 	model_->Draw(world_, viewProjection, textureHandle_);
 	model_->Draw(world3DReticle_, viewProjection);
