@@ -134,13 +134,6 @@ private: // メンバ変数
 	void CheckCollisionPair(Collider* colliderA, Collider* colliderB);
 
 	/// <summary>
-	/// ベクトルの距離を求める
-	/// </summary>
-	/// <param name="v"></param>
-	/// <returns></returns>
-	float Length(const Vector3& v);
-
-	/// <summary>
 	/// 敵の出現データを保存
 	/// </summary>
 	void LoadEnemyPopData();

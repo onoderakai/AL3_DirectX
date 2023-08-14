@@ -1,9 +1,9 @@
 ﻿#include "Player.h"
+#include "CollisionConfig.h"
+#include "Enemy.h"
 #include "ImGuiManager.h"
 #include "MathUtility.h"
-#include "CollisionConfig.h"
 #include <cassert>
-#include "ImGuiManager.h"
 
 Player::~Player() {
 	delete sprite2DReticle_;
@@ -44,21 +44,21 @@ void Player::Update(const ViewProjection& viewProjection) {
 		return false;
 	});
 
-	//ジョイスティックを使う
+	// ジョイスティックを使う
 	XINPUT_STATE joyState = {};
-	//移動処理
+	// 移動処理
 	Move(joyState);
 
 	// 攻撃処理
 	Attack();
-	//弾の更新処理
+	// 弾の更新処理
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Update();
 	}
 
-	//Trans3DReticle();
+	// Trans3DReticle();
 	WorldToScreen2DReticle(viewProjection);
-	//ScreenToWorld2DReticle(viewProjection, joyState);
+	// ScreenToWorld2DReticle(viewProjection, joyState);
 
 	// 当たり判定
 	float moveLimitX = 34.0f;
@@ -164,7 +164,15 @@ void Player::Attack() {
 		Vector3 pos = GetWorldPosition();
 
 		PlayerBullet* newBullet = new PlayerBullet();
-		Vector3 bulletVelocity = Get3DReticleWorldPosition() - GetWorldPosition();
+		// 弾の速度
+		Vector3 bulletVelocity = {0.0f, 0.0f, 1.0f};
+
+		if (isLockOn) {
+			bulletVelocity = lockOnPos - GetWorldPosition();
+		} else {
+			bulletVelocity = Get3DReticleWorldPosition() - GetWorldPosition();
+		}
+
 		// 弾の移動速度
 		float bulletSpeed = 10.0f;
 		// 弾の速度を正規化し速度をかける
@@ -215,6 +223,24 @@ void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
 
 	sprite2DReticle_->SetPosition(Vector2{float(mousePos.x), float(mousePos.y)});
 
+	// 敵のロックオン処理
+	isLockOn = false;
+	nearDis = lockOnDis;
+	for (Enemy* enemy : enemys_) {
+		Vector3 enemyPos = enemy->GetWorldPosition();
+		enemyPos = Transform(enemyPos, matViewProjectionViewport);
+		// マウスと敵の距離
+		float mouseToEnemyDis =
+		    Length(Vector2{float(mousePos.x), float(mousePos.y)} - Vector2{enemyPos.x, enemyPos.y});
+		// lockOnDisの範囲内かつ、一番近い敵をlockOnPosにする
+		if (nearDis >= mouseToEnemyDis) {
+			nearDis = mouseToEnemyDis;
+			lockOnPos = enemy->GetWorldPosition();
+			isLockOn = true;
+			sprite2DReticle_->SetPosition(Vector2{enemyPos.x, enemyPos.y});
+		}
+	}
+
 	Matrix4x4 matVPV = viewProjection.matView * viewProjection.matProjection * matViewport;
 
 	Matrix4x4 matInverseVPV = Inverse(matVPV);
@@ -232,7 +258,7 @@ void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
 	mouseDirection = Normalize(mouseDirection);
 	// カメラから照準オブジェクトの距離
 	const float kDisTestObj = 50.0f;
-	//プレイヤーと3Dレティクルのベクトル
+	// プレイヤーと3Dレティクルのベクトル
 	Vector3 direction = Get3DReticleWorldPosition() - GetWorldPosition();
 	direction = Normalize(direction);
 

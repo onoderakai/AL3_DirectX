@@ -6,6 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <fstream>
+#include "MathUtility.h"
 
 GameScene::GameScene() {}
 
@@ -65,6 +66,7 @@ void GameScene::Initialize() {
 	player_ = new Player();
 	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
 	player_->Initialeze(playerModel_, playerTextureHandle_, playerPos);
+	player_->SetEnemys(enemys_);
 
 	// エネミー
 	enemyGeneratePos_ = {5.0f, 3.0f, 100.0f};
@@ -143,6 +145,9 @@ void GameScene::Update() {
 			}
 			return false;
 		});
+
+		//プレイヤーに敵の情報を渡す
+		player_->SetEnemys(enemys_);
 
 		// 敵の更新処理を呼ぶ
 		for (Enemy* enemy : enemys_) {
@@ -354,8 +359,6 @@ void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
 		colliderB->OnCollision();
 	}
 }
-
-float GameScene::Length(const Vector3& v) { return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z); }
 
 void GameScene::LoadEnemyPopData() {
 

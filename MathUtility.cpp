@@ -50,3 +50,7 @@ Vector3 FaceToDirection(const Vector3& direction) {
 	result.x = std::atan2f(-theta.y, width);
 	return result;
 }
+
+float Length(const Vector2& v) { return sqrtf(v.x * v.x + v.y * v.y); }
+
+float Length(const Vector3& v) { return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z); }

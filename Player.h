@@ -7,6 +7,8 @@
 #include <list>
 #include "Collider.h"
 
+class Enemy;
+
 /// <summary>
 /// 自キャラ
 /// </summary>
@@ -87,6 +89,12 @@ public:
 	/// <param name="parent">親となるワールドトランスフォーム</param>
 	void SetParent(const WorldTransform* parent) { world_.parent_ = parent;}
 
+	/// <summary>
+	/// 敵のセッター
+	/// </summary>
+	/// <param name="enemys"></param>
+	void SetEnemys(std::list<Enemy*> enemys) { enemys_ = *&enemys; }
+
 private:
 	//入力
 	Input* input_ = nullptr;
@@ -98,6 +106,18 @@ private:
 	Model* model_ = nullptr;
 	//半径
 	float radius_ = 1.0f;
+
+	//敵のリスト
+	std::list<Enemy*> enemys_;
+
+	//ロックオンフラグ
+	bool isLockOn = false;
+	//ロックオン座標
+	Vector3 lockOnPos = {};
+	//ロックオンする距離
+	float lockOnDis = 100.0f;
+	//一番小さい数値を保存
+	float nearDis = lockOnDis;
 
 	//弾
 	std::list<PlayerBullet*> bullets_;
