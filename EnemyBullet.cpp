@@ -12,12 +12,7 @@ void EnemyBullet::Initialize(const Vector3& pos, const Vector3& velocity, Model*
 	world_.scale_.y = 0.5f;
 	world_.scale_.z = 2.0f;
 
-	//行列計算をしないで回転
-	Vector3 theta = velocity;
-	theta = Normalize(theta);
-	world_.rotation_.y = std::atan2f(theta.x, theta.z);
-	float width = sqrtf(theta.x * theta.x + theta.z * theta.z);
-	world_.rotation_.x = std::atan2f(-theta.y, width);
+	world_.rotation_ = FaceToDirection(velocity);
 	
 	velocity_ = velocity;
 	world_.translation_ = pos;
@@ -52,7 +47,7 @@ void EnemyBullet::Update() {
 	world_.UpdateMatrix();
 }
 
-void EnemyBullet::Draw(ViewProjection& viewProjection) {
+void EnemyBullet::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(world_, viewProjection, textureHandle_);
 }
 

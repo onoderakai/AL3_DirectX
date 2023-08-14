@@ -3,6 +3,7 @@
 #include "MathUtility.h"
 #include "CollisionConfig.h"
 #include <cassert>
+#include "ImGuiManager.h"
 
 Player::~Player() {
 	delete sprite2DReticle_;
@@ -120,11 +121,17 @@ void Player::Move(XINPUT_STATE& joyState) {
 	}
 	// 旋回
 	world_.rotation_ += rotate;
+
+	world_.rotation_ = FaceToDirection(Get3DReticleWorldPosition() - GetWorldPosition());
 }
 
 void Player::Draw(const ViewProjection& viewProjection) {
 
 	model_->Draw(world_, viewProjection, textureHandle_);
+	world3DReticle_.scale_.z = 1.0f;
+	world3DReticle_.scale_.x = 1.0f;
+	world3DReticle_.scale_.y = 1.0f;
+	world3DReticle_.rotation_ = FaceToDirection(Get3DReticleWorldPosition() - GetWorldPosition());
 	model_->Draw(world3DReticle_, viewProjection);
 	model_->Draw(world3DReticle2_, viewProjection);
 	model_->Draw(world3DReticle3_, viewProjection);
@@ -151,7 +158,7 @@ void Player::Attack() {
 	if (bulletCoolTime_ > 0) {
 		bulletCoolTime_--;
 	}
-	if (input_->PushKey(DIK_SPACE) && bulletCoolTime_ <= 0) {
+	if (input_->IsPressMouse(0) && bulletCoolTime_ <= 0) {
 		bulletCoolTime_ = 5;
 		// 自キャラの座標
 		Vector3 pos = GetWorldPosition();
@@ -159,7 +166,7 @@ void Player::Attack() {
 		PlayerBullet* newBullet = new PlayerBullet();
 		Vector3 bulletVelocity = Get3DReticleWorldPosition() - GetWorldPosition();
 		// 弾の移動速度
-		float bulletSpeed = 1.0f;
+		float bulletSpeed = 10.0f;
 		// 弾の速度を正規化し速度をかける
 		bulletVelocity = Normalize(bulletVelocity) * bulletSpeed;
 

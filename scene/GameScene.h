@@ -80,7 +80,7 @@ private: // メンバ変数
 	Stage* stage_ = nullptr;
 
 
-	std::stringstream enemyPopCommands;
+	std::stringstream stage1EnemyPopCommands;
 	//待機中のフラグ
 	bool isWait_ = false;
 	//待機中の時間
@@ -99,7 +99,6 @@ private: // メンバ変数
 	uint32_t playerTextureHandle_ = 0;
 
 	//エネミーを包含
-	//Enemy* enemy_ = nullptr;
 	std::list<Enemy*> enemys_;
 	// 弾の包含
 	std::list<EnemyBullet*> enemyBullets_;

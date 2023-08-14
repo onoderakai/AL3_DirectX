@@ -12,3 +12,5 @@
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
 Vector3 Transform(Vector3 Vector, Matrix4x4 Matrix);
+
+Vector3 FaceToDirection(const Vector3& direction);

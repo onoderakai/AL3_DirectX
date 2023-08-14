@@ -15,13 +15,7 @@ void PlayerBullet::Initialeze(Model* model, const Vector3& pos, const Vector3& v
 	world_.scale_.y = 0.5f;
 	world_.scale_.z = 2.0f;
 
-	//行列計算で角度を変える
-	Vector3 theta = velocity;
-	theta = Normalize(theta);
-	world_.rotation_.y = std::atan2f(theta.x, theta.z);
-	Matrix4x4 rotY = MakeRotationYMatrix(-world_.rotation_.y);
-	Vector3 velocityZ = TransformNormal(velocity, rotY);
-	world_.rotation_.x = std::atan2f(-velocityZ.y, velocityZ.z);
+	world_.rotation_ = FaceToDirection(velocity);
 
 	velocity_ = velocity;
 }

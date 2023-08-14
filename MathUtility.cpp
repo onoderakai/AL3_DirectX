@@ -1,5 +1,6 @@
 ﻿#include "MathUtility.h"
 #include <cassert>
+#include <cmath>
 
 Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
 	Vector3 result = {};
@@ -29,5 +30,23 @@ Vector3 Transform(Vector3 Vector, Matrix4x4 Matrix) {
 	result.y /= w;
 	result.z /= w;
 
+	return result;
+}
+
+Vector3 FaceToDirection(const Vector3& direction) {
+	// 行列計算で角度を変える
+	/*Vector3 result = {};
+	Vector3 theta = Normalize(direction);
+	result.y = std::atan2f(theta.x, theta.z);
+	Matrix4x4 rotY = MakeRotationYMatrix(-result.y);
+	Vector3 velocityZ = TransformNormal(direction, rotY);
+	result.x = std::atan2f(-velocityZ.y, velocityZ.z);*/
+
+	// 行列計算をしないで回転
+	Vector3 result = {};
+	Vector3 theta = Normalize(direction);
+	result.y = std::atan2f(theta.x, theta.z);
+	float width = sqrtf(theta.x * theta.x + theta.z * theta.z);
+	result.x = std::atan2f(-theta.y, width);
 	return result;
 }

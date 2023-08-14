@@ -13,7 +13,7 @@ class EnemyBullet : public Collider {
 public:
 	void Initialize(const Vector3& pos, const Vector3& velocity, Model* model);
 	void Update();
-	void Draw(ViewProjection& viewProjection);
+	void Draw(const ViewProjection& viewProjection);
 
 	/// <summary>
 	/// 当たり判定

@@ -1,11 +1,11 @@
 #include "GameScene.h"
 #include "AxisIndicator.h"
+#include "ImGuiManager.h"
 #include "SceneChange.h"
 #include "TextureManager.h"
 #include <cassert>
 #include <cmath>
 #include <fstream>
-#include "ImGuiManager.h"
 
 GameScene::GameScene() {}
 
@@ -95,6 +95,7 @@ void GameScene::Initialize() {
 	title_->Initialize(&scene_);
 	stage_ = new Stage();
 	stage_->Initialize(&scene_);
+	stage_->SetParameter(player_, skydome_, railCamera_, particleSystem_);
 }
 
 void GameScene::Update() {
@@ -120,7 +121,7 @@ void GameScene::Update() {
 	case SceneNum::STAGE:
 		UpdateEnemyPopCommands();
 
-		stage_->Update();
+		// stage_->Update();
 
 		railCamera_->Update();
 		if (!isDebugCamera) {
@@ -169,10 +170,13 @@ void GameScene::Update() {
 			skydome_->Update();
 		}
 
-		//パーティクルシステムの更新処理
+		// パーティクルシステムの更新処理
 		particleSystem_->Update();
 
 		CheckAllCollision();
+		break;
+	case SceneNum::BOSS_STAGE:
+
 		break;
 	default:
 		break;
@@ -212,6 +216,7 @@ void GameScene::Draw() {
 
 		break;
 	case SceneNum::STAGE:
+		// stage_->Draw();
 		if (player_) {
 			player_->Draw(viewProjection_);
 		}
@@ -359,7 +364,7 @@ void GameScene::LoadEnemyPopData() {
 	file.open("./Resources/enemyPop.csv");
 	assert(file.is_open());
 	// ファイルをコピー
-	enemyPopCommands << file.rdbuf();
+	stage1EnemyPopCommands << file.rdbuf();
 	// ファイルを閉じる
 	file.close();
 }
@@ -393,7 +398,7 @@ void GameScene::UpdateEnemyPopCommands() {
 	string line;
 
 	// コマンド実行ループ
-	while (getline(enemyPopCommands, line)) {
+	while (getline(stage1EnemyPopCommands, line)) {
 
 		istringstream line_stream(line);
 

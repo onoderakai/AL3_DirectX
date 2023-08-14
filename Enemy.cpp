@@ -49,7 +49,7 @@ void Enemy::Update() {
 	world_.UpdateMatrix();
 }
 
-void Enemy::Draw(ViewProjection& viewProjection) {
+void Enemy::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(world_, viewProjection, textureHandle_);
 }
 

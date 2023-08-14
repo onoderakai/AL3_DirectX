@@ -5,17 +5,10 @@
 
 Vector3 Normalize(const Vector3& v) {
 	float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-	//Vector3 result = {(v.x * v.x) / length, (v.y * v.y) / length, (v.z * v.z) / length};
+	if (length == 0.0f) {
+		return v;
+	}
 	Vector3 result = {v.x / length, v.y / length, v.z / length};
-	/*if (v.x < 0.0f) {
-		result.x *= -1;
-	}
-	if (v.y < 0.0f) {
-		result.y *= -1;
-	}
-	if (v.z < 0.0f) {
-		result.z *= -1;
-	}*/
 	return result;
 }
 

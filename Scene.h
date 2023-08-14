@@ -5,6 +5,7 @@
 /// </summary>
 enum class SceneNum {
 	TITLE,
-	STAGE
+	STAGE,
+	BOSS_STAGE
 };
 class Scene {};
