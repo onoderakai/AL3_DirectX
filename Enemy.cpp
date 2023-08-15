@@ -1,6 +1,7 @@
 ﻿#include "Enemy.h"
 #include "GameScene.h"
 #include "MathUtility.h"
+#include "ImGuiManager.h"
 #include "Player.h"
 #include <cassert>
 
@@ -55,7 +56,11 @@ void Enemy::Draw(const ViewProjection& viewProjection) {
 
 void Enemy::OnCollision() {
 	Particle::Parameter para = {};
+	para.type_ = Particle::Type::SCALE_CHANGE;
 	para.world_.translation_ = GetWorldPosition();
+	para.world_.scale_ = Vector3{2.0f, 2.0f, 2.0f};
+	particleSystem_->Generate(para, 10);
+	para.type_ = Particle::Type::SPHERE;
 	particleSystem_->Generate(para, 10);
 	isDead_ = true;
 }

@@ -261,13 +261,17 @@ void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
 	// プレイヤーと3Dレティクルのベクトル
 	Vector3 direction = Get3DReticleWorldPosition() - GetWorldPosition();
 	direction = Normalize(direction);
+	if (isLockOn) {
+		world3DReticle_.translation_ = lockOnPos;
 
-	world3DReticle_.translation_ = posNear + (mouseDirection * kDisTestObj);
-	world3DReticle2_.translation_ = world3DReticle_.translation_;
-	world3DReticle3_.translation_ = world3DReticle_.translation_;
-
-	world3DReticle2_.translation_ = world3DReticle2_.translation_ + (direction * 10.0f);
-	world3DReticle3_.translation_ = world3DReticle3_.translation_ + (direction * -10.0f);
+		world3DReticle2_.translation_ = world3DReticle_.translation_ + (direction * 10.0f);
+		world3DReticle3_.translation_ = world3DReticle_.translation_ + (direction * -10.0f);
+	} else {
+		world3DReticle_.translation_ = posNear + (mouseDirection * kDisTestObj);
+		
+		world3DReticle2_.translation_ = world3DReticle_.translation_ + (direction * 10.0f);
+		world3DReticle3_.translation_ = world3DReticle_.translation_ + (direction * -10.0f);
+	}
 
 	world3DReticle_.UpdateMatrix();
 	world3DReticle2_.UpdateMatrix();

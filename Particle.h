@@ -6,7 +6,8 @@ class Particle {
 public:
 	enum class Type {
 		CIRCLE,
-		Sphere
+		SPHERE,
+		SCALE_CHANGE
 	};
 
 	struct Parameter {
@@ -37,6 +38,7 @@ public:
 private:
 	//パラメーター
 	Parameter parameter_ = {};
+	Vector3 sizeChange = {};
 
 	//モデル
 	Model* model_ = nullptr;
@@ -49,4 +51,6 @@ private:
 	void TypeCircleUpdate();
 
 	void TypeSphereUpdate();
+
+	void TypeScaleChangeUpdate();
 };

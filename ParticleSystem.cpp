@@ -2,7 +2,7 @@
 
 ParticleSystem::~ParticleSystem() {
 	delete particleModel_;
-	//particles_.clear();
+	// particles_.clear();
 	for (Particle* particle : particles_) {
 		delete particle;
 	}
@@ -33,9 +33,13 @@ void ParticleSystem::Draw(const ViewProjection& view) {
 
 void ParticleSystem::AddParticle(Particle::Parameter parameter) {
 	Particle* newParticle = new Particle();
-	parameter.velocity_.x = (rand() % 100 - 50) / 100.0f;
-	parameter.velocity_.y = (rand() % 100 - 50) / 100.0f;
-	parameter.velocity_.z = (rand() % 100 - 50) / 100.0f;
+	parameter.world_.rotation_.x = float(rand() % 1000);
+	parameter.world_.rotation_.y = float(rand() % 1000);
+	parameter.world_.rotation_.z = float(rand() % 1000);
+
+	parameter.velocity_.x = (rand() % 1000 - 499) / 500.0f;
+	parameter.velocity_.y = (rand() % 1000 - 499) / 500.0f;
+	parameter.velocity_.z = (rand() % 1000 - 499) / 500.0f;
 	newParticle->Initialize(parameter, particleModel_);
 	particles_.push_back(newParticle);
 }
