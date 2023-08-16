@@ -341,10 +341,6 @@ void GameScene::CheckAllCollision() {
 
 void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
 	// 衝突フィルタリング
-	/*if ((colliderA->GetCollisionAttribute() != colliderB->GetCollisionMask()) ||
-	    (colliderB->GetCollisionAttribute() != colliderA->GetCollisionMask())) {
-	    return;
-	}*/
 	if (((colliderA->GetCollisionAttribute() & colliderB->GetCollisionMask()) == 0) ||
 	    ((colliderB->GetCollisionAttribute() & colliderA->GetCollisionMask())) == 0) {
 		return;
