@@ -1,12 +1,12 @@
 #include "GameScene.h"
 #include "AxisIndicator.h"
 #include "ImGuiManager.h"
+#include "MathUtility.h"
 #include "SceneChange.h"
 #include "TextureManager.h"
 #include <cassert>
 #include <cmath>
 #include <fstream>
-#include "MathUtility.h"
 
 GameScene::GameScene() {}
 
@@ -136,7 +136,6 @@ void GameScene::Update() {
 		if (player_) {
 			player_->Update(viewProjection_);
 		}
-
 		// デスフラグがtrueの敵を削除する
 		enemys_.remove_if([](Enemy* enemy) {
 			if (enemy->GetIsDead()) {
@@ -145,17 +144,14 @@ void GameScene::Update() {
 			}
 			return false;
 		});
-
-		//プレイヤーに敵の情報を渡す
+		// プレイヤーに敵の情報を渡す
 		player_->SetEnemys(enemys_);
-
 		// 敵の更新処理を呼ぶ
 		for (Enemy* enemy : enemys_) {
 			if (enemy) {
 				enemy->Update();
 			}
 		}
-
 		// デスフラグがtrueの弾を削除する
 		enemyBullets_.remove_if([](EnemyBullet* bullet) {
 			if (bullet->GetIsDead()) {
@@ -164,20 +160,17 @@ void GameScene::Update() {
 			}
 			return false;
 		});
-
 		// 弾の更新処理を呼ぶ
 		for (EnemyBullet* bullet : enemyBullets_) {
 			bullet->Update();
 		}
-
 		// 天球の更新処理
 		if (skydome_) {
 			skydome_->Update();
 		}
-
 		// パーティクルシステムの更新処理
 		particleSystem_->Update();
-
+		//衝突判定
 		CheckAllCollision();
 		break;
 	case SceneNum::BOSS_STAGE:
@@ -238,6 +231,8 @@ void GameScene::Draw() {
 		}
 		particleSystem_->Draw(viewProjection_);
 		break;
+	case SceneNum::BOSS_STAGE:
+		break;
 	default:
 		break;
 	}
@@ -260,6 +255,8 @@ void GameScene::Draw() {
 	case SceneNum::STAGE:
 		player_->DrawUI();
 		break;
+	case SceneNum::BOSS_STAGE:
+		break;
 	default:
 		break;
 	}
@@ -274,75 +271,82 @@ void GameScene::Draw() {
 }
 
 void GameScene::CheckAllCollision() {
-	//// 自弾リストの取得
-	// const list<PlayerBullet*> pBullets = player_->GetBullets();
-	// const list<EnemyBullet*> eBullets = enemyBullets_;
+	// コライダーリスト
+	list<Collider*> colliders;
 
-	//// コライダー
-	// list<Collider*> colliders;
+	// 衝突判定を行うために、コライダークラスを継承したクラスをコライダーリストに追加する
+	colliders.push_back(player_);
 
-	// colliders.push_back(player_);
+	for (Enemy* enemy : enemys_) {
+		colliders.push_back(enemy);
+	}
+
+	for (PlayerBullet* playerBullet : player_->GetBullets()) {
+		colliders.push_back(playerBullet);
+	}
+	for (EnemyBullet* enemyBullet : enemyBullets_) {
+		colliders.push_back(enemyBullet);
+	}
+
+	//コライダーリスト内のオブジェクトを総当たりで衝突判定する
+	list<Collider*>::iterator itrA = colliders.begin();
+	for (; itrA != colliders.end(); itrA++) {
+		Collider* A = *itrA;
+		list<Collider*>::iterator itrB = itrA;
+		itrB++;
+		for (; itrB != colliders.end(); itrB++) {
+			Collider* B = *itrB;
+			CheckCollisionPair(A, B);
+		}
+	}
+
+	//// 判定対象の座標
+	// Vector3 posA = {};
+	// Vector3 posB = {};
+
+	// const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
+	// const std::list<EnemyBullet*>& enemyBullets = enemyBullets_;
+
+	//// 自キャラの座標
+	// posA = player_->GetWorldPosition();
+
+	//// 自キャラと敵弾全ての当たり判定
+	// for (EnemyBullet* bullet : enemyBullets) {
+	//	CheckCollisionPair(player_, bullet);
+	// }
 
 	// for (Enemy* enemy : enemys_) {
-	//	colliders.push_back(enemy);
-	// }
-
-	// for (PlayerBullet* playerBullet : player_->GetBullets()) {
-	//	colliders.push_back(playerBullet);
-	// }
-	// for (EnemyBullet* enemyBullet : enemyBullets_) {
-	//	colliders.push_back(enemyBullet);
-	// }
-
-	// list<Collider*>::iterator itrA = colliders.begin();
-	// for (; itrA != colliders.end(); itrA++) {
-	//	Collider* A = *itrA;
-	//	list<Collider*>::iterator itrB = itrA;
-	//	itrB++;
-	//	for (; itrB != colliders.end(); itrB++) {
-	//		Collider* B = *itrB;
-	//		CheckCollisionPair(A, B);
+	//	// 敵キャラの座標
+	//	posA = enemy->GetWorldPosition();
+	//	// 敵キャラと自弾全ての当たり判定
+	//	for (PlayerBullet* bullet : playerBullets) {
+	//		CheckCollisionPair(enemy, bullet);
+	//		ImGui::Begin("bit");
+	//		ImGui::Text(
+	//		    "enemy %d,%d:bullet %d,%d", enemy->GetCollisionAttribute(),
+	//enemy->GetCollisionMask(), 		    bullet->GetCollisionAttribute(), bullet->GetCollisionMask());
+	//		ImGui::End();
 	//	}
 	// }
 
-	// 判定対象の座標
-	Vector3 posA = {};
-	Vector3 posB = {};
-
-	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
-	const std::list<EnemyBullet*>& enemyBullets = enemyBullets_;
-
-	// 自キャラの座標
-	posA = player_->GetWorldPosition();
-
-	// 自キャラと敵弾全ての当たり判定
-	for (EnemyBullet* bullet : enemyBullets) {
-		CheckCollisionPair(player_, bullet);
-	}
-
-	for (Enemy* enemy : enemys_) {
-		// 敵キャラの座標
-		posA = enemy->GetWorldPosition();
-		// 敵キャラと自弾全ての当たり判定
-		for (PlayerBullet* bullet : playerBullets) {
-			CheckCollisionPair(enemy, bullet);
-		}
-	}
-
-	// 自弾と敵弾の当たり判定
-	for (PlayerBullet* playerBullet : playerBullets) {
-		// 自弾の座標
-		posA = playerBullet->GetWorldPosition();
-		for (EnemyBullet* enemyBullet : enemyBullets) {
-			CheckCollisionPair(playerBullet, enemyBullet);
-		}
-	}
+	//// 自弾と敵弾の当たり判定
+	// for (PlayerBullet* playerBullet : playerBullets) {
+	//	// 自弾の座標
+	//	posA = playerBullet->GetWorldPosition();
+	//	for (EnemyBullet* enemyBullet : enemyBullets) {
+	//		CheckCollisionPair(playerBullet, enemyBullet);
+	//	}
+	// }
 }
 
 void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
 	// 衝突フィルタリング
-	if ((colliderA->GetCollisionAttribute() != colliderB->GetCollisionMask()) ||
+	/*if ((colliderA->GetCollisionAttribute() != colliderB->GetCollisionMask()) ||
 	    (colliderB->GetCollisionAttribute() != colliderA->GetCollisionMask())) {
+	    return;
+	}*/
+	if (((colliderA->GetCollisionAttribute() & colliderB->GetCollisionMask()) == 0) ||
+	    ((colliderB->GetCollisionAttribute() & colliderA->GetCollisionMask())) == 0) {
 		return;
 	}
 

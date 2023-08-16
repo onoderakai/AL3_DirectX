@@ -1,5 +1,6 @@
 ﻿#include "EnemyBullet.h"
 #include "MathUtility.h"
+#include "CollisionConfig.h"
 #include <cassert>
 #include "Player.h"
 
@@ -18,6 +19,12 @@ void EnemyBullet::Initialize(const Vector3& pos, const Vector3& velocity, Model*
 	world_.translation_ = pos;
 	model_ = model;
 	textureHandle_ = TextureManager::Load("white1x1.png");
+
+	// 衝突フィルタリングを設定
+	// このクラスの属性を設定
+	SetCollisonAttribute(kCollisionAttributeEnemy);
+	// このクラスの衝突しない属性を設定
+	SetCollisonMask(kCollisionAttributeEnemy ^ GetCollisionMask());
 }
 
 void EnemyBullet::Update() {

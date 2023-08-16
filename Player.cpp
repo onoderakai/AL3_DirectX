@@ -29,8 +29,11 @@ void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos
 	uint32_t textureReticle = TextureManager::Load("target.png");
 	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
 
-	SetCollisonAttribute(kConllisionAttributePlayer);
-	SetCollisonMask(0xffffffff - kConllisionAttributePlayer);
+	//衝突フィルタリングを設定
+	//  このクラスの属性を設定
+	SetCollisonAttribute(kCollisionAttributePlayer);
+	// このクラスの衝突しない属性を設定
+	SetCollisonMask(GetCollisionMask() ^ kCollisionAttributePlayer);
 }
 
 void Player::Update(const ViewProjection& viewProjection) {
@@ -268,7 +271,7 @@ void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
 		world3DReticle3_.translation_ = world3DReticle_.translation_ + (direction * -10.0f);
 	} else {
 		world3DReticle_.translation_ = posNear + (mouseDirection * kDisTestObj);
-		
+
 		world3DReticle2_.translation_ = world3DReticle_.translation_ + (direction * 10.0f);
 		world3DReticle3_.translation_ = world3DReticle_.translation_ + (direction * -10.0f);
 	}
@@ -334,4 +337,9 @@ void Player::ScreenToWorld2DReticle(const ViewProjection& viewProjection, XINPUT
 
 void Player::DrawUI() { sprite2DReticle_->Draw(); }
 
-void Player::OnCollision() {}
+void Player::OnCollision() {
+	hp_--;
+	if (hp_ <= 0) {
+		isDead_ = true;
+	}
+}

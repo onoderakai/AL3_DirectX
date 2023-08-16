@@ -106,6 +106,10 @@ private:
 	Model* model_ = nullptr;
 	//半径
 	float radius_ = 1.0f;
+	//デスフラグ
+	bool isDead_ = false;
+	//HP
+	uint32_t hp_ = 10;
 
 	//敵のリスト
 	std::list<Enemy*> enemys_;

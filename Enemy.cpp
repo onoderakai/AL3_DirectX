@@ -1,7 +1,8 @@
 ﻿#include "Enemy.h"
+#include "CollisionConfig.h"
 #include "GameScene.h"
-#include "MathUtility.h"
 #include "ImGuiManager.h"
+#include "MathUtility.h"
 #include "Player.h"
 #include <cassert>
 
@@ -14,7 +15,13 @@ void Enemy::Initialeze(Model* model, const Vector3& pos) {
 	world_.translation_ = pos;
 	velocity_ = {-0.3f, 0.3f, 0.0f};
 
-	//AttackReset();
+	AttackReset();
+
+	// 衝突フィルタリングを設定
+	// このクラスの属性を設定
+	SetCollisonAttribute(kCollisionAttributeEnemy);
+	// このクラスの衝突しない属性を設定
+	SetCollisonMask(kCollisionAttributeEnemy ^ GetCollisionMask());
 }
 
 void Enemy::Update() {

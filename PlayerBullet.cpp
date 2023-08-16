@@ -1,5 +1,6 @@
 ﻿#include "PlayerBullet.h"
 #include "MathUtility.h"
+#include "CollisionConfig.h"
 #include <cassert>
 
 void PlayerBullet::Initialeze(Model* model, const Vector3& pos, const Vector3& velocity) {
@@ -18,6 +19,12 @@ void PlayerBullet::Initialeze(Model* model, const Vector3& pos, const Vector3& v
 	world_.rotation_ = FaceToDirection(velocity);
 
 	velocity_ = velocity;
+
+	// 衝突フィルタリングを設定
+	// このクラスの属性を設定
+	SetCollisonAttribute(kCollisionAttributePlayer);
+	// このクラスの衝突しない属性を設定
+	SetCollisonMask(GetCollisionMask() ^ kCollisionAttributePlayer);
 }
 
 void PlayerBullet::Update() {
