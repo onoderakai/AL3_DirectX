@@ -12,6 +12,7 @@
 #include <sstream>
 //作成したクラスの読み込み
 #include "Player.h"
+#include "Boss.h"
 #include "Enemy.h"
 #include "Skydome.h"
 #include "RailCamera.h"
@@ -105,6 +106,13 @@ private: // メンバ変数
 	//モデル
 	Model* enemyModel_ = nullptr;
 	Vector3 enemyGeneratePos_ = {};
+
+	//ボスを包含
+	Boss* boss_ = nullptr;
+	// モデル
+	Model* bossModel_ = nullptr;
+	// テクスチャハンドル
+	uint32_t bossTextureHandle_ = 0;
 
 	//天球を包含
 	Skydome* skydome_ = nullptr;

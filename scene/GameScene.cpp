@@ -21,6 +21,8 @@ GameScene::~GameScene() {
 		delete bullet;
 	}
 	delete enemyModel_;
+	delete boss_;
+	delete bossModel_;
 	delete skydomeModel_;
 	delete skydome_;
 	delete railCamera_;
@@ -58,6 +60,9 @@ void GameScene::Initialize() {
 	// エネミーモデルの生成
 	enemyModel_ = Model::Create();
 
+	// ボスモデルの生成
+	bossModel_ = Model::Create();
+
 	// 天球のモデルを生成
 	skydomeModel_ = Model::CreateFromOBJ("skydome", true);
 
@@ -71,6 +76,10 @@ void GameScene::Initialize() {
 	// エネミー
 	enemyGeneratePos_ = {5.0f, 3.0f, 100.0f};
 	AddEnemy(enemyGeneratePos_);
+
+	// ボス
+	boss_ = new Boss();
+	boss_->Initialize();
 
 	// 天球
 	skydome_ = new Skydome();
@@ -170,11 +179,18 @@ void GameScene::Update() {
 		}
 		// パーティクルシステムの更新処理
 		particleSystem_->Update();
-		//衝突判定
+		// 衝突判定
 		CheckAllCollision();
 		break;
 	case SceneNum::BOSS_STAGE:
-
+		// プレイヤーの更新処理
+		if (player_) {
+			player_->Update(viewProjection_);
+		}
+		//ボスの更新処理
+		if (boss_) {
+			boss_->Update();
+		}
 		break;
 	default:
 		break;
@@ -232,6 +248,17 @@ void GameScene::Draw() {
 		particleSystem_->Draw(viewProjection_);
 		break;
 	case SceneNum::BOSS_STAGE:
+		if (player_) {
+			player_->Draw(viewProjection_);
+		}
+		if (skydome_) {
+			skydome_->Draw(viewProjection_);
+		}
+		// ボスの更新処理
+		if (boss_) {
+			boss_->Draw();
+		}
+		particleSystem_->Draw(viewProjection_);
 		break;
 	default:
 		break;
@@ -288,7 +315,7 @@ void GameScene::CheckAllCollision() {
 		colliders.push_back(enemyBullet);
 	}
 
-	//コライダーリスト内のオブジェクトを総当たりで衝突判定する
+	// コライダーリスト内のオブジェクトを総当たりで衝突判定する
 	list<Collider*>::iterator itrA = colliders.begin();
 	for (; itrA != colliders.end(); itrA++) {
 		Collider* A = *itrA;
@@ -324,8 +351,8 @@ void GameScene::CheckAllCollision() {
 	//		ImGui::Begin("bit");
 	//		ImGui::Text(
 	//		    "enemy %d,%d:bullet %d,%d", enemy->GetCollisionAttribute(),
-	//enemy->GetCollisionMask(), 		    bullet->GetCollisionAttribute(), bullet->GetCollisionMask());
-	//		ImGui::End();
+	// enemy->GetCollisionMask(), 		    bullet->GetCollisionAttribute(),
+	// bullet->GetCollisionMask()); 		ImGui::End();
 	//	}
 	// }
 
