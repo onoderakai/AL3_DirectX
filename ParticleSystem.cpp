@@ -1,14 +1,17 @@
 ﻿#include "ParticleSystem.h"
 
+ParticleSystem::ParticleSystem() { particleModel_ = Model::Create(); }
+
 ParticleSystem::~ParticleSystem() {
 	delete particleModel_;
-	// particles_.clear();
 	for (Particle* particle : particles_) {
 		delete particle;
 	}
 }
 
-void ParticleSystem::Initialize() { particleModel_ = Model::Create(); }
+void ParticleSystem::Initialize() {
+	//particles_.clear();
+}
 
 void ParticleSystem::Update() {
 	// デスフラグの立ったパーティクルを削除

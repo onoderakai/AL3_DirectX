@@ -55,6 +55,7 @@ SceneChange::SceneChange() {
 	loadingSprite_ = Sprite::Create(loadingTextureHandle_, Vector2{0.0f, 0.0f});
 	loadingSprite_->SetSize(Vector2{1280.0f, 720.0f});
 	loadingSprite_->SetColor(color);
+	input_ = Input::GetInstance();
 }
 
 SceneChange::~SceneChange() { delete loadingSprite_; }

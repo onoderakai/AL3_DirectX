@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Scene.h"
 #include "Sprite.h"
+#include "Input.h"
 
 class SceneChange final{
 public:
@@ -69,4 +70,6 @@ private:
 	//遷移画像の色
 	Vector4 color = {0.0f, 0.0f, 0.0f, 0.0f};
 	float addAlpha_ = 0.0f;
+
+	Input* input_ = nullptr;
 };

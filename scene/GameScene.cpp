@@ -27,7 +27,7 @@ GameScene::~GameScene() {
 	delete skydome_;
 	delete railCamera_;
 	delete title_;
-	delete stage_;
+	//delete stage_;
 
 	delete debugCamera_;
 }
@@ -44,9 +44,6 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-
-	// ビュープロジェクションの初期化
-	viewProjection_.Initialize();
 
 	// パーティクルシステムの生成
 	particleSystem_ = new ParticleSystem();
@@ -79,7 +76,7 @@ void GameScene::Initialize() {
 
 	// ボス
 	boss_ = new Boss();
-	boss_->Initialize();
+	boss_->Initialize(bossModel_);
 
 	// 天球
 	skydome_ = new Skydome();
@@ -92,6 +89,7 @@ void GameScene::Initialize() {
 	// 親子関係を結ぶ
 	player_->SetParent(&railCamera_->GetWorldTransform());
 
+	// ビュープロジェクションの初期化
 	viewProjection_.farZ = 100.0f;
 	viewProjection_.Initialize();
 
@@ -104,9 +102,41 @@ void GameScene::Initialize() {
 	// シーン関連の生成
 	title_ = new Title();
 	title_->Initialize(&scene_);
-	stage_ = new Stage();
-	stage_->Initialize(&scene_);
-	stage_->SetParameter(player_, skydome_, railCamera_, particleSystem_);
+	//stage_ = new Stage();
+	/*stage_->Initialize(&scene_);
+	stage_->SetParameter(player_, skydome_, railCamera_, particleSystem_);*/
+}
+
+void GameScene::SceneInitialize() {
+	particleSystem_->Initialize();
+
+	//enemyBullets_.clear();
+	/*enemyBullets_.clear();
+	enemys_.clear();
+	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
+	delete player_;
+	player_ = new Player();
+	player_->Initialeze(playerModel_, playerTextureHandle_, playerPos);
+	player_->SetEnemys(enemys_);*/
+	
+	boss_->Initialize(bossModel_);
+
+	skydome_->Initialize(skydomeModel_);
+
+	railCamera_->Initialize({0.0f, 0.0f, -100.0f}, {0.0f, 0.0f, 0.0f});
+
+	// 親子関係を結ぶ
+	player_->SetParent(&railCamera_->GetWorldTransform());
+
+	// ビュープロジェクションの初期化
+	viewProjection_.farZ = 100.0f;
+	viewProjection_.Initialize();
+
+	// ファイル読み込み
+	LoadEnemyPopData();
+	delete title_;
+	title_ = new Title();
+	title_->Initialize(&scene_);
 }
 
 void GameScene::Update() {
@@ -125,14 +155,26 @@ void GameScene::Update() {
 		viewProjection_.TransferMatrix();
 	}
 #endif // _DEBUG
+	preScene_ = scene_;
+	// 1でTITLEシーンに遷移する
+	if (input_->PushKey(DIK_1)) {
+		SceneChange::GetInstance()->Change(SceneNum::TITLE, &scene_);
+	}
+	// 2でSTAGEシーンに遷移する
+	if (input_->PushKey(DIK_2)) {
+		SceneChange::GetInstance()->Change(SceneNum::STAGE, &scene_);
+	}
+	// 3でBOSS_STAGEシーンに遷移する
+	if (input_->PushKey(DIK_3)) {
+		SceneChange::GetInstance()->Change(SceneNum::BOSS_STAGE, &scene_);
+	}
+	
 	switch (scene_) {
 	case SceneNum::TITLE:
 		title_->Update();
 		break;
 	case SceneNum::STAGE:
 		UpdateEnemyPopCommands();
-
-		// stage_->Update();
 
 		railCamera_->Update();
 		if (!isDebugCamera) {
@@ -183,19 +225,34 @@ void GameScene::Update() {
 		CheckAllCollision();
 		break;
 	case SceneNum::BOSS_STAGE:
+		railCamera_->Update();
+		if (!isDebugCamera) {
+			viewProjection_.matView = railCamera_->GetViewProjection().matView;
+			viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
+			viewProjection_.TransferMatrix();
+		}
 		// プレイヤーの更新処理
 		if (player_) {
 			player_->Update(viewProjection_);
 		}
-		//ボスの更新処理
+		// ボスの更新処理
 		if (boss_) {
 			boss_->Update();
 		}
+		// 天球の更新処理
+		if (skydome_) {
+			skydome_->Update();
+		}
+		// パーティクルシステムの更新処理
+		particleSystem_->Update();
 		break;
 	default:
 		break;
 	}
 	SceneChange::GetInstance()->Update();
+	if (preScene_ != scene_) {
+		SceneInitialize();
+	}
 }
 
 void GameScene::Draw() {
@@ -230,7 +287,6 @@ void GameScene::Draw() {
 
 		break;
 	case SceneNum::STAGE:
-		// stage_->Draw();
 		if (player_) {
 			player_->Draw(viewProjection_);
 		}
@@ -251,12 +307,11 @@ void GameScene::Draw() {
 		if (player_) {
 			player_->Draw(viewProjection_);
 		}
+		if (boss_) {
+			boss_->Draw(viewProjection_);
+		}
 		if (skydome_) {
 			skydome_->Draw(viewProjection_);
-		}
-		// ボスの更新処理
-		if (boss_) {
-			boss_->Draw();
 		}
 		particleSystem_->Draw(viewProjection_);
 		break;

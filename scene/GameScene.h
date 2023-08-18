@@ -17,7 +17,7 @@
 #include "Skydome.h"
 #include "RailCamera.h"
 #include "Title.h"
-#include "Stage.h"
+//#include "Stage.h"
 #include "Scene.h"
 #include "ParticleSystem.h"
 
@@ -43,6 +43,11 @@ public: // メンバ関数
 	/// 初期化
 	/// </summary>
 	void Initialize();
+	
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	void SceneInitialize();
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -78,8 +83,8 @@ private: // メンバ変数
 	//シーン関連
 	SceneNum scene_ = SceneNum::TITLE;
 	Title* title_ = nullptr;
-	Stage* stage_ = nullptr;
-
+	//Stage* stage_ = nullptr;
+	SceneNum preScene_ = scene_;
 
 	std::stringstream stage1EnemyPopCommands;
 	//待機中のフラグ

@@ -5,6 +5,8 @@
 
 class ParticleSystem {
 public:
+	ParticleSystem();
+
 	~ParticleSystem();
 
 	void Initialize();
