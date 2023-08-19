@@ -14,6 +14,10 @@ class Enemy;
 /// </summary>
 class Player : public Collider{
 public:
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	Player();
 
 	/// <summary>
 	/// デストラクタ

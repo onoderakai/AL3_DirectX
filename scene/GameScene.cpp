@@ -108,16 +108,28 @@ void GameScene::Initialize() {
 }
 
 void GameScene::SceneInitialize() {
+	//ファイルの読み込み行を0行目に戻す
+	stage1EnemyPopCommands.clear();
+	stage1EnemyPopCommands.seekg(0, ios::beg);
+
 	particleSystem_->Initialize();
 
-	//enemyBullets_.clear();
-	/*enemyBullets_.clear();
-	enemys_.clear();
+	enemyBullets_.remove_if([](EnemyBullet* bullet) {
+		delete bullet;
+		return true;
+	});
+
+	enemys_.remove_if([](Enemy* enemy) {
+		delete enemy;
+		return true;
+	});
+	// エネミー
+	enemyGeneratePos_ = {5.0f, 3.0f, 100.0f};
+	AddEnemy(enemyGeneratePos_);
+
 	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
-	delete player_;
-	player_ = new Player();
 	player_->Initialeze(playerModel_, playerTextureHandle_, playerPos);
-	player_->SetEnemys(enemys_);*/
+	player_->SetEnemys(enemys_);
 	
 	boss_->Initialize(bossModel_);
 
@@ -443,7 +455,6 @@ void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {
 }
 
 void GameScene::LoadEnemyPopData() {
-
 	// ファイル読み込み
 	ifstream file;
 	file.open("./Resources/enemyPop.csv");
@@ -455,6 +466,10 @@ void GameScene::LoadEnemyPopData() {
 }
 
 void GameScene::UpdateEnemyPopCommands() {
+	if (input_->PushKey(DIK_4)) {
+		stage1EnemyPopCommands.clear();
+		stage1EnemyPopCommands.seekg(0, ios::beg);
+	}
 	// 待機処理
 	if (isDefeat_) {
 		uint32_t enemyCount = 0;

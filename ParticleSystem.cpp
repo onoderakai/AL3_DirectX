@@ -10,7 +10,10 @@ ParticleSystem::~ParticleSystem() {
 }
 
 void ParticleSystem::Initialize() {
-	//particles_.clear();
+	particles_.remove_if([](Particle* particle) {
+		delete particle;
+		return true;
+	});
 }
 
 void ParticleSystem::Update() {

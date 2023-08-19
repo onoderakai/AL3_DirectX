@@ -5,6 +5,11 @@
 #include "MathUtility.h"
 #include <cassert>
 
+Player::Player() {
+	uint32_t textureReticle = TextureManager::Load("target.png");
+	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+}
+
 Player::~Player() {
 	delete sprite2DReticle_;
 	for (PlayerBullet* bullet : bullets_) {
@@ -13,6 +18,11 @@ Player::~Player() {
 }
 
 void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos) {
+	bullets_.remove_if([](PlayerBullet* bullet) {
+		delete bullet;
+		return true;
+	});
+
 	(assert(model));
 	(assert(textureHandle));
 	model_ = model;
@@ -26,11 +36,8 @@ void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos
 	world3DReticle2_.Initialize();
 	world3DReticle3_.Initialize();
 
-	uint32_t textureReticle = TextureManager::Load("target.png");
-	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
-
-	//衝突フィルタリングを設定
-	//  このクラスの属性を設定
+	// 衝突フィルタリングを設定
+	//   このクラスの属性を設定
 	SetCollisonAttribute(kCollisionAttributePlayer);
 	// このクラスの衝突しない属性を設定
 	SetCollisonMask(GetCollisionMask() ^ kCollisionAttributePlayer);
