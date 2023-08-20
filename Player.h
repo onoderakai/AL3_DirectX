@@ -62,6 +62,12 @@ public:
 	//ゲッター
 	
 	/// <summary>
+	/// 死亡フラグのゲッター
+	/// </summary>
+	/// <returns></returns>
+	const bool& GetIsDead() { return isDead_; }
+
+	/// <summary>
 	/// 弾のゲッター
 	/// </summary>
 	/// <returns></returns>
@@ -83,7 +89,7 @@ public:
 	/// 半径のゲッター
 	/// </summary>
 	/// <returns></returns>
-	const float& GetRadius() { return radius_; }
+	const float& GetRadius() override { return radius_; }
 
 	//セッター
 
@@ -113,7 +119,8 @@ private:
 	//デスフラグ
 	bool isDead_ = false;
 	//HP
-	uint32_t hp_ = 10;
+	uint32_t kMaxHp_ = 100;
+	int32_t hp_ = kMaxHp_;
 
 	//敵のリスト
 	std::list<Enemy*> enemys_;

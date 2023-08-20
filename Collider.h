@@ -13,7 +13,7 @@ public:
 	/// 半径のゲッター
 	/// </summary>
 	/// <returns></returns>
-	float GetRadius() { return radius_; }
+	virtual const float& GetRadius();
 
 	/// <summary>
 	/// 半径のセッター

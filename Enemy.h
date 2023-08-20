@@ -44,7 +44,7 @@ public:
 	/// <summary>
 	/// 当たり判定
 	/// </summary>
-	void OnCollision();
+	void OnCollision() override;
 
 	/// <summary>
 	/// 座標のゲッター
@@ -56,7 +56,7 @@ public:
 	/// 半径のゲッター
 	/// </summary>
 	/// <returns></returns>
-	const float& GetRadius() { return radius_; }
+	const float& GetRadius() override { return radius_; }
 
 	/// <summary>
 	/// デスフラグのゲッター

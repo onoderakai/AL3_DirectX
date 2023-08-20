@@ -31,6 +31,9 @@ void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos
 	input_ = Input::GetInstance();
 	world_.translation_ = pos;
 
+	isDead_ = false;
+	hp_ = kMaxHp_;
+
 	// 3Dレティクルの初期化
 	world3DReticle_.Initialize();
 	world3DReticle2_.Initialize();
@@ -80,16 +83,12 @@ void Player::Update(const ViewProjection& viewProjection) {
 	world_.translation_.y = min(world_.translation_.y, +moveLimitY);
 
 	world_.UpdateMatrix();
-#ifdef DEBUG
+#ifdef _DEBUG
 	// ImGui
 	ImGui::Begin("PlayerPos");
-	ImGui::Text(
-	    "x:%f:y:%f:z:%f", worldTransform_.translation_.x, worldTransform_.translation_.y,
-	    worldTransform_.translation_.z);
-	ImGui::SliderFloat3("", &worldTransform_.translation_.x, 0.0f, 10.0f);
+	ImGui::Text("%d", hp_);
 	ImGui::End();
-
-#endif // DEBUG
+#endif // _DEBUG
 }
 
 void Player::Move(XINPUT_STATE& joyState) {

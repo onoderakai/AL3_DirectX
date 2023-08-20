@@ -18,7 +18,7 @@ public:
 	/// <summary>
 	/// 当たり判定
 	/// </summary>
-	void OnCollision();
+	void OnCollision() override;
 	
 
 	/// <summary>
@@ -31,7 +31,7 @@ public:
 	/// 半径のゲッター
 	/// </summary>
 	/// <returns></returns>
-	const float& GetRadius() { return kRadius_; }
+	const float& GetRadius() override { return kRadius_; }
 
 	/// <summary>
 	/// 座標のゲッター

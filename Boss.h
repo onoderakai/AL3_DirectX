@@ -3,8 +3,12 @@
 #include "WorldTransform.h"
 #include "Model.h"
 
+class ParticleSystem;
+
 class Boss : public Collider {
 public:
+	Boss();
+
 	~Boss();
 
 	/// <summary>
@@ -22,8 +26,45 @@ public:
 	/// </summary>
 	void Draw(ViewProjection view);
 
+	/// <summary>
+	/// 半径のゲッター
+	/// </summary>
+	/// <returns></returns>
+	const float& GetRadius() override { return radius_; }
+
+	/// <summary>
+	/// 死亡フラグのゲッター
+	/// </summary>
+	/// <returns></returns>
+	const bool& GetIsDead() { return isDead_; }
+
+	/// <summary>
+	/// ワールド座標のゲッター
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetWorldPosition() override;
+
+	/// <summary>
+	/// 衝突判定
+	/// </summary>
+	void OnCollision() override;
+
+	/// <summary>
+	/// パーティクルシステムのセッター
+	/// </summary>
+	/// <param name="particleSystem"></param>
+	void SetParticleSystem(ParticleSystem* particleSystem) { particleSystem_ = particleSystem; }
+
 private:
+	ParticleSystem* particleSystem_ = nullptr;
+
 	Model* model_ = nullptr;
 	uint32_t textureHandle_ = 0;
 	WorldTransform world_;
+	float radius_ = 5.0f;
+
+	//HP
+	const uint32_t kMaxHp_ = 10;
+	int32_t hp_ = kMaxHp_;
+	bool isDead_ = false;
 };

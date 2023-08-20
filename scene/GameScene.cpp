@@ -27,7 +27,7 @@ GameScene::~GameScene() {
 	delete skydome_;
 	delete railCamera_;
 	delete title_;
-	//delete stage_;
+	// delete stage_;
 
 	delete debugCamera_;
 }
@@ -70,13 +70,10 @@ void GameScene::Initialize() {
 	player_->Initialeze(playerModel_, playerTextureHandle_, playerPos);
 	player_->SetEnemys(enemys_);
 
-	// エネミー
-	enemyGeneratePos_ = {5.0f, 3.0f, 100.0f};
-	AddEnemy(enemyGeneratePos_);
-
 	// ボス
 	boss_ = new Boss();
 	boss_->Initialize(bossModel_);
+	boss_->SetParticleSystem(particleSystem_);
 
 	// 天球
 	skydome_ = new Skydome();
@@ -102,13 +99,13 @@ void GameScene::Initialize() {
 	// シーン関連の生成
 	title_ = new Title();
 	title_->Initialize(&scene_);
-	//stage_ = new Stage();
+	// stage_ = new Stage();
 	/*stage_->Initialize(&scene_);
 	stage_->SetParameter(player_, skydome_, railCamera_, particleSystem_);*/
 }
 
 void GameScene::SceneInitialize() {
-	//ファイルの読み込み行を0行目に戻す
+	// ファイルの読み込み行を0行目に戻す
 	stage1EnemyPopCommands.clear();
 	stage1EnemyPopCommands.seekg(0, ios::beg);
 
@@ -123,14 +120,11 @@ void GameScene::SceneInitialize() {
 		delete enemy;
 		return true;
 	});
-	// エネミー
-	enemyGeneratePos_ = {5.0f, 3.0f, 100.0f};
-	AddEnemy(enemyGeneratePos_);
 
 	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
 	player_->Initialeze(playerModel_, playerTextureHandle_, playerPos);
 	player_->SetEnemys(enemys_);
-	
+
 	boss_->Initialize(bossModel_);
 
 	skydome_->Initialize(skydomeModel_);
@@ -149,6 +143,11 @@ void GameScene::SceneInitialize() {
 	delete title_;
 	title_ = new Title();
 	title_->Initialize(&scene_);
+
+	// コマンドの初期化
+	isDefeat_ = false;
+	isWait_ = false;
+	waitTime_ = 0;
 }
 
 void GameScene::Update() {
@@ -180,7 +179,7 @@ void GameScene::Update() {
 	if (input_->PushKey(DIK_3)) {
 		SceneChange::GetInstance()->Change(SceneNum::BOSS_STAGE, &scene_);
 	}
-	
+
 	switch (scene_) {
 	case SceneNum::TITLE:
 		title_->Update();
@@ -257,6 +256,8 @@ void GameScene::Update() {
 		}
 		// パーティクルシステムの更新処理
 		particleSystem_->Update();
+		// 衝突判定
+		CheckAllCollision();
 		break;
 	default:
 		break;
@@ -350,6 +351,7 @@ void GameScene::Draw() {
 		player_->DrawUI();
 		break;
 	case SceneNum::BOSS_STAGE:
+		player_->DrawUI();
 		break;
 	default:
 		break;
@@ -370,7 +372,9 @@ void GameScene::CheckAllCollision() {
 
 	// 衝突判定を行うために、コライダークラスを継承したクラスをコライダーリストに追加する
 	colliders.push_back(player_);
-
+	if (scene_ == SceneNum::BOSS_STAGE) {
+		colliders.push_back(boss_);
+	}
 	for (Enemy* enemy : enemys_) {
 		colliders.push_back(enemy);
 	}
