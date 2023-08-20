@@ -1,4 +1,5 @@
 ﻿#include "ParticleSystem.h"
+#include "MathUtility.h"
 
 ParticleSystem::ParticleSystem() { particleModel_ = Model::Create(); }
 
@@ -43,10 +44,12 @@ void ParticleSystem::AddParticle(Particle::Parameter parameter) {
 	parameter.world_.rotation_.y = float(rand() % 1000);
 	parameter.world_.rotation_.z = float(rand() % 1000);
 
-	parameter.velocity_.x = (rand() % 1000 - 499) / 500.0f;
-	parameter.velocity_.y = (rand() % 1000 - 499) / 500.0f;
-	parameter.velocity_.z = (rand() % 1000 - 499) / 500.0f;
-	newParticle->Initialize(parameter, particleModel_);
+	Vector3 velocity = {};
+	velocity.x = float(rand() % 1000 - 499);
+	velocity.y = float(rand() % 1000 - 499);
+	velocity.z = float(rand() % 1000 - 499);
+	velocity = Normalize(velocity);
+	newParticle->Initialize(parameter, velocity, particleModel_);
 	particles_.push_back(newParticle);
 }
 

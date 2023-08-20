@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "WorldTransform.h"
 #include "ViewProjection.h"
+#include "Input.h"
 
 class RailCamera {
 public:
@@ -29,6 +30,7 @@ public:
 	const WorldTransform& GetWorldTransform() { return world_; }
 
 private:
+	Input* input_;
 	WorldTransform world_;
 	ViewProjection viewProjection_;
 };

@@ -4,23 +4,8 @@
 #include "ImGuiManager.h"
 #include <cassert>
 
-void Particle::Initialize(Parameter parameter, uint32_t textureHandle, Model* model) {
-	assert(model);
-	model_ = model;
-	textureHandle_ = textureHandle;
-	parameter_.type_ = parameter.type_;
-
-	parameter_.world_.Initialize();
-	parameter_.world_.translation_ = parameter.world_.translation_;
-	parameter_.world_.rotation_ = parameter.world_.rotation_;
-	parameter_.velocity_ = parameter.velocity_;
-
-	sizeChange.x = float(parameter_.world_.scale_.x / parameter_.deathTimer_);
-	sizeChange.y = float(parameter_.world_.scale_.y / parameter_.deathTimer_);
-	sizeChange.z = float(parameter_.world_.scale_.z / parameter_.deathTimer_);
-}
-
-void Particle::Initialize(Parameter parameter, Model* model) {
+void Particle::Initialize(
+    Parameter parameter, const Vector3& velocity, Model* model) {
 	assert(model);
 	model_ = model;
 	textureHandle_ = TextureManager::Load("white1x1.png");
@@ -29,7 +14,7 @@ void Particle::Initialize(Parameter parameter, Model* model) {
 	parameter_.world_.Initialize();
 	parameter_.world_.translation_ = parameter.world_.translation_;
 	parameter_.world_.rotation_ = parameter.world_.rotation_;
-	parameter_.velocity_ = parameter.velocity_;
+	velocity_ = velocity;
 
 	switch (parameter_.type_) {
 	case Particle::Type::CIRCLE:
@@ -88,12 +73,12 @@ void Particle::Draw(const ViewProjection& view) {
 }
 
 void Particle::TypeCircleUpdate() {
-	parameter_.world_.translation_ += parameter_.velocity_;
+	parameter_.world_.translation_ += velocity_;
 	parameter_.world_.scale_ -= sizeChange;
 }
 
 void Particle::TypeSphereUpdate() {
-	parameter_.world_.translation_ += parameter_.velocity_;
+	parameter_.world_.translation_ += velocity_;
 	parameter_.world_.scale_ -= sizeChange;
 }
 

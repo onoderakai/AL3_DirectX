@@ -60,7 +60,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// ジョイスティックを使う
 	XINPUT_STATE joyState = {};
 	// 移動処理
-	Move(joyState);
+	//Move(joyState);
 
 	// 攻撃処理
 	Attack();
@@ -113,23 +113,6 @@ void Player::Move(XINPUT_STATE& joyState) {
 	}
 	// 移動
 	world_.translation_ += move;
-
-	// 旋回処理
-	Vector3 rotate = {};
-	const float matRotSpeed = 0.02f;
-	// 入力
-	if (input_->PushKey(DIK_UP)) {
-		rotate.x = -matRotSpeed;
-	} else if (input_->PushKey(DIK_DOWN)) {
-		rotate.x = matRotSpeed;
-	}
-	if (input_->PushKey(DIK_RIGHT)) {
-		rotate.y = matRotSpeed;
-	} else if (input_->PushKey(DIK_LEFT)) {
-		rotate.y = -matRotSpeed;
-	}
-	// 旋回
-	world_.rotation_ += rotate;
 
 	world_.rotation_ = FaceToDirection(Get3DReticleWorldPosition() - GetWorldPosition());
 }
