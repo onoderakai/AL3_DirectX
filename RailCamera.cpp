@@ -18,7 +18,7 @@ void RailCamera::Update() {
 	forward = TransformNormal(forward, world_.matWorld_);
 	// 長さを整える
 	forward = Normalize(forward) * speed;
-	world_.translation_ += forward;
+	//world_.translation_ += forward;
 	ImGui::Begin("RailCamera");
 	ImGui::DragFloat3("cameraTranslate", &world_.translation_.x, 0.01f);
 	ImGui::DragFloat3("cameraRot", &world_.rotation_.x, 0.01f);
@@ -26,7 +26,7 @@ void RailCamera::Update() {
 
 	// 移動処理
 	Vector3 move = {};
-	const float kCharacterSpeed = 0.2f;
+	const float kCharacterSpeed = 0.6f;
 	// 入力
 	if (input_->PushKey(DIK_A)) {
 		move.x -= kCharacterSpeed;
@@ -38,11 +38,13 @@ void RailCamera::Update() {
 	} else if (input_->PushKey(DIK_S)) {
 		move.y -= kCharacterSpeed;
 	}
+	float y = move.y;
 	// ワールド行列の反映
 	move = TransformNormal(move, world_.matWorld_);
 	// 長さを整える
 	move = Normalize(move) * kCharacterSpeed;
 	// 移動
+	move.y = y;
 	world_.translation_ += move;
 
 	// 旋回処理

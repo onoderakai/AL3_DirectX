@@ -61,6 +61,8 @@ void Player::Update(const ViewProjection& viewProjection) {
 	XINPUT_STATE joyState = {};
 	// 移動処理
 	//Move(joyState);
+	world_.rotation_ = FaceToDirection(Get3DReticleWorldPosition() - GetWorldPosition());
+
 
 	// 攻撃処理
 	Attack();

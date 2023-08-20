@@ -6,7 +6,12 @@
 
 Boss::Boss() { textureHandle_ = TextureManager::Load("target.png"); }
 
-Boss::~Boss() {}
+Boss::~Boss() {
+	for (BossBullet* bullet : bullets_) {
+		delete bullet;
+	}
+	delete homingBulletModel_;
+}
 
 void Boss::Initialize(Model* model) {
 	assert(model);
@@ -24,6 +29,9 @@ void Boss::Initialize(Model* model) {
 }
 
 void Boss::Update() {
+	for (BossBullet* bullet : bullets_) {
+		bullet->Update();
+	}
 #ifdef _DEBUG
 	ImGui::Begin("hp");
 	ImGui::Text("%d", hp_);
@@ -33,7 +41,12 @@ void Boss::Update() {
 	world_.UpdateMatrix();
 }
 
-void Boss::Draw(ViewProjection view) { model_->Draw(world_, view, textureHandle_); }
+void Boss::Draw(ViewProjection view) {
+	model_->Draw(world_, view, textureHandle_);
+	for (BossBullet* bullet : bullets_) {
+		bullet->Draw();
+	}
+}
 
 Vector3 Boss::GetWorldPosition() {
 	Vector3 worldPos = {};

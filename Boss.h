@@ -2,6 +2,8 @@
 #include "Collider.h"
 #include "WorldTransform.h"
 #include "Model.h"
+#include "BossBullet.h"
+#include <list>
 
 class ParticleSystem;
 
@@ -62,6 +64,10 @@ private:
 	uint32_t textureHandle_ = 0;
 	WorldTransform world_;
 	float radius_ = 5.0f;
+
+	//弾の包含
+	Model* homingBulletModel_ = nullptr;
+	std::list<BossBullet*> bullets_;
 
 	//HP
 	const uint32_t kMaxHp_ = 10;
