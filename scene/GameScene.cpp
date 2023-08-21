@@ -72,6 +72,7 @@ void GameScene::Initialize() {
 
 	// ボス
 	boss_ = new Boss();
+	boss_->SetPlayer(player_);
 	boss_->Initialize(bossModel_);
 	boss_->SetParticleSystem(particleSystem_);
 

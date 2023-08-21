@@ -4,7 +4,10 @@
 #include "ParticleSystem.h"
 #include <cassert>
 
-Boss::Boss() { textureHandle_ = TextureManager::Load("target.png"); }
+Boss::Boss() {
+	textureHandle_ = TextureManager::Load("target.png");
+	homingBulletModel_ = Model::Create();
+}
 
 Boss::~Boss() {
 	for (BossBullet* bullet : bullets_) {
@@ -20,7 +23,7 @@ void Boss::Initialize(Model* model) {
 
 	isDead_ = false;
 	hp_ = kMaxHp_;
-
+	Attack();
 	// 衝突フィルタリングを設定
 	// このクラスの属性を設定
 	SetCollisonAttribute(kCollisionAttributeBoss);
@@ -29,6 +32,15 @@ void Boss::Initialize(Model* model) {
 }
 
 void Boss::Update() {
+	// デスフラグがtrueの弾を削除する
+	bullets_.remove_if([](BossBullet* bullet) {
+		if (bullet->GetIsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
+
 	for (BossBullet* bullet : bullets_) {
 		bullet->Update();
 	}
@@ -41,10 +53,10 @@ void Boss::Update() {
 	world_.UpdateMatrix();
 }
 
-void Boss::Draw(ViewProjection view) {
+void Boss::Draw(const ViewProjection& view) {
 	model_->Draw(world_, view, textureHandle_);
 	for (BossBullet* bullet : bullets_) {
-		bullet->Draw();
+		bullet->Draw(view);
 	}
 }
 
@@ -63,4 +75,11 @@ void Boss::OnCollision() {
 		para.world_.scale_ = Vector3{2.0f, 2.0f, 2.0f};
 		particleSystem_->Generate(para, 10);
 	}
+}
+
+void Boss::Attack() {
+	BossBullet* newBullet = new BossBullet();
+	newBullet->Initialize(homingBulletModel_);
+	newBullet->SetPlayer(player_);
+	bullets_.push_back(newBullet);
 }

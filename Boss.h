@@ -6,6 +6,7 @@
 #include <list>
 
 class ParticleSystem;
+class Player;
 
 class Boss : public Collider {
 public:
@@ -26,13 +27,19 @@ public:
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(ViewProjection view);
+	void Draw(const ViewProjection& view);
 
 	/// <summary>
 	/// 半径のゲッター
 	/// </summary>
 	/// <returns></returns>
 	const float& GetRadius() override { return radius_; }
+
+	/// <summary>
+	/// 弾のゲッター
+	/// </summary>
+	/// <returns></returns>
+	const std::list<BossBullet*>& GetBullets() { return bullets_; }
 
 	/// <summary>
 	/// 死亡フラグのゲッター
@@ -57,8 +64,15 @@ public:
 	/// <param name="particleSystem"></param>
 	void SetParticleSystem(ParticleSystem* particleSystem) { particleSystem_ = particleSystem; }
 
+	/// <summary>
+	/// プレイヤーのセッター
+	/// </summary>
+	/// <param name="player"></param>
+	void SetPlayer(Player* player) { player_ = player; }
+
 private:
 	ParticleSystem* particleSystem_ = nullptr;
+	Player* player_ = nullptr;
 
 	Model* model_ = nullptr;
 	uint32_t textureHandle_ = 0;
@@ -73,4 +87,6 @@ private:
 	const uint32_t kMaxHp_ = 10;
 	int32_t hp_ = kMaxHp_;
 	bool isDead_ = false;
+
+	void Attack();
 };
