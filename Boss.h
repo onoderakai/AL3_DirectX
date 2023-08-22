@@ -75,9 +75,8 @@ private:
 	Player* player_ = nullptr;
 
 	Model* model_ = nullptr;
-	uint32_t textureHandle_ = 0;
 	WorldTransform world_;
-	float radius_ = 5.0f;
+	float radius_ = 10.0f;
 
 	//弾の包含
 	Model* homingBulletModel_ = nullptr;

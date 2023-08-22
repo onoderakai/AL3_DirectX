@@ -7,8 +7,6 @@ void PlayerBullet::Initialeze(Model* model, const Vector3& pos, const Vector3& v
 	(assert(model));
 	model_ = model;
 
-	textureHandle_ = TextureManager::Load("white1x1.png");
-
 	world_.Initialize();
 	world_.translation_ = pos;
 
@@ -39,7 +37,7 @@ void PlayerBullet::Update() {
 }
 
 void PlayerBullet::Draw(const ViewProjection& viewProjection) {
-	model_->Draw(world_, viewProjection, textureHandle_);
+	model_->Draw(world_, viewProjection);
 }
 
 void PlayerBullet::OnCollision() {

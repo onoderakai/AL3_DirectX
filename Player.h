@@ -30,7 +30,7 @@ public:
 	/// <param name="model">モデル情報</param>
 	/// <param name="textureHandle">テクスチャハンドル</param>
 	/// <param name="pos">生成座標</param>
-	void Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos);
+	void Initialeze(Model* model, const Vector3& pos);
 
 	/// <summary>
 	/// 更新
@@ -83,7 +83,19 @@ public:
 	/// 3Dレティクルのワールド座標を取得
 	/// </summary>
 	/// <returns></returns>
-	Vector3 Get3DReticleWorldPosition(); 
+	Vector3 Get3DReticleWorldPosition();
+
+	/// <summary>
+	/// 3Dレティクルのワールド座標を取得
+	/// </summary>
+	/// <returns></returns>
+	Vector3 Get3DReticleFrontWorldPosition();
+
+	/// <summary>
+	/// 3Dレティクルのワールド座標を取得
+	/// </summary>
+	/// <returns></returns>
+	Vector3 Get3DReticleBackWorldPosition();
 
 	/// <summary>
 	/// 半径のゲッター
@@ -108,12 +120,11 @@ public:
 private:
 	//入力
 	Input* input_ = nullptr;
-	//テクスチャハンドル
-	uint32_t textureHandle_ = 0;
 	// ワールド変換データ
 	WorldTransform world_;
 	// モデル情報
 	Model* model_ = nullptr;
+	Model* bulletModel_ = nullptr;
 	//半径
 	float radius_ = 1.0f;
 	//デスフラグ
@@ -141,10 +152,12 @@ private:
 
 	//3Dレティクル
 	WorldTransform world3DReticle_;
-	WorldTransform world3DReticle2_;
-	WorldTransform world3DReticle3_;
+	WorldTransform world3DReticleBack_;
+	WorldTransform world3DReticleFront_;
 	//2Dレティクル用のスプライト
 	Sprite* sprite2DReticle_ = nullptr;
+	Sprite* sprite2DReticleBack_ = nullptr;
+	Sprite* sprite2DReticleFront_ = nullptr;
 	
 	/// <summary>
 	/// 攻撃

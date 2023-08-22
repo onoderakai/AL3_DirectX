@@ -2,10 +2,11 @@
 #include "CollisionConfig.h"
 #include "ImGuiManager.h"
 #include "ParticleSystem.h"
+#include "Player.h"
 #include <cassert>
+#include "MathUtility.h"
 
 Boss::Boss() {
-	textureHandle_ = TextureManager::Load("target.png");
 	homingBulletModel_ = Model::Create();
 }
 
@@ -20,6 +21,9 @@ void Boss::Initialize(Model* model) {
 	assert(model);
 	model_ = model;
 	world_.Initialize();
+	world_.scale_.x *= 2.0f;
+	world_.scale_.y *= 2.0f;
+	world_.scale_.z *= 2.0f;
 
 	isDead_ = false;
 	hp_ = kMaxHp_;
@@ -41,6 +45,8 @@ void Boss::Update() {
 		return false;
 	});
 
+	world_.rotation_ = FaceToDirection(player_->GetWorldPosition() - GetWorldPosition());
+
 	for (BossBullet* bullet : bullets_) {
 		bullet->Update();
 	}
@@ -54,7 +60,7 @@ void Boss::Update() {
 }
 
 void Boss::Draw(const ViewProjection& view) {
-	model_->Draw(world_, view, textureHandle_);
+	model_->Draw(world_, view);
 	for (BossBullet* bullet : bullets_) {
 		bullet->Draw(view);
 	}

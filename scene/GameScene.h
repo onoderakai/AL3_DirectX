@@ -101,9 +101,7 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 	//モデル
 	Model* playerModel_ = nullptr;
-	//テクスチャハンドル
-	uint32_t playerTextureHandle_ = 0;
-
+	
 	//エネミーを包含
 	std::list<Enemy*> enemys_;
 	// 弾の包含

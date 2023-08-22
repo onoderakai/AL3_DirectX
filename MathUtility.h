@@ -13,6 +13,11 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
 Vector3 Transform(Vector3 Vector, Matrix4x4 Matrix);
 
+/// <summary>
+/// 指定したベクトル方向の回転を返す
+/// </summary>
+/// <param name="direction">向いてほしいベクトル</param>
+/// <returns></returns>
 Vector3 FaceToDirection(const Vector3& direction);
 
 /// <summary>

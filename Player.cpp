@@ -8,36 +8,41 @@
 Player::Player() {
 	uint32_t textureReticle = TextureManager::Load("target.png");
 	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	sprite2DReticleFront_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	sprite2DReticleBack_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	bulletModel_ = Model::CreateFromOBJ("PlayerBullet", true);
 }
 
 Player::~Player() {
 	delete sprite2DReticle_;
+	delete sprite2DReticleFront_;
+	delete sprite2DReticleBack_;
 	for (PlayerBullet* bullet : bullets_) {
 		delete bullet;
 	}
+	delete bulletModel_;
 }
 
-void Player::Initialeze(Model* model, uint32_t textureHandle, const Vector3& pos) {
+void Player::Initialeze(Model* model, const Vector3& pos) {
 	bullets_.remove_if([](PlayerBullet* bullet) {
 		delete bullet;
 		return true;
 	});
 
 	(assert(model));
-	(assert(textureHandle));
 	model_ = model;
-	textureHandle_ = textureHandle;
 	world_.Initialize();
 	input_ = Input::GetInstance();
 	world_.translation_ = pos;
+	world_.scale_ = {0.5f, 0.5f, 0.5f};
 
 	isDead_ = false;
 	hp_ = kMaxHp_;
 
 	// 3Dレティクルの初期化
 	world3DReticle_.Initialize();
-	world3DReticle2_.Initialize();
-	world3DReticle3_.Initialize();
+	world3DReticleBack_.Initialize();
+	world3DReticleFront_.Initialize();
 
 	// 衝突フィルタリングを設定
 	//   このクラスの属性を設定
@@ -60,9 +65,8 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// ジョイスティックを使う
 	XINPUT_STATE joyState = {};
 	// 移動処理
-	//Move(joyState);
+	// Move(joyState);
 	world_.rotation_ = FaceToDirection(Get3DReticleWorldPosition() - GetWorldPosition());
-
 
 	// 攻撃処理
 	Attack();
@@ -121,14 +125,11 @@ void Player::Move(XINPUT_STATE& joyState) {
 
 void Player::Draw(const ViewProjection& viewProjection) {
 
-	model_->Draw(world_, viewProjection, textureHandle_);
-	world3DReticle_.scale_.z = 1.0f;
-	world3DReticle_.scale_.x = 1.0f;
-	world3DReticle_.scale_.y = 1.0f;
+	model_->Draw(world_, viewProjection);
 	world3DReticle_.rotation_ = FaceToDirection(Get3DReticleWorldPosition() - GetWorldPosition());
-	model_->Draw(world3DReticle_, viewProjection);
-	model_->Draw(world3DReticle2_, viewProjection);
-	model_->Draw(world3DReticle3_, viewProjection);
+	/*model_->Draw(world3DReticle_, viewProjection);
+	model_->Draw(world3DReticleBack_, viewProjection);
+	model_->Draw(world3DReticleFront_, viewProjection);*/
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
@@ -145,6 +146,22 @@ Vector3 Player::Get3DReticleWorldPosition() {
 	worldPos = {
 	    world3DReticle_.matWorld_.m[3][0], world3DReticle_.matWorld_.m[3][1],
 	    world3DReticle_.matWorld_.m[3][2]};
+	return worldPos;
+}
+
+Vector3 Player::Get3DReticleFrontWorldPosition() {
+	Vector3 worldPos = {};
+	worldPos = {
+	    world3DReticleFront_.matWorld_.m[3][0], world3DReticleFront_.matWorld_.m[3][1],
+	    world3DReticleFront_.matWorld_.m[3][2]};
+	return worldPos;
+}
+
+Vector3 Player::Get3DReticleBackWorldPosition() {
+	Vector3 worldPos = {};
+	worldPos = {
+	    world3DReticleBack_.matWorld_.m[3][0], world3DReticleBack_.matWorld_.m[3][1],
+	    world3DReticleBack_.matWorld_.m[3][2]};
 	return worldPos;
 }
 
@@ -172,7 +189,7 @@ void Player::Attack() {
 		// 弾の速度を正規化し速度をかける
 		bulletVelocity = Normalize(bulletVelocity) * bulletSpeed;
 
-		newBullet->Initialeze(model_, pos, bulletVelocity);
+		newBullet->Initialeze(bulletModel_, pos, bulletVelocity);
 
 		bullets_.push_back(newBullet);
 	}
@@ -258,18 +275,28 @@ void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
 	if (isLockOn) {
 		world3DReticle_.translation_ = lockOnPos;
 
-		world3DReticle2_.translation_ = world3DReticle_.translation_ + (direction * 10.0f);
-		world3DReticle3_.translation_ = world3DReticle_.translation_ + (direction * -10.0f);
+		world3DReticleBack_.translation_ = world3DReticle_.translation_ + (direction * 10.0f);
+		world3DReticleFront_.translation_ = world3DReticle_.translation_ + (direction * -10.0f);
 	} else {
 		world3DReticle_.translation_ = posNear + (mouseDirection * kDisTestObj);
 
-		world3DReticle2_.translation_ = world3DReticle_.translation_ + (direction * 10.0f);
-		world3DReticle3_.translation_ = world3DReticle_.translation_ + (direction * -10.0f);
+		world3DReticleBack_.translation_ = world3DReticle_.translation_ + (direction * 10.0f);
+		world3DReticleFront_.translation_ = world3DReticle_.translation_ + (direction * -10.0f);
 	}
 
+	ReticlePos = Get3DReticleFrontWorldPosition();
+	// ワールドからスクリーン
+	ReticlePos = Transform(ReticlePos, matViewProjectionViewport);
+	sprite2DReticleFront_->SetPosition(Vector2{ReticlePos.x, ReticlePos.y});
+
+	ReticlePos = Get3DReticleBackWorldPosition();
+	// ワールドからスクリーン
+	ReticlePos = Transform(ReticlePos, matViewProjectionViewport);
+	sprite2DReticleBack_->SetPosition(Vector2{ReticlePos.x, ReticlePos.y});
+
 	world3DReticle_.UpdateMatrix();
-	world3DReticle2_.UpdateMatrix();
-	world3DReticle3_.UpdateMatrix();
+	world3DReticleBack_.UpdateMatrix();
+	world3DReticleFront_.UpdateMatrix();
 }
 
 void Player::ScreenToWorld2DReticle(const ViewProjection& viewProjection, XINPUT_STATE& joyState) {
@@ -315,18 +342,22 @@ void Player::ScreenToWorld2DReticle(const ViewProjection& viewProjection, XINPUT
 	Vector3 direction = Get3DReticleWorldPosition() - GetWorldPosition();
 	direction = Normalize(direction);
 	world3DReticle_.translation_ = posNear + (rayDirection * kDisTestObj);
-	world3DReticle2_.translation_ = world3DReticle_.translation_;
-	world3DReticle3_.translation_ = world3DReticle_.translation_;
+	world3DReticleBack_.translation_ = world3DReticle_.translation_;
+	world3DReticleFront_.translation_ = world3DReticle_.translation_;
 
-	world3DReticle2_.translation_ = world3DReticle2_.translation_ + (direction * 10.0f);
-	world3DReticle3_.translation_ = world3DReticle3_.translation_ + (direction * -10.0f);
+	world3DReticleBack_.translation_ = world3DReticleBack_.translation_ + (direction * -10.0f);
+	world3DReticleFront_.translation_ = world3DReticleFront_.translation_ + (direction * 10.0f);
 
 	world3DReticle_.UpdateMatrix();
-	world3DReticle2_.UpdateMatrix();
-	world3DReticle3_.UpdateMatrix();
+	world3DReticleBack_.UpdateMatrix();
+	world3DReticleFront_.UpdateMatrix();
 }
 
-void Player::DrawUI() { sprite2DReticle_->Draw(); }
+void Player::DrawUI() {
+	sprite2DReticle_->Draw();
+	sprite2DReticleFront_->Draw();
+	sprite2DReticleBack_->Draw();
+}
 
 void Player::OnCollision() {
 	hp_--;

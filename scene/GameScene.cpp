@@ -50,15 +50,13 @@ void GameScene::Initialize() {
 	particleSystem_->Initialize();
 
 	// プレイヤーモデルの生成
-	playerModel_ = Model::Create();
-	// プレイヤーのテクスチャハンドルを代入
-	playerTextureHandle_ = TextureManager::Load("sample.png");
-
+	playerModel_ = Model::CreateFromOBJ("Player", true);
+	
 	// エネミーモデルの生成
 	enemyModel_ = Model::Create();
 
 	// ボスモデルの生成
-	bossModel_ = Model::Create();
+	bossModel_ = Model::CreateFromOBJ("Boss", true);
 
 	// 天球のモデルを生成
 	skydomeModel_ = Model::CreateFromOBJ("skydome", true);
@@ -67,7 +65,7 @@ void GameScene::Initialize() {
 	// プレイヤー
 	player_ = new Player();
 	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
-	player_->Initialeze(playerModel_, playerTextureHandle_, playerPos);
+	player_->Initialeze(playerModel_, playerPos);
 	player_->SetEnemys(enemys_);
 
 	// ボス
@@ -123,7 +121,7 @@ void GameScene::SceneInitialize() {
 	});
 
 	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
-	player_->Initialeze(playerModel_, playerTextureHandle_, playerPos);
+	player_->Initialeze(playerModel_, playerPos);
 	player_->SetEnemys(enemys_);
 
 	boss_->Initialize(bossModel_);

@@ -60,8 +60,7 @@ public:
 private:
 	WorldTransform world_;
 	Model* model_ = nullptr;
-	uint32_t textureHandle_ = 0;
-
+	
 	Vector3 velocity_ = {};
 
 	//弾の半径
