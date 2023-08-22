@@ -45,7 +45,7 @@ void RailCamera::Update() {
 	move = Normalize(move) * kCharacterSpeed;
 	// 移動
 	move.y = y;
-	world_.translation_ += move;
+	//world_.translation_ += move;
 
 	// 旋回処理
 	Vector3 rotate = {};
@@ -62,7 +62,7 @@ void RailCamera::Update() {
 		rotate.y = -matRotSpeed;
 	}
 	// 旋回
-	world_.rotation_ += rotate;
+	//world_.rotation_ += rotate;
 
 	world_.UpdateMatrix();
 	viewProjection_.matView = Inverse(world_.matWorld_);

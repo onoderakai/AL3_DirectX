@@ -8,8 +8,10 @@
 Player::Player() {
 	uint32_t textureReticle = TextureManager::Load("target.png");
 	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
-	sprite2DReticleFront_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
 	sprite2DReticleBack_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	sprite2DReticleBack_->SetSize(Vector2{40.0f, 40.0f});
+	sprite2DReticleFront_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	sprite2DReticleFront_->SetSize(Vector2{80.0f, 80.0f});
 	bulletModel_ = Model::CreateFromOBJ("PlayerBullet", true);
 }
 
@@ -65,7 +67,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// ジョイスティックを使う
 	XINPUT_STATE joyState = {};
 	// 移動処理
-	// Move(joyState);
+	Move(joyState);
 	world_.rotation_ = FaceToDirection(Get3DReticleWorldPosition() - GetWorldPosition());
 
 	// 攻撃処理
@@ -80,8 +82,8 @@ void Player::Update(const ViewProjection& viewProjection) {
 	// ScreenToWorld2DReticle(viewProjection, joyState);
 
 	// 当たり判定
-	float moveLimitX = 34.0f;
-	float moveLimitY = 18.0f;
+	float moveLimitX = 12.0f;
+	float moveLimitY = 7.0f;
 
 	world_.translation_.x = max(world_.translation_.x, -moveLimitX);
 	world_.translation_.x = min(world_.translation_.x, +moveLimitX);
