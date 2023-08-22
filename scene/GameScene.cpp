@@ -171,12 +171,24 @@ void GameScene::Update() {
 		SceneChange::GetInstance()->Change(SceneNum::TITLE, &scene_);
 	}
 	// 2でSTAGEシーンに遷移する
-	if (input_->PushKey(DIK_2)) {
+	else if (input_->PushKey(DIK_2)) {
 		SceneChange::GetInstance()->Change(SceneNum::STAGE, &scene_);
 	}
 	// 3でBOSS_STAGEシーンに遷移する
-	if (input_->PushKey(DIK_3)) {
+	else if (input_->PushKey(DIK_3)) {
 		SceneChange::GetInstance()->Change(SceneNum::BOSS_STAGE, &scene_);
+	}
+	// 4でCLEARシーンに遷移する
+	else if (input_->PushKey(DIK_4)) {
+		SceneChange::GetInstance()->Change(SceneNum::CLEAR, &scene_);
+	}
+	// 5でGAMEOVERシーンに遷移する
+	else if (input_->PushKey(DIK_5)) {
+		SceneChange::GetInstance()->Change(SceneNum::GAMEOVER, &scene_);
+	}
+	else if (input_->PushKey(DIK_6)) {
+		stage1EnemyPopCommands.clear();
+		stage1EnemyPopCommands.seekg(0, ios::beg);
 	}
 
 	switch (scene_) {
@@ -257,6 +269,16 @@ void GameScene::Update() {
 		particleSystem_->Update();
 		// 衝突判定
 		CheckAllCollision();
+		break;
+	case SceneNum::CLEAR:
+		if (input_->PushKey(DIK_SPACE)) {
+			SceneChange::GetInstance()->Change(SceneNum::TITLE, &scene_);
+		}
+		break;
+	case SceneNum::GAMEOVER:
+		if (input_->PushKey(DIK_SPACE)) {
+			SceneChange::GetInstance()->Change(SceneNum::TITLE, &scene_);
+		}
 		break;
 	default:
 		break;
@@ -351,6 +373,12 @@ void GameScene::Draw() {
 		break;
 	case SceneNum::BOSS_STAGE:
 		player_->DrawUI();
+		break;
+	case SceneNum::CLEAR:
+
+		break;
+	case SceneNum::GAMEOVER:
+
 		break;
 	default:
 		break;
@@ -469,10 +497,6 @@ void GameScene::LoadEnemyPopData() {
 }
 
 void GameScene::UpdateEnemyPopCommands() {
-	if (input_->PushKey(DIK_4)) {
-		stage1EnemyPopCommands.clear();
-		stage1EnemyPopCommands.seekg(0, ios::beg);
-	}
 	// 待機処理
 	if (isDefeat_) {
 		uint32_t enemyCount = 0;

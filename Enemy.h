@@ -16,6 +16,9 @@ class ParticleSystem;
 /// </summary>
 class Enemy : public Collider {
 public:
+
+	Enemy();
+
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
@@ -89,6 +92,7 @@ private:
 	Model* model_ = nullptr;
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
+	uint32_t particleTextureHandle_ = 0;
 	// 半径
 	float radius_ = 1.0f;
 

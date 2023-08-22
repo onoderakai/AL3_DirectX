@@ -5,6 +5,9 @@
 #include "MathUtility.h"
 #include "Player.h"
 #include <cassert>
+#include "TextureManager.h"
+
+Enemy::Enemy() { particleTextureHandle_ = TextureManager::Load("red1x1.png"); }
 
 void Enemy::Initialeze(Model* model, const Vector3& pos) {
 	(assert(model));
@@ -66,7 +69,7 @@ void Enemy::OnCollision() {
 	para.type_ = Particle::Type::SCALE_CHANGE;
 	para.world_.translation_ = GetWorldPosition();
 	para.world_.scale_ = Vector3{2.0f, 2.0f, 2.0f};
-	particleSystem_->Generate(para, 10);
+	particleSystem_->Generate(para, 10, particleTextureHandle_);
 	para.type_ = Particle::Type::SPHERE;
 	particleSystem_->Generate(para, 10);
 	isDead_ = true;

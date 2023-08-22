@@ -6,6 +6,8 @@
 enum class SceneNum {
 	TITLE,
 	STAGE,
-	BOSS_STAGE
+	BOSS_STAGE,
+	CLEAR,
+	GAMEOVER
 };
 class Scene {};

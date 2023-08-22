@@ -4,11 +4,12 @@
 #include "ImGuiManager.h"
 #include <cassert>
 
+Particle::Particle() { textureHandle_ = TextureManager::Load("white1x1.png"); }
+
 void Particle::Initialize(
     Parameter parameter, const Vector3& velocity, Model* model) {
 	assert(model);
 	model_ = model;
-	textureHandle_ = TextureManager::Load("white1x1.png");
 	parameter_.type_ = parameter.type_;
 
 	parameter_.world_.Initialize();
@@ -31,7 +32,7 @@ void Particle::Initialize(
 		break;
 	case Particle::Type::SCALE_CHANGE:
 		parameter_.world_.scale_ = Vector3{0.0f, 0.0f, 0.0f};
-		sizeChange.x = 0.5f;
+		sizeChange.x = 1.0f;
 		sizeChange.y = float(2.0f / parameter_.deathTimer_);
 		sizeChange.z = float(2.0f / parameter_.deathTimer_);
 		break;
@@ -39,6 +40,12 @@ void Particle::Initialize(
 		break;
 	}
 	
+}
+
+void Particle::Initialize(
+    Parameter parameter, const Vector3& velocity, Model* model, uint32_t textureHandle) {
+	Initialize(parameter, velocity, model);
+	textureHandle_ = textureHandle;
 }
 
 void Particle::Update() {

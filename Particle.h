@@ -14,11 +14,16 @@ public:
 		// 速度
 		float speed_ = 1.0f;
 		// デスタイム
-		uint32_t deathTimer_ = 60;
+		uint32_t deathTimer_ = 30;
 	};
+
+	Particle();
 
 	void Initialize(
 	    Parameter parameter, const Vector3& velocity, Model* model);
+
+	void Initialize(
+	    Parameter parameter, const Vector3& velocity, Model* model, uint32_t textureHandle);
 
 	void Update();
 

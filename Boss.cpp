@@ -7,6 +7,9 @@
 #include "MathUtility.h"
 
 Boss::Boss() {
+	world_.scale_.x *= 3.0f;
+	world_.scale_.y *= 3.0f;
+	world_.scale_.z *= 3.0f;
 	homingBulletModel_ = Model::Create();
 }
 
@@ -21,9 +24,11 @@ void Boss::Initialize(Model* model) {
 	assert(model);
 	model_ = model;
 	world_.Initialize();
-	world_.scale_.x *= 2.0f;
-	world_.scale_.y *= 2.0f;
-	world_.scale_.z *= 2.0f;
+
+	bullets_.remove_if([](BossBullet* bullet) {
+		delete bullet;
+		return true;
+	});
 
 	isDead_ = false;
 	hp_ = kMaxHp_;
