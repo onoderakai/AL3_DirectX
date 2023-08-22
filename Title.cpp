@@ -27,8 +27,6 @@ void Title::Update() {
 	titleSprite_->SetColor(a);
 }
 
-void Title::Draw() {}
-
 void Title::DrawBackground() {
 	titleSprite_->Draw();
 }

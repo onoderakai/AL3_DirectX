@@ -18,6 +18,8 @@
 #include "RailCamera.h"
 #include "Title.h"
 //#include "Stage.h"
+#include "Clear.h"
+#include "GameOver.h"
 #include "Scene.h"
 #include "ParticleSystem.h"
 
@@ -84,6 +86,8 @@ private: // メンバ変数
 	SceneNum scene_ = SceneNum::TITLE;
 	Title* title_ = nullptr;
 	//Stage* stage_ = nullptr;
+	Clear* clear_ = nullptr;
+	GameOver* gameOver_ = nullptr;
 	SceneNum preScene_ = scene_;
 
 	std::stringstream stage1EnemyPopCommands;

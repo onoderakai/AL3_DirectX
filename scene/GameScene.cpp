@@ -28,6 +28,8 @@ GameScene::~GameScene() {
 	delete railCamera_;
 	delete title_;
 	// delete stage_;
+	delete clear_;
+	delete gameOver_;
 
 	delete debugCamera_;
 }
@@ -98,6 +100,10 @@ void GameScene::Initialize() {
 	// シーン関連の生成
 	title_ = new Title();
 	title_->Initialize(&scene_);
+	clear_ = new Clear();
+	clear_->Initialize(&scene_);
+	gameOver_ = new GameOver();
+	gameOver_->Initialize(&scene_);
 	// stage_ = new Stage();
 	/*stage_->Initialize(&scene_);
 	stage_->SetParameter(player_, skydome_, railCamera_, particleSystem_);*/
@@ -142,6 +148,14 @@ void GameScene::SceneInitialize() {
 	delete title_;
 	title_ = new Title();
 	title_->Initialize(&scene_);
+
+	delete clear_;
+	clear_ = new Clear();
+	clear_->Initialize(&scene_);
+
+	delete gameOver_;
+	gameOver_ = new GameOver();
+	gameOver_->Initialize(&scene_);
 
 	// コマンドの初期化
 	isDefeat_ = false;
@@ -271,14 +285,10 @@ void GameScene::Update() {
 		CheckAllCollision();
 		break;
 	case SceneNum::CLEAR:
-		if (input_->PushKey(DIK_SPACE)) {
-			SceneChange::GetInstance()->Change(SceneNum::TITLE, &scene_);
-		}
+		clear_->Update();
 		break;
 	case SceneNum::GAMEOVER:
-		if (input_->PushKey(DIK_SPACE)) {
-			SceneChange::GetInstance()->Change(SceneNum::TITLE, &scene_);
-		}
+		gameOver_->Update();
 		break;
 	default:
 		break;
@@ -375,10 +385,10 @@ void GameScene::Draw() {
 		player_->DrawUI();
 		break;
 	case SceneNum::CLEAR:
-
+		clear_->DrawBackground();
 		break;
 	case SceneNum::GAMEOVER:
-
+		gameOver_->DrawBackground();
 		break;
 	default:
 		break;

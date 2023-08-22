@@ -1,21 +1,19 @@
 ﻿#pragma once
-#include "Scene.h"
 #include "Input.h"
+#include "Scene.h"
 #include "Sprite.h"
 
-class Title {
+class GameOver {
 public:
-
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~Title();
+	~GameOver();
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Initialize(SceneNum* pScene);
-
 
 	/// <summary>
 	/// 更新
@@ -29,11 +27,10 @@ public:
 
 private:
 	Input* input_ = nullptr;
-	//シーン変数のポインタ
+	// シーン変数のポインタ
 	SceneNum* pScene_;
 
-	//タイトル画像関連
-	uint32_t titleTextureHandle_ = 0;
-	Sprite* titleSprite_ = nullptr;
-	Vector4 a = {0.0f, 1.0f, 0.0f, 1.0f};
+	// タイトル画像関連
+	uint32_t gameOverTextureHandle_ = 0;
+	Sprite* gameOverSprite_ = nullptr;
 };
