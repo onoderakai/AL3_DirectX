@@ -7,8 +7,9 @@
 Particle::Particle() { textureHandle_ = TextureManager::Load("white1x1.png"); }
 
 void Particle::Initialize(
-    Parameter parameter, const Vector3& velocity, Model* model) {
+    const Parameter& parameter, const Vector3& velocity, Model* model) {
 	assert(model);
+	parameter_ = parameter;
 	model_ = model;
 	parameter_.type_ = parameter.type_;
 
@@ -31,10 +32,11 @@ void Particle::Initialize(
 		sizeChange.z = float(parameter_.world_.scale_.z / parameter_.deathTimer_);
 		break;
 	case Particle::Type::SCALE_CHANGE:
+		targetScale_ = {10.0f, 1.0f, 1.0f};
 		parameter_.world_.scale_ = Vector3{0.0f, 0.0f, 0.0f};
-		sizeChange.x = 1.0f;
-		sizeChange.y = float(2.0f / parameter_.deathTimer_);
-		sizeChange.z = float(2.0f / parameter_.deathTimer_);
+		sizeChange.x = float(2.0f / parameter_.deathTimer_) * targetScale_.x;
+		sizeChange.y = float(2.0f / parameter_.deathTimer_) * targetScale_.y;
+		sizeChange.z = float(2.0f / parameter_.deathTimer_) * targetScale_.z;
 		break;
 	default:
 		break;
@@ -43,7 +45,7 @@ void Particle::Initialize(
 }
 
 void Particle::Initialize(
-    Parameter parameter, const Vector3& velocity, Model* model, uint32_t textureHandle) {
+    const Parameter& parameter, const Vector3& velocity, Model* model, uint32_t textureHandle) {
 	Initialize(parameter, velocity, model);
 	textureHandle_ = textureHandle;
 }
@@ -91,10 +93,9 @@ void Particle::TypeSphereUpdate() {
 
 void Particle::TypeScaleChangeUpdate() {
 	parameter_.world_.scale_ += sizeChange;
-	Vector3 targetScale = {10.0f, 1.0f, 1.0f};
-	if (parameter_.world_.scale_.x >= targetScale.x &&
-	    parameter_.world_.scale_.y >= targetScale.y &&
-	    parameter_.world_.scale_.z >= targetScale.z) {
+	if (parameter_.world_.scale_.x >= targetScale_.x &&
+	    parameter_.world_.scale_.y >= targetScale_.y &&
+	    parameter_.world_.scale_.z >= targetScale_.z) {
 		sizeChange.y *= -1.0f;
 		sizeChange.z *= -1.0f;
 	}

@@ -3,6 +3,7 @@
 #include "Enemy.h"
 #include "ImGuiManager.h"
 #include "MathUtility.h"
+#include "ParticleSystem.h"
 #include <cassert>
 
 Player::Player() {
@@ -93,7 +94,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 	world_.UpdateMatrix();
 #ifdef _DEBUG
 	// ImGui
-	ImGui::Begin("PlayerPos");
+	ImGui::Begin("PlayerHp");
 	ImGui::Text("%d", hp_);
 	ImGui::End();
 #endif // _DEBUG
@@ -364,6 +365,11 @@ void Player::DrawUI() {
 void Player::OnCollision() {
 	hp_--;
 	if (hp_ <= 0) {
+		Particle::Parameter para = {};
+		para.deathTimer_ = 30;
+		para.type_ = Particle::Type::SCALE_CHANGE;
+		para.world_.translation_ = GetWorldPosition();
+		particleSystem_->Generate(para, 20);
 		isDead_ = true;
 	}
 }

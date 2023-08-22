@@ -15,9 +15,9 @@ public:
 
 	void Draw(const ViewProjection& view);
 
-	void Generate(Particle::Parameter parameter, uint32_t howMany);
+	void Generate(Particle::Parameter& parameter, uint32_t howMany);
 
-	void Generate(Particle::Parameter parameter, uint32_t howMany, uint32_t textureHandle);
+	void Generate(Particle::Parameter& parameter, uint32_t howMany, uint32_t textureHandle);
 
 private:
 	// パーティクルの包含
@@ -26,7 +26,7 @@ private:
 	// パーティクルのモデル
 	Model* particleModel_ = nullptr;
 
-	void AddParticle(Particle::Parameter parameter);
+	void AddParticle(Particle::Parameter& parameter);
 
-	void AddParticle(Particle::Parameter parameter, uint32_t textureHandle);
+	void AddParticle(Particle::Parameter& parameter, uint32_t textureHandle);
 };

@@ -8,6 +8,7 @@
 #include "Collider.h"
 
 class Enemy;
+class ParticleSystem;
 
 /// <summary>
 /// 自キャラ
@@ -115,7 +116,13 @@ public:
 	/// 敵のセッター
 	/// </summary>
 	/// <param name="enemys"></param>
-	void SetEnemys(std::list<Enemy*> enemys) { enemys_ = *&enemys; }
+	void SetEnemys(std::list<Enemy*> enemys) { enemys_ = enemys; }
+
+	/// <summary>
+	/// パーティクルシステムのセッター
+	/// </summary>
+	/// <param name="particleSystem"></param>
+	void SetParticleSystem(ParticleSystem* particleSystem) { particleSystem_ = particleSystem; }
 
 private:
 	//入力
@@ -130,11 +137,13 @@ private:
 	//デスフラグ
 	bool isDead_ = false;
 	//HP
-	uint32_t kMaxHp_ = 100;
+	uint32_t kMaxHp_ = 10;
 	int32_t hp_ = kMaxHp_;
 
 	//敵のリスト
 	std::list<Enemy*> enemys_;
+	//パーティクルシステム
+	ParticleSystem* particleSystem_ = nullptr;
 
 	//ロックオンフラグ
 	bool isLockOn = false;

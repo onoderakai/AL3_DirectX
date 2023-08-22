@@ -8,7 +8,7 @@ public:
 
 	struct Parameter {
 		// パーティクルの種類
-		Type type_;
+		Type type_ = Type::SPHERE;
 		// 座標
 		WorldTransform world_;
 		// 速度
@@ -20,10 +20,10 @@ public:
 	Particle();
 
 	void Initialize(
-	    Parameter parameter, const Vector3& velocity, Model* model);
+	    const Parameter& parameter, const Vector3& velocity, Model* model);
 
 	void Initialize(
-	    Parameter parameter, const Vector3& velocity, Model* model, uint32_t textureHandle);
+	    const Parameter& parameter, const Vector3& velocity, Model* model, uint32_t textureHandle);
 
 	void Update();
 
@@ -40,6 +40,7 @@ private:
 	Parameter parameter_ = {};
 	Vector3 sizeChange = {};
 	Vector3 velocity_ = {};
+	Vector3 targetScale_ = {};
 
 	// モデル
 	Model* model_ = nullptr;

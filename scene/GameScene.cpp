@@ -53,7 +53,7 @@ void GameScene::Initialize() {
 
 	// プレイヤーモデルの生成
 	playerModel_ = Model::CreateFromOBJ("Player", true);
-	
+
 	// エネミーモデルの生成
 	enemyModel_ = Model::Create();
 
@@ -69,6 +69,7 @@ void GameScene::Initialize() {
 	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
 	player_->Initialeze(playerModel_, playerPos);
 	player_->SetEnemys(enemys_);
+	player_->SetParticleSystem(particleSystem_);
 
 	// ボス
 	boss_ = new Boss();
@@ -129,6 +130,7 @@ void GameScene::SceneInitialize() {
 	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
 	player_->Initialeze(playerModel_, playerPos);
 	player_->SetEnemys(enemys_);
+	player_->SetParticleSystem(particleSystem_);
 
 	boss_->Initialize(bossModel_);
 
@@ -199,8 +201,7 @@ void GameScene::Update() {
 	// 5でGAMEOVERシーンに遷移する
 	else if (input_->PushKey(DIK_5)) {
 		SceneChange::GetInstance()->Change(SceneNum::GAMEOVER, &scene_);
-	}
-	else if (input_->PushKey(DIK_6)) {
+	} else if (input_->PushKey(DIK_6)) {
 		stage1EnemyPopCommands.clear();
 		stage1EnemyPopCommands.seekg(0, ios::beg);
 	}
@@ -221,7 +222,11 @@ void GameScene::Update() {
 
 		// プレイヤーの更新処理
 		if (player_) {
-			player_->Update(viewProjection_);
+			if (player_->GetIsDead()) {
+				SceneChange::GetInstance()->Change(SceneNum::GAMEOVER, &scene_);
+			} else {
+				player_->Update(viewProjection_);
+			}
 		}
 		// デスフラグがtrueの敵を削除する
 		enemys_.remove_if([](Enemy* enemy) {
@@ -269,7 +274,11 @@ void GameScene::Update() {
 		}
 		// プレイヤーの更新処理
 		if (player_) {
-			player_->Update(viewProjection_);
+			if (player_->GetIsDead()) {
+				SceneChange::GetInstance()->Change(SceneNum::GAMEOVER, &scene_);
+			} else {
+				player_->Update(viewProjection_);
+			}
 		}
 		// ボスの更新処理
 		if (boss_) {
@@ -332,7 +341,9 @@ void GameScene::Draw() {
 		break;
 	case SceneNum::STAGE:
 		if (player_) {
-			player_->Draw(viewProjection_);
+			if (!player_->GetIsDead()) {
+				player_->Draw(viewProjection_);
+			}
 		}
 		for (EnemyBullet* bullet : enemyBullets_) {
 			bullet->Draw(viewProjection_);
@@ -349,7 +360,9 @@ void GameScene::Draw() {
 		break;
 	case SceneNum::BOSS_STAGE:
 		if (player_) {
-			player_->Draw(viewProjection_);
+			if (!player_->GetIsDead()) {
+				player_->Draw(viewProjection_);
+			}
 		}
 		if (boss_) {
 			boss_->Draw(viewProjection_);
@@ -408,7 +421,9 @@ void GameScene::CheckAllCollision() {
 	list<Collider*> colliders;
 
 	// 衝突判定を行うために、コライダークラスを継承したクラスをコライダーリストに追加する
-	colliders.push_back(player_);
+	if (!player_->GetIsDead()) {
+		colliders.push_back(player_);
+	}
 	if (scene_ == SceneNum::BOSS_STAGE) {
 		colliders.push_back(boss_);
 	}
@@ -434,44 +449,6 @@ void GameScene::CheckAllCollision() {
 			CheckCollisionPair(A, B);
 		}
 	}
-
-	//// 判定対象の座標
-	// Vector3 posA = {};
-	// Vector3 posB = {};
-
-	// const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
-	// const std::list<EnemyBullet*>& enemyBullets = enemyBullets_;
-
-	//// 自キャラの座標
-	// posA = player_->GetWorldPosition();
-
-	//// 自キャラと敵弾全ての当たり判定
-	// for (EnemyBullet* bullet : enemyBullets) {
-	//	CheckCollisionPair(player_, bullet);
-	// }
-
-	// for (Enemy* enemy : enemys_) {
-	//	// 敵キャラの座標
-	//	posA = enemy->GetWorldPosition();
-	//	// 敵キャラと自弾全ての当たり判定
-	//	for (PlayerBullet* bullet : playerBullets) {
-	//		CheckCollisionPair(enemy, bullet);
-	//		ImGui::Begin("bit");
-	//		ImGui::Text(
-	//		    "enemy %d,%d:bullet %d,%d", enemy->GetCollisionAttribute(),
-	// enemy->GetCollisionMask(), 		    bullet->GetCollisionAttribute(),
-	// bullet->GetCollisionMask()); 		ImGui::End();
-	//	}
-	// }
-
-	//// 自弾と敵弾の当たり判定
-	// for (PlayerBullet* playerBullet : playerBullets) {
-	//	// 自弾の座標
-	//	posA = playerBullet->GetWorldPosition();
-	//	for (EnemyBullet* enemyBullet : enemyBullets) {
-	//		CheckCollisionPair(playerBullet, enemyBullet);
-	//	}
-	// }
 }
 
 void GameScene::CheckCollisionPair(Collider* colliderA, Collider* colliderB) {

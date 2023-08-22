@@ -68,8 +68,8 @@ void Enemy::OnCollision() {
 	Particle::Parameter para = {};
 	para.type_ = Particle::Type::SCALE_CHANGE;
 	para.world_.translation_ = GetWorldPosition();
-	para.world_.scale_ = Vector3{2.0f, 2.0f, 2.0f};
 	particleSystem_->Generate(para, 10, particleTextureHandle_);
+	para.world_.scale_ = Vector3{2.0f, 2.0f, 2.0f};
 	para.type_ = Particle::Type::SPHERE;
 	particleSystem_->Generate(para, 10);
 	isDead_ = true;
