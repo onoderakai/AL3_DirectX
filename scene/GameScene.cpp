@@ -553,6 +553,11 @@ void GameScene::UpdateEnemyPopCommands() {
 
 			// コマンドループを抜ける
 			break;
+		} else if (word.find("CLEAR") == 0) {
+			getline(line_stream, word, ',');
+			SceneChange::GetInstance()->Change(SceneNum::CLEAR, &scene_);
+			// コマンドループを抜ける
+			break;
 		}
 	}
 }
