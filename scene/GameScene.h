@@ -23,6 +23,8 @@
 #include "Scene.h"
 #include "ParticleSystem.h"
 
+#include "EnemyType.h"
+
 using namespace std;
 
 /// <summary>
@@ -71,7 +73,7 @@ public: // メンバ関数
 	/// 敵を追加する
 	/// </summary>
 	/// <param name="pos"></param>
-	void AddEnemy(Vector3 pos);
+	void AddEnemy(Type type, Vector3 pos);
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;

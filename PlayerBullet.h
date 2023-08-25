@@ -64,7 +64,7 @@ private:
 	Vector3 velocity_ = {};
 
 	//弾の半径
-	const float kRadius_ = 1.0f;
+	const float kRadius_ = 2.0f;
 	//寿命(フレーム)
 	static const int32_t kLifeTime = 60 * 5;
 	//デスタイマー

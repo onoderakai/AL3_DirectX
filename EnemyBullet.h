@@ -1,8 +1,9 @@
 ﻿#pragma once
-#include "Model.h"
-#include "WorldTransform.h"
-#include "ViewProjection.h"
 #include "Collider.h"
+#include "EnemyType.h"
+#include "Model.h"
+#include "ViewProjection.h"
+#include "WorldTransform.h"
 
 class Player;
 
@@ -11,7 +12,7 @@ class Player;
 /// </summary>
 class EnemyBullet : public Collider {
 public:
-	void Initialize(const Vector3& pos, const Vector3& velocity, Model* model);
+	void Initialize(Type enemyType, const Vector3& pos, const Vector3& velocity, Model* model);
 	void Update();
 	void Draw(const ViewProjection& viewProjection);
 
@@ -19,7 +20,6 @@ public:
 	/// 当たり判定
 	/// </summary>
 	void OnCollision() override;
-	
 
 	/// <summary>
 	/// デスフラグのゲッター
@@ -51,15 +51,24 @@ private:
 	uint32_t textureHandle_ = 0;
 	Vector3 velocity_;
 
-	//プレイヤーの包含
+	// プレイヤーの包含
 	Player* player_ = nullptr;
 
-	//弾の半径
+	//敵の種類
+	Type bulletType_ = Type::NORMAL;
+
+	// 弾の半径
 	const float kRadius_ = 1.0f;
-	//弾の寿命
+	// 弾の寿命
 	const int kLifeTime = 60 * 20;
-	//デスタイマー
+	// デスタイマー
 	int deathTimer_ = kLifeTime;
-	//デスフラグ
+	// デスフラグ
 	bool isDead_ = false;
+
+	void NormalUpdate();
+
+	void ToPlayerUpdate();
+
+	void HomingUpdate();
 };

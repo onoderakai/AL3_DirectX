@@ -6,6 +6,7 @@
 #include "Vector3.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "EnemyType.h"
 
 class Player;
 class GameScene;
@@ -16,7 +17,6 @@ class ParticleSystem;
 /// </summary>
 class Enemy : public Collider {
 public:
-	enum class Type { NORMAL, TO_PLAYER, HOMING };
 	Enemy();
 
 	/// <summary>
@@ -107,16 +107,6 @@ private:
 
 	Vector3 velocity_ = {};
 
-	/// <summary>
-	/// 攻撃処理
-	/// </summary>
-	void HomingAttack();
-
-	/// <summary>
-	/// 種類に応じて弾を発射して発射クールタイムをリセットする
-	/// </summary>
-	void AttackReset();
-
 	// デスフラグ
 	bool isDead_ = false;
 	// デスタイマー
@@ -138,9 +128,19 @@ private:
 	list<TimeCall*> timeCalls_;
 
 	/// <summary>
+	/// 種類に応じて弾を発射して発射クールタイムをリセットする
+	/// </summary>
+	void AttackReset();
+
+	/// <summary>
 	/// NORMALの更新処理
 	/// </summary>
 	void NormalUpdate();
+
+	/// <summary>
+	/// NORMALの更新処理
+	/// </summary>
+	void NormalAttack();
 
 	/// <summary>
 	/// TO_PLAYERの更新処理
@@ -148,7 +148,17 @@ private:
 	void ToPlayerUpdate();
 
 	/// <summary>
+	/// TO_PLAYERの更新処理
+	/// </summary>
+	void ToPlayerAttack();
+
+	/// <summary>
 	/// HOMINGの更新処理
 	/// </summary>
 	void HomingUpdate();
+
+	/// <summary>
+	/// 攻撃処理
+	/// </summary>
+	void HomingAttack();
 };

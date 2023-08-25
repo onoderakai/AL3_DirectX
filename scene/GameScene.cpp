@@ -145,8 +145,6 @@ void GameScene::SceneInitialize() {
 	viewProjection_.farZ = 100.0f;
 	viewProjection_.Initialize();
 
-	// ファイル読み込み
-	LoadEnemyPopData();
 	delete title_;
 	title_ = new Title();
 	title_->Initialize(&scene_);
@@ -535,7 +533,18 @@ void GameScene::UpdateEnemyPopCommands() {
 			// Z座標
 			getline(line_stream, word, ',');
 			float z = (float)atof(word.c_str());
-			AddEnemy({x, y, z});
+
+			// 敵のタイプ
+			Type enemyType = Type::NORMAL;
+			getline(line_stream, word, ',');
+			if (word.find("NORMAL") == 0) {
+				enemyType = Type::NORMAL;
+			} else if (word.find("TO_PLAYER") == 0) {
+				enemyType = Type::TO_PLAYER;
+			} else if (word.find("HOMING") == 0) {
+				enemyType = Type::HOMING;
+			}
+			AddEnemy(enemyType, {x, y, z});
 		} else if (word.find("WAIT") == 0) {
 
 			getline(line_stream, word, ',');
@@ -555,7 +564,7 @@ void GameScene::UpdateEnemyPopCommands() {
 			break;
 		} else if (word.find("CLEAR") == 0) {
 			getline(line_stream, word, ',');
-			//SceneChange::GetInstance()->Change(SceneNum::CLEAR, &scene_);
+			SceneChange::GetInstance()->Change(SceneNum::CLEAR, &scene_);
 			// コマンドループを抜ける
 			break;
 		}
@@ -567,11 +576,11 @@ void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
 	enemyBullets_.push_back(enemyBullet);
 }
 
-void GameScene::AddEnemy(Vector3 pos) {
+void GameScene::AddEnemy(Type type, Vector3 pos) {
 	Enemy* newEnemy = new Enemy();
 	newEnemy->SetPlayer(player_);
 	newEnemy->SetGameScene(this);
 	newEnemy->SetParticleSystem(particleSystem_);
-	newEnemy->Initialize(enemyModel_, pos);
+	newEnemy->Initialize(type, enemyModel_, pos);
 	enemys_.push_back(newEnemy);
 }

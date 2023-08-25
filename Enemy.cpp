@@ -52,13 +52,13 @@ void Enemy::Update() {
 
 	// 種類別の行動パターン
 	switch (type_) {
-	case Enemy::Type::NORMAL:
+	case Type::NORMAL:
 		NormalUpdate();
 		break;
-	case Enemy::Type::TO_PLAYER:
+	case Type::TO_PLAYER:
 		ToPlayerUpdate();
 		break;
-	case Enemy::Type::HOMING:
+	case Type::HOMING:
 		HomingUpdate();
 		break;
 	default:
@@ -91,34 +91,15 @@ Vector3 Enemy::GetWorldPosition() {
 	return worldPos;
 }
 
-void Enemy::HomingAttack() {
-	// 弾のベクトルをプレイヤーの向きにする
-	assert(player_);
-	Vector3 bulletVelocity = player_->GetWorldPosition() - world_.translation_;
-	bulletVelocity = Normalize(bulletVelocity);
-	// 弾の移動速度
-	float bulletSpeed = 1.0f;
-	bulletVelocity.x *= bulletSpeed;
-	bulletVelocity.y *= bulletSpeed;
-	bulletVelocity.z *= bulletSpeed;
-	// bulletVelocity = TransformNormal(bulletVelocity, world_.matWorld_);
-
-	// 弾を生成
-	EnemyBullet* newBullet = new EnemyBullet();
-	newBullet->Initialize(world_.translation_, bulletVelocity, model_);
-	newBullet->SetPlayer(player_);
-	// 生成した弾をリストに追加
-	gameScene_->AddEnemyBullet(newBullet);
-}
-
 void Enemy::AttackReset() {
 	switch (type_) {
-	case Enemy::Type::NORMAL:
+	case Type::NORMAL:
+		NormalAttack();
 		break;
-	case Enemy::Type::TO_PLAYER:
+	case Type::TO_PLAYER:
+		ToPlayerAttack();
 		break;
-	case Enemy::Type::HOMING:
-		// 弾を発射する
+	case Type::HOMING:
 		HomingAttack();
 		break;
 	default:
@@ -135,14 +116,62 @@ void Enemy::NormalUpdate() {
 	}
 }
 
+void Enemy::NormalAttack() {
+	Vector3 bulletVelocity = {0.0f, 0.0f, -1.0f};
+	// 弾を生成
+	EnemyBullet* newBullet = new EnemyBullet();
+	newBullet->Initialize(type_, world_.translation_, bulletVelocity, model_);
+	newBullet->SetPlayer(player_);
+	// 生成した弾をリストに追加
+	gameScene_->AddEnemyBullet(newBullet);
+}
+
 void Enemy::ToPlayerUpdate() {
 	if (world_.translation_.z >= 0.0f) {
 		world_.translation_.z -= 0.3f;
 	}
 }
 
+void Enemy::ToPlayerAttack() {
+	// 弾のベクトルをプレイヤーの向きにする
+	assert(player_);
+	Vector3 bulletVelocity = player_->GetWorldPosition() - world_.translation_;
+	bulletVelocity = Normalize(bulletVelocity);
+	// 弾の移動速度
+	float bulletSpeed = 1.0f;
+	bulletVelocity.x *= bulletSpeed;
+	bulletVelocity.y *= bulletSpeed;
+	bulletVelocity.z *= bulletSpeed;
+
+	// 弾を生成
+	EnemyBullet* newBullet = new EnemyBullet();
+	newBullet->Initialize(type_, world_.translation_, bulletVelocity, model_);
+	newBullet->SetPlayer(player_);
+	// 生成した弾をリストに追加
+	gameScene_->AddEnemyBullet(newBullet);
+}
+
 void Enemy::HomingUpdate() {
 	if (world_.translation_.z >= 0.0f) {
 		world_.translation_.z -= 0.3f;
 	}
+}
+
+void Enemy::HomingAttack() {
+	// 弾のベクトルをプレイヤーの向きにする
+	assert(player_);
+	Vector3 bulletVelocity = player_->GetWorldPosition() - world_.translation_;
+	bulletVelocity = Normalize(bulletVelocity);
+	// 弾の移動速度
+	float bulletSpeed = 1.0f;
+	bulletVelocity.x *= bulletSpeed;
+	bulletVelocity.y *= bulletSpeed;
+	bulletVelocity.z *= bulletSpeed;
+	
+	// 弾を生成
+	EnemyBullet* newBullet = new EnemyBullet();
+	newBullet->Initialize(type_, world_.translation_, bulletVelocity, model_);
+	newBullet->SetPlayer(player_);
+	// 生成した弾をリストに追加
+	gameScene_->AddEnemyBullet(newBullet);
 }

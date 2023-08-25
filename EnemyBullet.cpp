@@ -1,11 +1,14 @@
 ﻿#include "EnemyBullet.h"
-#include "MathUtility.h"
 #include "CollisionConfig.h"
-#include <cassert>
+#include "MathUtility.h"
 #include "Player.h"
+#include <cassert>
 
-void EnemyBullet::Initialize(const Vector3& pos, const Vector3& velocity, Model* model) {
+void EnemyBullet::Initialize(
+    Type enemyType, const Vector3& pos, const Vector3& velocity, Model* model) {
 	assert(model);
+
+	bulletType_ = enemyType;
 
 	world_.Initialize();
 
@@ -14,7 +17,7 @@ void EnemyBullet::Initialize(const Vector3& pos, const Vector3& velocity, Model*
 	world_.scale_.z = 2.0f;
 
 	world_.rotation_ = FaceToDirection(velocity);
-	
+
 	velocity_ = velocity;
 	world_.translation_ = pos;
 	model_ = model;
@@ -33,21 +36,19 @@ void EnemyBullet::Update() {
 		return;
 	}
 
-	// ホーミング
-	Vector3 toPlayer = player_->GetWorldPosition() - GetWorldPosition();
-	// ベクトルを正規化する
-	toPlayer = Normalize(toPlayer);
-	velocity_ = Normalize(velocity_);
-	// 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
-	velocity_ = Lerp(velocity_, toPlayer, 0.2f) * 1.0f;
-
-	// 行列計算をしないで回転/////////////////////////////
-	Vector3 theta = velocity_;
-	theta = Normalize(theta);
-	world_.rotation_.y = std::atan2f(theta.x, theta.z);
-	float width = sqrtf(theta.x * theta.x + theta.z * theta.z);
-	world_.rotation_.x = std::atan2f(-theta.y, width);
-	////////////////////////////////////////////////////
+	switch (bulletType_) {
+	case Type::NORMAL:
+		NormalUpdate();
+		break;
+	case Type::TO_PLAYER:
+		ToPlayerUpdate();
+		break;
+	case Type::HOMING:
+		HomingUpdate();
+		break;
+	default:
+		break;
+	}
 
 	world_.translation_ += velocity_;
 
@@ -58,12 +59,26 @@ void EnemyBullet::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(world_, viewProjection, textureHandle_);
 }
 
-void EnemyBullet::OnCollision() {
-	isDead_ = true;
-}
+void EnemyBullet::OnCollision() { isDead_ = true; }
 
 Vector3 EnemyBullet::GetWorldPosition() {
 	Vector3 worldPos = {};
 	worldPos = {world_.matWorld_.m[3][0], world_.matWorld_.m[3][1], world_.matWorld_.m[3][2]};
 	return worldPos;
+}
+
+void EnemyBullet::NormalUpdate() {}
+
+void EnemyBullet::ToPlayerUpdate() {}
+
+void EnemyBullet::HomingUpdate() { // ホーミング
+	Vector3 toPlayer = player_->GetWorldPosition() - GetWorldPosition();
+	// ベクトルを正規化する
+	toPlayer = Normalize(toPlayer);
+	velocity_ = Normalize(velocity_);
+	// 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
+	velocity_ = Lerp(velocity_, toPlayer, 0.2f) * 1.0f;
+
+	// 行列計算をしないで回転
+	world_.rotation_ = FaceToDirection(velocity_);
 }
