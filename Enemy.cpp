@@ -4,12 +4,12 @@
 #include "ImGuiManager.h"
 #include "MathUtility.h"
 #include "Player.h"
-#include <cassert>
 #include "TextureManager.h"
+#include <cassert>
 
 Enemy::Enemy() { particleTextureHandle_ = TextureManager::Load("red1x1.png"); }
 
-void Enemy::Initialeze(Model* model, const Vector3& pos) {
+void Enemy::Initialize(Model* model, const Vector3& pos) {
 	(assert(model));
 	model_ = model;
 	textureHandle_ = TextureManager::Load("/cube/cube.jpg");
@@ -27,9 +27,14 @@ void Enemy::Initialeze(Model* model, const Vector3& pos) {
 	SetCollisonMask(kCollisionAttributeEnemy ^ GetCollisionMask());
 }
 
+void Enemy::Initialize(Type type, Model* model, const Vector3& pos) {
+	type_ = type;
+	Initialize(model, pos);
+}
+
 void Enemy::Update() {
 	if (--deathTimer_ <= 0) {
-		isDead_ = true;
+		//isDead_ = true;
 	}
 
 	// デスフラグがtrueのTimeCallを削除する
@@ -45,17 +50,22 @@ void Enemy::Update() {
 		timeCall->Update();
 	}
 
-	switch (state_) {
-	case Enemy::AttackState::APPROACH:
-		ApproachUpdate();
+	// 種類別の行動パターン
+	switch (type_) {
+	case Enemy::Type::NORMAL:
+		NormalUpdate();
 		break;
-	case Enemy::AttackState::LEAVE:
-		LeaveUpdate();
-		timeCalls_.clear();
+	case Enemy::Type::TO_PLAYER:
+		ToPlayerUpdate();
+		break;
+	case Enemy::Type::HOMING:
+		HomingUpdate();
 		break;
 	default:
 		break;
 	}
+
+	//timeCalls_.clear();
 
 	world_.UpdateMatrix();
 }
@@ -81,16 +91,7 @@ Vector3 Enemy::GetWorldPosition() {
 	return worldPos;
 }
 
-void Enemy::ApproachUpdate() {
-	world_.translation_.z -= 0.3f;
-	if (world_.translation_.z < 0.0f) {
-		state_ = AttackState::LEAVE;
-	}
-}
-
-void Enemy::LeaveUpdate() { world_.translation_ += velocity_; }
-
-void Enemy::Attack() {
+void Enemy::HomingAttack() {
 	// 弾のベクトルをプレイヤーの向きにする
 	assert(player_);
 	Vector3 bulletVelocity = player_->GetWorldPosition() - world_.translation_;
@@ -111,9 +112,37 @@ void Enemy::Attack() {
 }
 
 void Enemy::AttackReset() {
-	// 弾を発射する
-	Attack();
+	switch (type_) {
+	case Enemy::Type::NORMAL:
+		break;
+	case Enemy::Type::TO_PLAYER:
+		break;
+	case Enemy::Type::HOMING:
+		// 弾を発射する
+		HomingAttack();
+		break;
+	default:
+		break;
+	}
 
 	// 発射タイマーをセットする
 	timeCalls_.push_back(new TimeCall(bind(&Enemy::AttackReset, this), attackInterval));
+}
+
+void Enemy::NormalUpdate() {
+	if (world_.translation_.z >= 0.0f) {
+		world_.translation_.z -= 0.3f;
+	}
+}
+
+void Enemy::ToPlayerUpdate() {
+	if (world_.translation_.z >= 0.0f) {
+		world_.translation_.z -= 0.3f;
+	}
+}
+
+void Enemy::HomingUpdate() {
+	if (world_.translation_.z >= 0.0f) {
+		world_.translation_.z -= 0.3f;
+	}
 }

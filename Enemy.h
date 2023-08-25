@@ -16,22 +16,28 @@ class ParticleSystem;
 /// </summary>
 class Enemy : public Collider {
 public:
-
+	enum class Type { NORMAL, TO_PLAYER, HOMING };
 	Enemy();
 
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~Enemy() {
-		timeCalls_.clear();
-	}
+	~Enemy() { timeCalls_.clear(); }
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="model">モデル</param>
 	/// <param name="pos">初期座標</param>
-	void Initialeze(Model* model, const Vector3& pos);
+	void Initialize(Model* model, const Vector3& pos);
+
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="type"></param>
+	/// <param name="model"></param>
+	/// <param name="pos"></param>
+	void Initialize(Type type, Model* model, const Vector3& pos);
 
 	/// <summary>
 	/// 更新
@@ -78,7 +84,7 @@ public:
 	/// </summary>
 	/// <param name="gameScene"></param>
 	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
-	
+
 	/// <summary>
 	/// パーティクルシステムのセッター
 	/// </summary>
@@ -86,6 +92,9 @@ public:
 	void SetParticleSystem(ParticleSystem* particleSystem) { particleSystem_ = particleSystem; }
 
 private:
+	// 種類
+	Type type_ = Type::NORMAL;
+
 	// 座標
 	WorldTransform world_;
 	// モデル
@@ -99,30 +108,12 @@ private:
 	Vector3 velocity_ = {};
 
 	/// <summary>
-	/// 攻撃の状態
-	/// </summary>
-	enum class AttackState { APPROACH, LEAVE };
-
-	/// <summary>
-	/// 接近状態の更新処理
-	/// </summary>
-	void ApproachUpdate();
-
-	/// <summary>
-	/// 離脱状態の更新処理
-	/// </summary>
-	void LeaveUpdate();
-
-	// 攻撃
-	AttackState state_ = AttackState::APPROACH;
-
-	/// <summary>
 	/// 攻撃処理
 	/// </summary>
-	void Attack();
+	void HomingAttack();
 
 	/// <summary>
-	/// 弾を発射して発射クールタイムをリセットする
+	/// 種類に応じて弾を発射して発射クールタイムをリセットする
 	/// </summary>
 	void AttackReset();
 
@@ -140,9 +131,24 @@ private:
 	// ゲームシーン
 	GameScene* gameScene_ = nullptr;
 
-	//パーティクルシステム
+	// パーティクルシステム
 	ParticleSystem* particleSystem_ = nullptr;
 
 	// 時限発動のリスト
 	list<TimeCall*> timeCalls_;
+
+	/// <summary>
+	/// NORMALの更新処理
+	/// </summary>
+	void NormalUpdate();
+
+	/// <summary>
+	/// TO_PLAYERの更新処理
+	/// </summary>
+	void ToPlayerUpdate();
+
+	/// <summary>
+	/// HOMINGの更新処理
+	/// </summary>
+	void HomingUpdate();
 };

@@ -555,7 +555,7 @@ void GameScene::UpdateEnemyPopCommands() {
 			break;
 		} else if (word.find("CLEAR") == 0) {
 			getline(line_stream, word, ',');
-			SceneChange::GetInstance()->Change(SceneNum::CLEAR, &scene_);
+			//SceneChange::GetInstance()->Change(SceneNum::CLEAR, &scene_);
 			// コマンドループを抜ける
 			break;
 		}
@@ -572,6 +572,6 @@ void GameScene::AddEnemy(Vector3 pos) {
 	newEnemy->SetPlayer(player_);
 	newEnemy->SetGameScene(this);
 	newEnemy->SetParticleSystem(particleSystem_);
-	newEnemy->Initialeze(enemyModel_, pos);
+	newEnemy->Initialize(enemyModel_, pos);
 	enemys_.push_back(newEnemy);
 }

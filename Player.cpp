@@ -188,7 +188,7 @@ void Player::Attack() {
 		}
 
 		// 弾の移動速度
-		float bulletSpeed = 10.0f;
+		float bulletSpeed = 5.0f;
 		// 弾の速度を正規化し速度をかける
 		bulletVelocity = Normalize(bulletVelocity) * bulletSpeed;
 
