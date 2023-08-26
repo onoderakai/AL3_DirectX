@@ -39,8 +39,10 @@ void Player::Initialeze(Model* model, const Vector3& pos) {
 	world_.translation_ = pos;
 	world_.scale_ = {0.5f, 0.5f, 0.5f};
 
+	style_ = Style::NORMAL;
 	isDead_ = false;
 	hp_ = kMaxHp_;
+	bulletCoolTime_ = 0;
 
 	// 3Dレティクルの初期化
 	world3DReticle_.Initialize();
@@ -65,10 +67,20 @@ void Player::Update(const ViewProjection& viewProjection) {
 		return false;
 	});
 
+	StyleChange();
+
 	// ジョイスティックを使う
 	XINPUT_STATE joyState = {};
 	// 移動処理
-	Move(joyState);
+	switch (style_) {
+	case Player::Style::NORMAL:
+		Move(joyState);
+		break;
+	case Player::Style::SNIPER:
+		break;
+	default:
+		break;
+	}
 	world_.rotation_ = FaceToDirection(Get3DReticleWorldPosition() - GetWorldPosition());
 
 	// 攻撃処理
@@ -130,9 +142,6 @@ void Player::Draw(const ViewProjection& viewProjection) {
 
 	model_->Draw(world_, viewProjection);
 	world3DReticle_.rotation_ = FaceToDirection(Get3DReticleWorldPosition() - GetWorldPosition());
-	/*model_->Draw(world3DReticle_, viewProjection);
-	model_->Draw(world3DReticleBack_, viewProjection);
-	model_->Draw(world3DReticleFront_, viewProjection);*/
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
@@ -168,12 +177,45 @@ Vector3 Player::Get3DReticleBackWorldPosition() {
 	return worldPos;
 }
 
+void Player::StyleChange() {
+	if (input_->TriggerKey(DIK_R)) {
+		switch (style_) {
+		case Player::Style::NORMAL:
+			style_ = Style::SNIPER;
+			break;
+		case Player::Style::SNIPER:
+			style_ = Style::NORMAL;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
 void Player::Attack() {
 	if (bulletCoolTime_ > 0) {
 		bulletCoolTime_--;
 	}
 	if (input_->IsPressMouse(0) && bulletCoolTime_ <= 0) {
-		bulletCoolTime_ = 5;
+		// 弾の移動速度
+		float bulletSpeed = 1.0f;
+		switch (style_) {
+		case Player::Style::NORMAL:
+			bulletCoolTime_ = kNormalCoolTime_;
+			bulletSpeed = kNormalBulletSpeed_;
+			break;
+		case Player::Style::SNIPER:
+			bulletCoolTime_ = kSniperCoolTime_;
+			if (isLockOn) {
+				isLockOn = false;
+				lockOnEnemy_->OnCollision();
+			}
+			bulletSpeed = kSniperBulletSpeed_;
+			break;
+		default:
+			break;
+		}
+
 		// 自キャラの座標
 		Vector3 pos = GetWorldPosition();
 
@@ -187,8 +229,6 @@ void Player::Attack() {
 			bulletVelocity = Get3DReticleWorldPosition() - GetWorldPosition();
 		}
 
-		// 弾の移動速度
-		float bulletSpeed = 5.0f;
 		// 弾の速度を正規化し速度をかける
 		bulletVelocity = Normalize(bulletVelocity) * bulletSpeed;
 
@@ -239,19 +279,22 @@ void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
 
 	// 敵のロックオン処理
 	isLockOn = false;
-	nearDis = lockOnDis;
-	for (Enemy* enemy : enemys_) {
-		Vector3 enemyPos = enemy->GetWorldPosition();
-		enemyPos = Transform(enemyPos, matViewProjectionViewport);
-		// マウスと敵の距離
-		float mouseToEnemyDis =
-		    Length(Vector2{float(mousePos.x), float(mousePos.y)} - Vector2{enemyPos.x, enemyPos.y});
-		// lockOnDisの範囲内かつ、一番近い敵をlockOnPosにする
-		if (nearDis >= mouseToEnemyDis) {
-			nearDis = mouseToEnemyDis;
-			lockOnPos = enemy->GetWorldPosition();
-			isLockOn = true;
-			sprite2DReticle_->SetPosition(Vector2{enemyPos.x, enemyPos.y});
+	if (style_ == Style::SNIPER) {
+		nearDis = lockOnDis;
+		for (Enemy* enemy : enemys_) {
+			Vector3 enemyPos = enemy->GetWorldPosition();
+			enemyPos = Transform(enemyPos, matViewProjectionViewport);
+			// マウスと敵の距離
+			float mouseToEnemyDis = Length(
+			    Vector2{float(mousePos.x), float(mousePos.y)} - Vector2{enemyPos.x, enemyPos.y});
+			// lockOnDisの範囲内かつ、一番近い敵をlockOnPosにする
+			if (nearDis >= mouseToEnemyDis) {
+				nearDis = mouseToEnemyDis;
+				lockOnPos = enemy->GetWorldPosition();
+				lockOnEnemy_ = enemy;
+				isLockOn = true;
+				sprite2DReticle_->SetPosition(Vector2{enemyPos.x, enemyPos.y});
+			}
 		}
 	}
 

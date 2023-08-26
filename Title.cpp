@@ -21,6 +21,9 @@ void Title::Update() {
 	if (input_->PushKey(DIK_SPACE)) {
 		SceneChange::GetInstance()->Change(SceneNum::STAGE, pScene_);
 	}
+	else if (input_->PushKey(DIK_RETURN)) {
+		SceneChange::GetInstance()->Change(SceneNum::EXPLAIN, pScene_);
+	}
 	ImGui::Begin("a");
 	ImGui::DragFloat4("a", &a.x, 0.01f);
 	ImGui::End();

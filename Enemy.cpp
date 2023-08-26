@@ -34,7 +34,7 @@ void Enemy::Initialize(Type type, Model* model, const Vector3& pos) {
 
 void Enemy::Update() {
 	if (--deathTimer_ <= 0) {
-		//isDead_ = true;
+		// isDead_ = true;
 	}
 
 	// デスフラグがtrueのTimeCallを削除する
@@ -53,9 +53,11 @@ void Enemy::Update() {
 	// 種類別の行動パターン
 	switch (type_) {
 	case Type::NORMAL:
+		isAttack = true;
 		NormalUpdate();
 		break;
 	case Type::TO_PLAYER:
+		isAttack = true;
 		ToPlayerUpdate();
 		break;
 	case Type::HOMING:
@@ -65,7 +67,7 @@ void Enemy::Update() {
 		break;
 	}
 
-	//timeCalls_.clear();
+	// timeCalls_.clear();
 
 	world_.UpdateMatrix();
 }
@@ -92,18 +94,20 @@ Vector3 Enemy::GetWorldPosition() {
 }
 
 void Enemy::AttackReset() {
-	switch (type_) {
-	case Type::NORMAL:
-		NormalAttack();
-		break;
-	case Type::TO_PLAYER:
-		ToPlayerAttack();
-		break;
-	case Type::HOMING:
-		HomingAttack();
-		break;
-	default:
-		break;
+	if (isAttack) {
+		switch (type_) {
+		case Type::NORMAL:
+			NormalAttack();
+			break;
+		case Type::TO_PLAYER:
+			ToPlayerAttack();
+			break;
+		case Type::HOMING:
+			HomingAttack();
+			break;
+		default:
+			break;
+		}
 	}
 
 	// 発射タイマーをセットする
@@ -113,11 +117,26 @@ void Enemy::AttackReset() {
 void Enemy::NormalUpdate() {
 	if (world_.translation_.z >= 0.0f) {
 		world_.translation_.z -= 0.3f;
+	} else {
+		world_.translation_.x += velocity_.x;
+		world_.translation_.y += velocity_.y;
+		if (world_.translation_.x >= 70.0f) {
+			velocity_.x *= -1.0f;
+		}
+		if (world_.translation_.x <= -70.0f) {
+			velocity_.x *= -1.0f;
+		}
+		if (world_.translation_.y >= 40.0f) {
+			velocity_.y *= -1.0f;
+		}
+		if (world_.translation_.y <= -40.0f) {
+			velocity_.y *= -1.0f;
+		}
 	}
 }
 
 void Enemy::NormalAttack() {
-	Vector3 bulletVelocity = {0.0f, 0.0f, -1.0f};
+	Vector3 bulletVelocity = {0.0f, 0.0f, -3.0f};
 	// 弾を生成
 	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(type_, world_.translation_, bulletVelocity, model_);
@@ -152,8 +171,12 @@ void Enemy::ToPlayerAttack() {
 }
 
 void Enemy::HomingUpdate() {
-	if (world_.translation_.z >= 0.0f) {
-		world_.translation_.z -= 0.3f;
+	if (world_.translation_.z > 0.0f) {
+		world_.translation_.z -= 2.0f;
+		if (world_.translation_.z <= 0.0f) {
+			world_.translation_.z = 0.0f;
+			isAttack = true;
+		}
 	}
 }
 
@@ -163,11 +186,11 @@ void Enemy::HomingAttack() {
 	Vector3 bulletVelocity = player_->GetWorldPosition() - world_.translation_;
 	bulletVelocity = Normalize(bulletVelocity);
 	// 弾の移動速度
-	float bulletSpeed = 1.0f;
+	float bulletSpeed = 0.5f;
 	bulletVelocity.x *= bulletSpeed;
 	bulletVelocity.y *= bulletSpeed;
 	bulletVelocity.z *= bulletSpeed;
-	
+
 	// 弾を生成
 	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(type_, world_.translation_, bulletVelocity, model_);

@@ -30,6 +30,7 @@ GameScene::~GameScene() {
 	// delete stage_;
 	delete clear_;
 	delete gameOver_;
+	delete explain_;
 
 	delete debugCamera_;
 }
@@ -105,9 +106,8 @@ void GameScene::Initialize() {
 	clear_->Initialize(&scene_);
 	gameOver_ = new GameOver();
 	gameOver_->Initialize(&scene_);
-	// stage_ = new Stage();
-	/*stage_->Initialize(&scene_);
-	stage_->SetParameter(player_, skydome_, railCamera_, particleSystem_);*/
+	explain_ = new OperationExplain();
+	explain_->Initialize(&scene_);
 }
 
 void GameScene::SceneInitialize() {
@@ -207,6 +207,9 @@ void GameScene::Update() {
 	switch (scene_) {
 	case SceneNum::TITLE:
 		title_->Update();
+		break;
+	case SceneNum::EXPLAIN:
+		explain_->Update();
 		break;
 	case SceneNum::STAGE:
 		UpdateEnemyPopCommands();
@@ -388,6 +391,9 @@ void GameScene::Draw() {
 	switch (scene_) {
 	case SceneNum::TITLE:
 		title_->DrawBackground();
+		break;
+	case SceneNum::EXPLAIN:
+		explain_->DrawBackground();
 		break;
 	case SceneNum::STAGE:
 		player_->DrawUI();

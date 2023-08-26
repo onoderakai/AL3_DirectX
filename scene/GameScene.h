@@ -20,6 +20,7 @@
 //#include "Stage.h"
 #include "Clear.h"
 #include "GameOver.h"
+#include "OperationExplain.h"
 #include "Scene.h"
 #include "ParticleSystem.h"
 
@@ -90,6 +91,7 @@ private: // メンバ変数
 	//Stage* stage_ = nullptr;
 	Clear* clear_ = nullptr;
 	GameOver* gameOver_ = nullptr;
+	OperationExplain* explain_ = nullptr;
 	SceneNum preScene_ = scene_;
 
 	std::stringstream stage1EnemyPopCommands;

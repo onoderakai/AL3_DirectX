@@ -112,6 +112,8 @@ private:
 	// デスタイマー
 	uint32_t deathTimer_ = 600;
 
+	//攻撃フラグ
+	bool isAttack = false;
 	// 攻撃間隔
 	int attackInterval = 45;
 

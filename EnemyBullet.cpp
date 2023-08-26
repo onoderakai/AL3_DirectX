@@ -18,6 +18,7 @@ void EnemyBullet::Initialize(
 
 	world_.rotation_ = FaceToDirection(velocity);
 
+	speed_ = Length(velocity);
 	velocity_ = velocity;
 	world_.translation_ = pos;
 	model_ = model;
@@ -71,14 +72,24 @@ void EnemyBullet::NormalUpdate() {}
 
 void EnemyBullet::ToPlayerUpdate() {}
 
-void EnemyBullet::HomingUpdate() { // ホーミング
-	Vector3 toPlayer = player_->GetWorldPosition() - GetWorldPosition();
-	// ベクトルを正規化する
-	toPlayer = Normalize(toPlayer);
-	velocity_ = Normalize(velocity_);
-	// 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
-	velocity_ = Lerp(velocity_, toPlayer, 0.2f) * 1.0f;
+void EnemyBullet::HomingUpdate() {
+	if (!isHoming) {
+		return;
+	}
 
-	// 行列計算をしないで回転
-	world_.rotation_ = FaceToDirection(velocity_);
+	float homingLength = 10.0f;
+	if (Length(player_->GetWorldPosition() - GetWorldPosition()) >= homingLength) {
+		// ホーミング
+		Vector3 toPlayer = player_->GetWorldPosition() - GetWorldPosition();
+		// ベクトルを正規化する
+		toPlayer = Normalize(toPlayer);
+		velocity_ = Normalize(velocity_);
+		// 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
+		velocity_ = Lerp(velocity_, toPlayer, 0.05f) * speed_;
+
+		// 行列計算をしないで回転
+		world_.rotation_ = FaceToDirection(velocity_);
+	} else {
+		isHoming = false;
+	}
 }

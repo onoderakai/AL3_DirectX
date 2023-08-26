@@ -15,6 +15,11 @@ class ParticleSystem;
 /// </summary>
 class Player : public Collider{
 public:
+	enum class Style {
+		NORMAL,
+		SNIPER
+	};
+
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
@@ -125,6 +130,7 @@ public:
 	void SetParticleSystem(ParticleSystem* particleSystem) { particleSystem_ = particleSystem; }
 
 private:
+	Style style_ = Style::NORMAL;
 	//入力
 	Input* input_ = nullptr;
 	// ワールド変換データ
@@ -133,7 +139,7 @@ private:
 	Model* model_ = nullptr;
 	Model* bulletModel_ = nullptr;
 	//半径
-	float radius_ = 1.0f;
+	float radius_ = 2.5f;
 	//デスフラグ
 	bool isDead_ = false;
 	//HP
@@ -153,11 +159,19 @@ private:
 	float lockOnDis = 100.0f;
 	//一番小さい数値を保存
 	float nearDis = lockOnDis;
+	//ロックオンした敵の情報
+	Enemy* lockOnEnemy_ = nullptr;
 
 	//弾
 	std::list<PlayerBullet*> bullets_;
 	//弾の発射クールタイム
 	int bulletCoolTime_ = 0;
+	const uint32_t kNormalCoolTime_ = 5;
+	const uint32_t kSniperCoolTime_ = 60;
+
+	//弾の速度
+	const float kNormalBulletSpeed_ = 5.0f;
+	const float kSniperBulletSpeed_ = 20.0f;
 
 	//3Dレティクル
 	WorldTransform world3DReticle_;
@@ -168,6 +182,11 @@ private:
 	Sprite* sprite2DReticleBack_ = nullptr;
 	Sprite* sprite2DReticleFront_ = nullptr;
 	
+	/// <summary>
+	/// 形態変化
+	/// </summary>
+	void StyleChange();
+
 	/// <summary>
 	/// 攻撃
 	/// </summary>

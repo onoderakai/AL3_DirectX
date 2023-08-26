@@ -50,6 +50,7 @@ private:
 	Model* model_ = nullptr;
 	uint32_t textureHandle_ = 0;
 	Vector3 velocity_;
+	float speed_ = 0.0f;
 
 	// プレイヤーの包含
 	Player* player_ = nullptr;
@@ -59,6 +60,8 @@ private:
 
 	// 弾の半径
 	const float kRadius_ = 1.0f;
+	//ホーミングフラグ
+	bool isHoming = true;
 	// 弾の寿命
 	const int kLifeTime = 60 * 20;
 	// デスタイマー
