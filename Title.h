@@ -40,6 +40,8 @@ private:
 	Sprite* titleSprite_ = nullptr;
 	//次に進む
 	Sprite* pushNextSprite_ = nullptr;
+	//操作説明に進む
+	Sprite* pushExplainSprite_ = nullptr;
 	bool isChange_ = false;
 	float flashSpeed_ = -0.02f;
 };

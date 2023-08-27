@@ -11,11 +11,15 @@ Title::Title() {
 	uint32_t pushNextTextureHandle = TextureManager::Load("push_next.png");
 	pushNextSprite_ =
 	    Sprite::Create(pushNextTextureHandle, Vector2{640.0f, 480.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	uint32_t pushExplainTextureHandle = TextureManager::Load("push_explain.png");
+	pushExplainSprite_ = Sprite::Create(
+	    pushExplainTextureHandle, Vector2{640.0f, 600.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
 }
 
 Title::~Title() {
 	delete titleSprite_;
 	delete pushNextSprite_;
+	delete pushExplainSprite_;
 }
 
 void Title::Initialize(SceneNum* pScene) {
@@ -35,6 +39,7 @@ void Title::Update() {
 	// シーン遷移中なら透明度を変えない
 	if (isChange_) {
 		pushNextSprite_->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+		pushExplainSprite_->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
 		return;
 	}
 	// 透明度を徐々に変える
@@ -48,9 +53,11 @@ void Title::Update() {
 		flashSpeed_ *= -1.0f;
 	}
 	pushNextSprite_->SetColor(tmpColor);
+	pushExplainSprite_->SetColor(tmpColor);
 }
 
 void Title::DrawBackground() {
 	titleSprite_->Draw();
 	pushNextSprite_->Draw();
+	pushExplainSprite_->Draw();
 }
