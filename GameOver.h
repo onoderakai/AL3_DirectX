@@ -46,4 +46,9 @@ private:
 	// タイトル画像関連
 	uint32_t gameOverTextureHandle_ = 0;
 	Sprite* gameOverSprite_ = nullptr;
+
+	//リトライ文字
+	Sprite* retrySprite_ = nullptr;
+	// タイトルに戻る文字
+	Sprite* returnTitleSprite_ = nullptr;
 };

@@ -38,4 +38,6 @@ private:
 	//タイトル画像関連
 	uint32_t titleTextureHandle_ = 0;
 	Sprite* titleSprite_ = nullptr;
+	//次に進む
+	Sprite* pushNextSprite_ = nullptr;
 };

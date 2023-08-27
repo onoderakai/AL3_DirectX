@@ -37,4 +37,7 @@ private:
 	// タイトル画像関連
 	uint32_t clearTextureHandle_ = 0;
 	Sprite* clearSprite_ = nullptr;
+
+	// 次に進む
+	Sprite* pushNextSprite_ = nullptr;
 };

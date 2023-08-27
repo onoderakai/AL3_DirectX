@@ -37,4 +37,7 @@ private:
 	// 操作説明画像関連
 	uint32_t explainTextureHandle_ = 0;
 	Sprite* explainSprite_ = nullptr;
+
+	// 次に進む
+	Sprite* pushNextSprite_ = nullptr;
 };
