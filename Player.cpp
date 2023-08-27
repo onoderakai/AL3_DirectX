@@ -327,13 +327,17 @@ void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
 	Vector3 direction = Get3DReticleWorldPosition() - GetWorldPosition();
 	direction = Normalize(direction);
 	if (isLockOn) {
-		world3DReticle_.translation_ = lockOnPos;
+		sprite2DReticleBack_->SetRotation(sprite2DReticleBack_->GetRotation() + 0.1f);
+		sprite2DReticleFront_->SetRotation(sprite2DReticleFront_->GetRotation() - 0.1f);
 
+		world3DReticle_.translation_ = lockOnPos;
 		world3DReticleBack_.translation_ = world3DReticle_.translation_ + (direction * 10.0f);
 		world3DReticleFront_.translation_ = world3DReticle_.translation_ + (direction * -10.0f);
 	} else {
-		world3DReticle_.translation_ = posNear + (mouseDirection * kDisTestObj);
+		sprite2DReticleBack_->SetRotation(0.0f);
+		sprite2DReticleFront_->SetRotation(0.0f);
 
+		world3DReticle_.translation_ = posNear + (mouseDirection * kDisTestObj);
 		world3DReticleBack_.translation_ = world3DReticle_.translation_ + (direction * 10.0f);
 		world3DReticleFront_.translation_ = world3DReticle_.translation_ + (direction * -10.0f);
 	}
