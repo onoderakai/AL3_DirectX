@@ -20,9 +20,9 @@ void PlayerBullet::Initialeze(Model* model, const Vector3& pos, const Vector3& v
 
 	// 衝突フィルタリングを設定
 	// このクラスの属性を設定
-	SetCollisonAttribute(kCollisionAttributePlayer);
+	SetCollisonAttribute(kCollisionAttributeBullet);
 	// このクラスの衝突しない属性を設定
-	SetCollisonMask(GetCollisionMask() ^ kCollisionAttributePlayer);
+	SetCollisonMask(GetCollisionMask() ^ kCollisionAttributePlayer ^ kCollisionAttributeBullet);
 }
 
 void PlayerBullet::Update() {

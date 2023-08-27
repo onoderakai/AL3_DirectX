@@ -26,9 +26,9 @@ void EnemyBullet::Initialize(
 
 	// 衝突フィルタリングを設定
 	// このクラスの属性を設定
-	SetCollisonAttribute(kCollisionAttributeEnemy);
+	SetCollisonAttribute(kCollisionAttributeBullet);
 	// このクラスの衝突しない属性を設定
-	SetCollisonMask(kCollisionAttributeEnemy ^ GetCollisionMask());
+	SetCollisonMask(GetCollisionMask() ^ kCollisionAttributeEnemy ^ kCollisionAttributeBullet);
 }
 
 void EnemyBullet::Update() {
