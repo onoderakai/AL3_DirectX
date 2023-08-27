@@ -6,6 +6,10 @@
 class Clear {
 public:
 	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	Clear();
+	/// <summary>
 	/// デストラクタ
 	/// </summary>
 	~Clear();
@@ -28,7 +32,7 @@ public:
 private:
 	Input* input_ = nullptr;
 	// シーン変数のポインタ
-	SceneNum* pScene_;
+	SceneNum* pScene_ = nullptr;
 
 	// タイトル画像関連
 	uint32_t clearTextureHandle_ = 0;

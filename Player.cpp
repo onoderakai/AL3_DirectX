@@ -8,12 +8,17 @@
 
 Player::Player() {
 	uint32_t textureReticle = TextureManager::Load("target.png");
+	uint32_t hpTexture = TextureManager::Load("player_hp.png");
 	sprite2DReticle_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
 	sprite2DReticleBack_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
 	sprite2DReticleBack_->SetSize(Vector2{40.0f, 40.0f});
 	sprite2DReticleFront_ = Sprite::Create(textureReticle, {640, 360}, {1, 1, 1, 1}, {0.5f, 0.5f});
 	sprite2DReticleFront_->SetSize(Vector2{80.0f, 80.0f});
 	bulletModel_ = Model::CreateFromOBJ("PlayerBullet", true);
+	for (uint32_t i = 0; i < kMaxHp_; i++) {
+		hpSprite_[i] =
+		    Sprite::Create(hpTexture, {48 + (48.0f * i), 688}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	}
 }
 
 Player::~Player() {
@@ -24,6 +29,9 @@ Player::~Player() {
 		delete bullet;
 	}
 	delete bulletModel_;
+	for (uint32_t i = 0; i < kMaxHp_; i++) {
+		delete hpSprite_[i];
+	}
 }
 
 void Player::Initialeze(Model* model, const Vector3& pos) {
@@ -399,10 +407,17 @@ void Player::ScreenToWorld2DReticle(const ViewProjection& viewProjection, XINPUT
 	world3DReticleFront_.UpdateMatrix();
 }
 
+void Player::HpDraw() {
+	for (int i = 0; i < hp_; i++) {
+		hpSprite_[i]->Draw();
+	}
+}
+
 void Player::DrawUI() {
 	sprite2DReticle_->Draw();
 	sprite2DReticleFront_->Draw();
 	sprite2DReticleBack_->Draw();
+	HpDraw();
 }
 
 void Player::OnCollision() {

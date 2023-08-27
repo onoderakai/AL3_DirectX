@@ -11,6 +11,12 @@ Boss::Boss() {
 	world_.scale_.y *= 3.0f;
 	world_.scale_.z *= 3.0f;
 	homingBulletModel_ = Model::Create();
+	uint32_t hpTexture = TextureManager::Load("boss_hp.png");
+	for (uint32_t i = 0; i < kMaxHp_; i++) {
+		hpSprite_[i] =
+		    Sprite::Create(hpTexture, {48 + (56.0f * i), 16}, {1, 1, 1, 1}, {0.5f, 0.5f});
+		hpSprite_[i]->SetSize(hpSprite_[i]->GetSize() * 2.0f);
+	}
 }
 
 Boss::~Boss() {
@@ -18,6 +24,9 @@ Boss::~Boss() {
 		delete bullet;
 	}
 	delete homingBulletModel_;
+	for (uint32_t i = 0; i < kMaxHp_; i++) {
+		delete hpSprite_[i];
+	}
 }
 
 void Boss::Initialize(Model* model) {
@@ -65,9 +74,19 @@ void Boss::Update() {
 }
 
 void Boss::Draw(const ViewProjection& view) {
+	if (isDead_) {
+		return;
+	}
+
 	model_->Draw(world_, view);
 	for (BossBullet* bullet : bullets_) {
 		bullet->Draw(view);
+	}
+}
+
+void Boss::DrawUI() {
+	for (int i = 0; i < hp_; i++) {
+		hpSprite_[i]->Draw();
 	}
 }
 
@@ -80,6 +99,7 @@ Vector3 Boss::GetWorldPosition() {
 void Boss::OnCollision() {
 	hp_--;
 	if (hp_ <= 0) {
+		isDead_ = true;
 		Particle::Parameter para = {};
 		para.type_ = Particle::Type::SPHERE;
 		para.world_.translation_ = GetWorldPosition();

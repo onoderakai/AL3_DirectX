@@ -6,6 +6,10 @@
 class OperationExplain {
 public:
 	/// <summary>
+	/// コンストラク
+	/// </summary>
+	OperationExplain();
+	/// <summary>
 	/// デストラクタ
 	/// </summary>
 	~OperationExplain();
@@ -28,7 +32,7 @@ public:
 private:
 	Input* input_ = nullptr;
 	// シーン変数のポインタ
-	SceneNum* pScene_;
+	SceneNum* pScene_ = nullptr;
 
 	// 操作説明画像関連
 	uint32_t explainTextureHandle_ = 0;

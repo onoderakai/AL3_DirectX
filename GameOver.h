@@ -1,10 +1,15 @@
 ﻿#pragma once
+#include "ImGuiManager.h"
 #include "Input.h"
 #include "Scene.h"
 #include "Sprite.h"
 
 class GameOver {
 public:
+	/// <summary>
+	/// コンストラク
+	/// </summary>
+	GameOver();
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
@@ -25,10 +30,18 @@ public:
 	/// </summary>
 	void DrawBackground();
 
+	/// <summary>
+	/// 前のシーン情報のセッター
+	/// </summary>
+	/// <param name="preScene"></param>
+	void SetPreScene(const SceneNum& preScene) { preScene_ = preScene; }
+
 private:
 	Input* input_ = nullptr;
 	// シーン変数のポインタ
-	SceneNum* pScene_;
+	SceneNum* pScene_ = nullptr;
+	// 前のシーンの情報
+	SceneNum preScene_;
 
 	// タイトル画像関連
 	uint32_t gameOverTextureHandle_ = 0;

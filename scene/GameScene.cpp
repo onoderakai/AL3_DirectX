@@ -145,17 +145,10 @@ void GameScene::SceneInitialize() {
 	viewProjection_.farZ = 100.0f;
 	viewProjection_.Initialize();
 
-	delete title_;
-	title_ = new Title();
 	title_->Initialize(&scene_);
-
-	delete clear_;
-	clear_ = new Clear();
 	clear_->Initialize(&scene_);
-
-	delete gameOver_;
-	gameOver_ = new GameOver();
 	gameOver_->Initialize(&scene_);
+	explain_->Initialize(&scene_);
 
 	// コマンドの初期化
 	isDefeat_ = false;
@@ -224,6 +217,7 @@ void GameScene::Update() {
 		// プレイヤーの更新処理
 		if (player_) {
 			if (player_->GetIsDead()) {
+				gameOver_->SetPreScene(SceneNum::STAGE);
 				SceneChange::GetInstance()->Change(SceneNum::GAMEOVER, &scene_);
 			} else {
 				player_->Update(viewProjection_);
@@ -276,6 +270,7 @@ void GameScene::Update() {
 		// プレイヤーの更新処理
 		if (player_) {
 			if (player_->GetIsDead()) {
+				gameOver_->SetPreScene(SceneNum::BOSS_STAGE);
 				SceneChange::GetInstance()->Change(SceneNum::GAMEOVER, &scene_);
 			} else {
 				player_->Update(viewProjection_);
@@ -283,7 +278,11 @@ void GameScene::Update() {
 		}
 		// ボスの更新処理
 		if (boss_) {
-			boss_->Update();
+			if (boss_->GetIsDead()) {
+				SceneChange::GetInstance()->Change(SceneNum::CLEAR, &scene_);
+			} else {
+				boss_->Update();
+			}
 		}
 		// 天球の更新処理
 		if (skydome_) {
@@ -400,6 +399,7 @@ void GameScene::Draw() {
 		break;
 	case SceneNum::BOSS_STAGE:
 		player_->DrawUI();
+		boss_->DrawUI();
 		break;
 	case SceneNum::CLEAR:
 		clear_->DrawBackground();
@@ -429,7 +429,9 @@ void GameScene::CheckAllCollision() {
 		colliders.push_back(player_);
 	}
 	if (scene_ == SceneNum::BOSS_STAGE) {
-		colliders.push_back(boss_);
+		if (!boss_->GetIsDead()) {
+			colliders.push_back(boss_);
+		}
 	}
 	for (Enemy* enemy : enemys_) {
 		colliders.push_back(enemy);

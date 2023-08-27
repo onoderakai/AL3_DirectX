@@ -143,7 +143,8 @@ private:
 	//デスフラグ
 	bool isDead_ = false;
 	//HP
-	uint32_t kMaxHp_ = 10;
+	const uint32_t kMaxHp_ = 10;
+	Sprite* hpSprite_[10] = {};
 	int32_t hp_ = kMaxHp_;
 
 	//敵のリスト
@@ -208,4 +209,9 @@ private:
 	/// </summary>
 	/// <param name="viewProjection"></param>
 	void ScreenToWorld2DReticle(const ViewProjection& viewProjection, XINPUT_STATE& joyState);
+
+	/// <summary>
+	/// HPの描画
+	/// </summary>
+	void HpDraw();
 };

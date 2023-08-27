@@ -3,6 +3,7 @@
 #include "WorldTransform.h"
 #include "Model.h"
 #include "BossBullet.h"
+#include "Sprite.h"
 #include <list>
 
 class ParticleSystem;
@@ -28,6 +29,11 @@ public:
 	/// 描画
 	/// </summary>
 	void Draw(const ViewProjection& view);
+
+	/// <summary>
+	/// UI描画
+	/// </summary>
+	void DrawUI();
 
 	/// <summary>
 	/// 半径のゲッター
@@ -83,8 +89,9 @@ private:
 	std::list<BossBullet*> bullets_;
 
 	//HP
-	const uint32_t kMaxHp_ = 10;
+	const uint32_t kMaxHp_ = 20;
 	int32_t hp_ = kMaxHp_;
+	Sprite* hpSprite_[20];
 	bool isDead_ = false;
 
 	void Attack();
