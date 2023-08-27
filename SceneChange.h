@@ -42,6 +42,12 @@ public:
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// シーン遷移中のフラグのゲッター
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsLoading() { return isLoading_; }
+
 private:
 
 	/// <summary>

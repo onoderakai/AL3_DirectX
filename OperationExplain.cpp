@@ -27,6 +27,24 @@ void OperationExplain::Update() {
 	if (input_->PushKey(DIK_SPACE)) {
 		SceneChange::GetInstance()->Change(SceneNum::TITLE, pScene_);
 	}
+
+	isChange_ = SceneChange::GetInstance()->GetIsLoading();
+	// シーン遷移中なら透明度を変えない
+	if (isChange_) {
+		pushNextSprite_->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+		return;
+	}
+	// 透明度を徐々に変える
+	Vector4 tmpColor = pushNextSprite_->GetColor();
+	tmpColor.w += flashSpeed_;
+	if (tmpColor.w <= 0.1f) {
+		tmpColor.w = 0.1f;
+		flashSpeed_ *= -1.0f;
+	} else if (tmpColor.w >= 1.0f) {
+		tmpColor.w = 1.0f;
+		flashSpeed_ *= -1.0f;
+	}
+	pushNextSprite_->SetColor(tmpColor);
 }
 
 void OperationExplain::DrawBackground() {

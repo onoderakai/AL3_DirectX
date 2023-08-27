@@ -51,4 +51,6 @@ private:
 	Sprite* retrySprite_ = nullptr;
 	// タイトルに戻る文字
 	Sprite* returnTitleSprite_ = nullptr;
+	bool isChange_ = false;
+	float flashSpeed_ = 0.02f;
 };

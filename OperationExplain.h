@@ -40,4 +40,6 @@ private:
 
 	// 次に進む
 	Sprite* pushNextSprite_ = nullptr;
+	bool isChange_ = false;
+	float flashSpeed_ = 0.02f;
 };
