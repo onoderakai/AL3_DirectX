@@ -34,7 +34,7 @@ Player::~Player() {
 	}
 }
 
-void Player::Initialeze(Model* model, const Vector3& pos) {
+void Player::Initialeze(Model* model, Model* sniperModel, const Vector3& pos) {
 	bullets_.remove_if([](PlayerBullet* bullet) {
 		delete bullet;
 		return true;
@@ -42,6 +42,7 @@ void Player::Initialeze(Model* model, const Vector3& pos) {
 
 	(assert(model));
 	model_ = model;
+	sniperModel_ = sniperModel;
 	world_.Initialize();
 	input_ = Input::GetInstance();
 	world_.translation_ = pos;
@@ -113,7 +114,6 @@ void Player::Update(const ViewProjection& viewProjection) {
 
 	world_.UpdateMatrix();
 #ifdef _DEBUG
-	// ImGui
 	ImGui::Begin("PlayerHp");
 	ImGui::Text("%d", hp_);
 	ImGui::End();
@@ -147,8 +147,16 @@ void Player::Move(XINPUT_STATE& joyState) {
 }
 
 void Player::Draw(const ViewProjection& viewProjection) {
-
-	model_->Draw(world_, viewProjection);
+	switch (style_) {
+	case Player::Style::NORMAL:
+		model_->Draw(world_, viewProjection);
+		break;
+	case Player::Style::SNIPER:
+		sniperModel_->Draw(world_, viewProjection);
+		break;
+	default:
+		break;
+	}
 	world3DReticle_.rotation_ = FaceToDirection(Get3DReticleWorldPosition() - GetWorldPosition());
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);

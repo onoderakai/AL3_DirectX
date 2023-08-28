@@ -36,7 +36,7 @@ public:
 	/// <param name="model">モデル情報</param>
 	/// <param name="textureHandle">テクスチャハンドル</param>
 	/// <param name="pos">生成座標</param>
-	void Initialeze(Model* model, const Vector3& pos);
+	void Initialeze(Model* model, Model* sniperModel, const Vector3& pos);
 
 	/// <summary>
 	/// 更新
@@ -137,6 +137,7 @@ private:
 	WorldTransform world_;
 	// モデル情報
 	Model* model_ = nullptr;
+	Model* sniperModel_ = nullptr;
 	Model* bulletModel_ = nullptr;
 	//半径
 	float radius_ = 2.5f;

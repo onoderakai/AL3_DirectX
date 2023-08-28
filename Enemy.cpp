@@ -12,7 +12,6 @@ Enemy::Enemy() { particleTextureHandle_ = TextureManager::Load("red1x1.png"); }
 void Enemy::Initialize(Model* model, const Vector3& pos) {
 	(assert(model));
 	model_ = model;
-	textureHandle_ = TextureManager::Load("/cube/cube.jpg");
 
 	world_.Initialize();
 	world_.translation_ = pos;
@@ -73,7 +72,7 @@ void Enemy::Update() {
 }
 
 void Enemy::Draw(const ViewProjection& viewProjection) {
-	model_->Draw(world_, viewProjection, textureHandle_);
+	model_->Draw(world_, viewProjection);
 }
 
 void Enemy::OnCollision() {

@@ -14,6 +14,7 @@ GameScene::~GameScene() {
 	delete particleSystem_;
 	delete player_;
 	delete playerModel_;
+	delete playerSniperModel_;
 	for (Enemy* enemy : enemys_) {
 		delete enemy;
 	}
@@ -54,9 +55,10 @@ void GameScene::Initialize() {
 
 	// プレイヤーモデルの生成
 	playerModel_ = Model::CreateFromOBJ("Player", true);
+	playerSniperModel_ = Model::CreateFromOBJ("SniperPlayer", true);
 
 	// エネミーモデルの生成
-	enemyModel_ = Model::Create();
+	enemyModel_ = Model::CreateFromOBJ("Enemy1", true);
 
 	// ボスモデルの生成
 	bossModel_ = Model::CreateFromOBJ("Boss", true);
@@ -68,7 +70,7 @@ void GameScene::Initialize() {
 	// プレイヤー
 	player_ = new Player();
 	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
-	player_->Initialeze(playerModel_, playerPos);
+	player_->Initialeze(playerModel_, playerSniperModel_, playerPos);
 	player_->SetEnemys(enemys_);
 	player_->SetParticleSystem(particleSystem_);
 
@@ -128,7 +130,7 @@ void GameScene::SceneInitialize() {
 	});
 
 	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
-	player_->Initialeze(playerModel_, playerPos);
+	player_->Initialeze(playerModel_, playerSniperModel_, playerPos);
 	player_->SetEnemys(enemys_);
 	player_->SetParticleSystem(particleSystem_);
 

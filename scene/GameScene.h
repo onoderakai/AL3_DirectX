@@ -109,6 +109,7 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 	//モデル
 	Model* playerModel_ = nullptr;
+	Model* playerSniperModel_ = nullptr;
 	
 	//エネミーを包含
 	std::list<Enemy*> enemys_;

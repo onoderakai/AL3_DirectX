@@ -19,11 +19,7 @@ void RailCamera::Update() {
 	// 長さを整える
 	forward = Normalize(forward) * speed;
 	//world_.translation_ += forward;
-	ImGui::Begin("RailCamera");
-	ImGui::DragFloat3("cameraTranslate", &world_.translation_.x, 0.01f);
-	ImGui::DragFloat3("cameraRot", &world_.rotation_.x, 0.01f);
-	ImGui::End();
-
+	
 	// 移動処理
 	Vector3 move = {};
 	const float kCharacterSpeed = 0.6f;
