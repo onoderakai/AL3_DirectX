@@ -64,12 +64,26 @@ void Boss::Update() {
 	for (BossBullet* bullet : bullets_) {
 		bullet->Update();
 	}
+
+	switch (state_) {
+	case Boss::State::LATERAL_MOVE:
+		LateralMoveUpdate();
+		break;
+	case Boss::State::VERTICAL_MOVE:
+		VerticalMoveUpdate();
+		break;
+	case Boss::State::EASE:
+		EaseMoveUpdate();
+		break;
+	default:
+		break;
+	}
 #ifdef _DEBUG
 	ImGui::Begin("hp");
 	ImGui::Text("%d", hp_);
 	ImGui::End();
 #endif // _DEBUG
-	//
+	
 	world_.UpdateMatrix();
 }
 
@@ -114,3 +128,9 @@ void Boss::Attack() {
 	newBullet->SetPlayer(player_);
 	bullets_.push_back(newBullet);
 }
+
+void Boss::LateralMoveUpdate() {}
+
+void Boss::VerticalMoveUpdate() {}
+
+void Boss::EaseMoveUpdate() {}

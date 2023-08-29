@@ -7,7 +7,7 @@ class Player;
 
 class BossBullet : public Collider {
 public:
-	enum class AttackType { Normal, HOMING };
+	enum class AttackType { NORMAL, HOMING };
 	void Initialize(Model* model);
 	void Initialize(Model* model, const float& speed);
 	void Update();
@@ -45,6 +45,9 @@ public:
 	void SetPlayer(Player* player) { player_ = player; }
 
 private:
+	//弾の種類
+	AttackType attackType_ = AttackType::HOMING;
+
 	Player* player_ = nullptr;
 	Model* model_ = nullptr;
 	WorldTransform world_;
@@ -59,4 +62,14 @@ private:
 
 	Vector3 velocity_ = {};
 	float speed_ = 0.2f;
+
+	/// <summary>
+	/// 通常攻撃の更新処理
+	/// </summary>
+	void AttackNormalUpdate();
+
+	/// <summary>
+	/// ホーミング攻撃の更新処理
+	/// </summary>
+	void AttackHomingUpdate();
 };

@@ -11,6 +11,11 @@ class Player;
 
 class Boss : public Collider {
 public:
+	enum class State {
+		LATERAL_MOVE,
+		VERTICAL_MOVE,
+		EASE
+	};
 	Boss();
 
 	~Boss();
@@ -77,7 +82,12 @@ public:
 	void SetPlayer(Player* player) { player_ = player; }
 
 private:
+	//行動状態
+	State state_ = State::LATERAL_MOVE;
+
+	//パーティクルシステム
 	ParticleSystem* particleSystem_ = nullptr;
+	//プレイヤー
 	Player* player_ = nullptr;
 
 	Model* model_ = nullptr;
@@ -93,6 +103,21 @@ private:
 	int32_t hp_ = kMaxHp_;
 	Sprite* hpSprite_[20];
 	bool isDead_ = false;
+
+	/// <summary>
+	/// 横移動状態の更新処理
+	/// </summary>
+	void LateralMoveUpdate();
+
+	/// <summary>
+	/// 縦移動状態の更新処理
+	/// </summary>
+	void VerticalMoveUpdate();
+	
+	/// <summary>
+	/// イージング移動状態の更新処理
+	/// </summary>
+	void EaseMoveUpdate();
 
 	void Attack();
 };
