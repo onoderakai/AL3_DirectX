@@ -17,6 +17,7 @@ Boss::Boss() {
 		    Sprite::Create(hpTexture, {48 + (56.0f * i), 16}, {1, 1, 1, 1}, {0.5f, 0.5f});
 		hpSprite_[i]->SetSize(hpSprite_[i]->GetSize() * 2.0f);
 	}
+	easing_ = new Easing();
 }
 
 Boss::~Boss() {
@@ -27,18 +28,22 @@ Boss::~Boss() {
 	for (uint32_t i = 0; i < kMaxHp_; i++) {
 		delete hpSprite_[i];
 	}
+	delete easing_;
 }
 
 void Boss::Initialize(Model* model) {
 	assert(model);
 	model_ = model;
 	world_.Initialize();
+	world_.translation_ = {};
 
 	bullets_.remove_if([](BossBullet* bullet) {
 		delete bullet;
 		return true;
 	});
 
+	state_ = State::EASE;
+	isEase_ = false;
 	isDead_ = false;
 	hp_ = kMaxHp_;
 	Attack();
@@ -133,4 +138,12 @@ void Boss::LateralMoveUpdate() {}
 
 void Boss::VerticalMoveUpdate() {}
 
-void Boss::EaseMoveUpdate() {}
+void Boss::EaseMoveUpdate() {
+	if (!isEase_) {
+		isEase_ = true;
+		start = GetWorldPosition();
+		end.x = float(rand() % 140 - 70);
+		end.y = float(rand() % 80 - 40);
+	}
+	world_.translation_ = easing_->EaseOutSine(world_.translation_, start, end, 60, isEase_);
+}

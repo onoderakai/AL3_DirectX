@@ -33,5 +33,3 @@ float Length(const Vector2& v);
 /// <param name="v"></param>
 /// <returns></returns>
 float Length(const Vector3& v);
-
-

@@ -7,6 +7,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include "EnemyType.h"
+#include "Easing.h"
 
 class Player;
 class GameScene;
@@ -22,7 +23,7 @@ public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~Enemy() { timeCalls_.clear(); }
+	~Enemy();
 
 	/// <summary>
 	/// 初期化
@@ -118,6 +119,12 @@ private:
 
 	// プレイヤー
 	Player* player_ = nullptr;
+
+	// イージング関連
+	Easing* easing_ = nullptr;
+	bool isEase_ = false;
+	Vector3 start = {};
+	Vector3 end = {};
 
 	// ゲームシーン
 	GameScene* gameScene_ = nullptr;

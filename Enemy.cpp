@@ -7,7 +7,15 @@
 #include "TextureManager.h"
 #include <cassert>
 
-Enemy::Enemy() { particleTextureHandle_ = TextureManager::Load("red1x1.png"); }
+Enemy::Enemy() {
+	particleTextureHandle_ = TextureManager::Load("red1x1.png");
+	easing_ = new Easing();
+}
+
+Enemy::~Enemy() {
+	timeCalls_.clear();
+	delete easing_;
+}
 
 void Enemy::Initialize(Model* model, const Vector3& pos) {
 	(assert(model));
@@ -16,6 +24,7 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 	world_.Initialize();
 	world_.translation_ = pos;
 	velocity_ = {-0.3f, 0.3f, 0.0f};
+	isEase_ = false;
 
 	AttackReset();
 
@@ -71,9 +80,7 @@ void Enemy::Update() {
 	world_.UpdateMatrix();
 }
 
-void Enemy::Draw(const ViewProjection& viewProjection) {
-	model_->Draw(world_, viewProjection);
-}
+void Enemy::Draw(const ViewProjection& viewProjection) { model_->Draw(world_, viewProjection); }
 
 void Enemy::OnCollision() {
 	Particle::Parameter para = {};
@@ -147,6 +154,14 @@ void Enemy::NormalAttack() {
 void Enemy::ToPlayerUpdate() {
 	if (world_.translation_.z >= 0.0f) {
 		world_.translation_.z -= 0.3f;
+	} else {
+		if (!isEase_) {
+			isEase_ = true;
+			start = GetWorldPosition();
+			end.x = float(rand() % 140 - 70);
+			end.y = float(rand() % 80 - 40);
+		}
+		world_.translation_ = easing_->ConstantEase(world_.translation_, start, end, 120, isEase_);
 	}
 }
 

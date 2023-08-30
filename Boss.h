@@ -5,6 +5,7 @@
 #include "BossBullet.h"
 #include "Sprite.h"
 #include <list>
+#include "Easing.h"
 
 class ParticleSystem;
 class Player;
@@ -83,7 +84,7 @@ public:
 
 private:
 	//行動状態
-	State state_ = State::LATERAL_MOVE;
+	State state_ = State::EASE;
 
 	//パーティクルシステム
 	ParticleSystem* particleSystem_ = nullptr;
@@ -103,6 +104,12 @@ private:
 	int32_t hp_ = kMaxHp_;
 	Sprite* hpSprite_[20];
 	bool isDead_ = false;
+
+	//イージング関連
+	Easing* easing_ = nullptr;
+	bool isEase_ = false;
+	Vector3 start = {};
+	Vector3 end = {};
 
 	/// <summary>
 	/// 横移動状態の更新処理
