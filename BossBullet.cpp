@@ -4,22 +4,27 @@
 #include "Player.h"
 #include <cassert>
 
-void BossBullet::Initialize(Model* model) {
+void BossBullet::Initialize(Model* model, AttackType attackType, const Vector3& pos) {
 	assert(model);
 	model_ = model;
 
 	world_.Initialize();
+	attackType_ = attackType;
+	world_.translation_ = pos;
 
 	// 衝突フィルタリングを設定
 	// このクラスの属性を設定
 	SetCollisonAttribute(kCollisionAttributeBoss);
 	// このクラスの衝突しない属性を設定
-	SetCollisonMask(kCollisionAttributeBoss ^ kCollisionAttributeEnemy ^ GetCollisionMask());
+	SetCollisonMask(
+	    kCollisionAttributeBoss ^ kCollisionAttributeEnemy ^ GetCollisionMask() ^
+	    kCollisionAttributeBullet);
 }
 
-void BossBullet::Initialize(Model* model, const float& speed) {
-	Initialize(model);
-	speed_ = speed;
+void BossBullet::Initialize(
+    Model* model, AttackType attackType, const Vector3& pos, const Vector3& velocity) {
+	Initialize(model, attackType, pos);
+	velocity_ = velocity;
 }
 
 void BossBullet::Update() {
@@ -37,7 +42,7 @@ void BossBullet::Update() {
 	default:
 		break;
 	}
-	
+
 	world_.translation_ += velocity_;
 
 	world_.UpdateMatrix();
@@ -47,8 +52,8 @@ void BossBullet::Draw(const ViewProjection& view) { model_->Draw(world_, view); 
 
 void BossBullet::OnCollision() {
 	hp_--;
+	isDead_ = true;
 	if (hp_ <= 0) {
-		isDead_ = true;
 	}
 }
 
@@ -61,14 +66,24 @@ Vector3 BossBullet::GetWorldPosition() {
 void BossBullet::AttackNormalUpdate() {}
 
 void BossBullet::AttackHomingUpdate() {
-	// ホーミング
-	Vector3 toPlayer = player_->GetWorldPosition() - GetWorldPosition();
-	// ベクトルを正規化する
-	toPlayer = Normalize(toPlayer);
-	velocity_ = Normalize(velocity_);
-	// 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
-	speed_ *= 1.01f;
-	velocity_ = Lerp(velocity_, toPlayer, 0.2f) * speed_;
+	if (!isHoming_) {
+		return;
+	}
 
-	world_.rotation_ = FaceToDirection(velocity_);
+	float homingLength = 45.0f;
+	if (Length(player_->GetWorldPosition() - GetWorldPosition()) >= homingLength) {
+		// ホーミング
+		Vector3 toPlayer = player_->GetWorldPosition() - GetWorldPosition();
+		// ベクトルを正規化する
+		toPlayer = Normalize(toPlayer);
+		velocity_ = Normalize(velocity_);
+		// 球面線形補間により、今の速度と自キャラへのベクトルを内挿し、新たな速度とする
+		speed_ *= 1.01f;
+		velocity_ = Lerp(velocity_, toPlayer, 0.2f) * speed_;
+
+		// 行列計算をしないで回転
+		world_.rotation_ = FaceToDirection(velocity_);
+	} else {
+		isHoming_ = false;
+	}
 }

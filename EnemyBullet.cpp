@@ -73,7 +73,7 @@ void EnemyBullet::NormalUpdate() {}
 void EnemyBullet::ToPlayerUpdate() {}
 
 void EnemyBullet::HomingUpdate() {
-	if (!isHoming) {
+	if (!isHoming_) {
 		return;
 	}
 
@@ -90,6 +90,6 @@ void EnemyBullet::HomingUpdate() {
 		// 行列計算をしないで回転
 		world_.rotation_ = FaceToDirection(velocity_);
 	} else {
-		isHoming = false;
+		isHoming_ = false;
 	}
 }

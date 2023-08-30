@@ -445,6 +445,9 @@ void GameScene::CheckAllCollision() {
 	if (scene_ == SceneNum::BOSS_STAGE) {
 		if (!boss_->GetIsDead()) {
 			colliders.push_back(boss_);
+			for (BossBullet* bullet : boss_->GetBullets()) {
+				colliders.push_back(bullet);
+			}
 		}
 	}
 	for (Enemy* enemy : enemys_) {

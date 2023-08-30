@@ -8,8 +8,9 @@ class Player;
 class BossBullet : public Collider {
 public:
 	enum class AttackType { NORMAL, HOMING };
-	void Initialize(Model* model);
-	void Initialize(Model* model, const float& speed);
+	void Initialize(Model* model, AttackType attackType, const Vector3& pos);
+	void Initialize(
+	    Model* model, AttackType attackType, const Vector3& pos, const Vector3& velocity);
 	void Update();
 	void Draw(const ViewProjection& view);
 
@@ -62,6 +63,8 @@ private:
 
 	Vector3 velocity_ = {};
 	float speed_ = 0.2f;
+
+	bool isHoming_ = true;
 
 	/// <summary>
 	/// 通常攻撃の更新処理

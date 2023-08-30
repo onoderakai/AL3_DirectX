@@ -46,7 +46,7 @@ void Boss::Initialize(Model* model) {
 	isEase_ = false;
 	isDead_ = false;
 	hp_ = kMaxHp_;
-	Attack();
+
 	// 衝突フィルタリングを設定
 	// このクラスの属性を設定
 	SetCollisonAttribute(kCollisionAttributeBoss);
@@ -66,13 +66,20 @@ void Boss::Update() {
 
 	world_.rotation_ = FaceToDirection(player_->GetWorldPosition() - GetWorldPosition());
 
-	for (BossBullet* bullet : bullets_) {
-		bullet->Update();
+	moveFrame_++;
+	if (moveFrame_ >= kChangeStateFrame_) {
+		moveFrame_ = 0;
+		easing_->ResetTimeCount();
+		isEase_ = false;
+		if (state_ == State::LATERAL_MOVE) {
+			state_ = State::EASE;
+		} else {
+			state_ = State::LATERAL_MOVE;
+		}
 	}
-
 	switch (state_) {
 	case Boss::State::LATERAL_MOVE:
-		LateralMoveUpdate();
+		NormalMoveUpdate();
 		break;
 	case Boss::State::VERTICAL_MOVE:
 		VerticalMoveUpdate();
@@ -82,6 +89,10 @@ void Boss::Update() {
 		break;
 	default:
 		break;
+	}
+
+	for (BossBullet* bullet : bullets_) {
+		bullet->Update();
 	}
 #ifdef _DEBUG
 	ImGui::Begin("hp");
@@ -127,23 +138,63 @@ void Boss::OnCollision() {
 	}
 }
 
-void Boss::Attack() {
-	BossBullet* newBullet = new BossBullet();
-	newBullet->Initialize(homingBulletModel_);
-	newBullet->SetPlayer(player_);
-	bullets_.push_back(newBullet);
-}
+void Boss::NormalMoveUpdate() {
+	if (!isEase_) {
+		isEase_ = true;
+		NormalBulletAttack();
 
-void Boss::LateralMoveUpdate() {}
+		BossBullet* newBullet = new BossBullet();
+		Vector3 bulletVelocity = player_->GetWorldPosition() - GetWorldPosition();
+		bulletVelocity.x += 5.0f;
+		bulletVelocity = Normalize(bulletVelocity) * 2.0f;
+		newBullet->Initialize(
+		    homingBulletModel_, BossBullet::AttackType::NORMAL, GetWorldPosition(), bulletVelocity);
+		newBullet->SetPlayer(player_);
+		bullets_.push_back(newBullet);
+
+		BossBullet* newBullet2 = new BossBullet();
+		bulletVelocity.x -= 0.2f;
+		bulletVelocity = Normalize(bulletVelocity) * 2.0f;
+		newBullet2->Initialize(
+		    homingBulletModel_, BossBullet::AttackType::NORMAL, GetWorldPosition(), bulletVelocity);
+		newBullet2->SetPlayer(player_);
+		bullets_.push_back(newBullet2);
+
+		start = GetWorldPosition();
+		end.x = float(rand() % 140 - 70);
+		end.y = float(rand() % 80 - 40);
+		end.z = float(rand() % 60);
+	}
+	world_.translation_ = easing_->ConstantEase(world_.translation_, start, end, 100, isEase_);
+}
 
 void Boss::VerticalMoveUpdate() {}
 
 void Boss::EaseMoveUpdate() {
 	if (!isEase_) {
 		isEase_ = true;
+		HomingBulletAttack();
 		start = GetWorldPosition();
 		end.x = float(rand() % 140 - 70);
 		end.y = float(rand() % 80 - 40);
+		end.z = float(rand() % 60);
 	}
 	world_.translation_ = easing_->EaseOutSine(world_.translation_, start, end, 60, isEase_);
+}
+
+void Boss::NormalBulletAttack() {
+	BossBullet* newBullet = new BossBullet();
+	Vector3 bulletVelocity = player_->GetWorldPosition() - GetWorldPosition();
+	bulletVelocity = Normalize(bulletVelocity) * 2.0f;
+	newBullet->Initialize(
+	    homingBulletModel_, BossBullet::AttackType::NORMAL, GetWorldPosition(), bulletVelocity);
+	newBullet->SetPlayer(player_);
+	bullets_.push_back(newBullet);
+}
+
+void Boss::HomingBulletAttack() {
+	BossBullet* newBullet = new BossBullet();
+	newBullet->Initialize(homingBulletModel_, BossBullet::AttackType::HOMING, GetWorldPosition());
+	newBullet->SetPlayer(player_);
+	bullets_.push_back(newBullet);
 }

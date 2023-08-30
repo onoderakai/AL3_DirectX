@@ -61,11 +61,11 @@ private:
 	// 弾の半径
 	const float kRadius_ = 1.0f;
 	//ホーミングフラグ
-	bool isHoming = true;
+	bool isHoming_ = true;
 	// 弾の寿命
-	const int kLifeTime = 60 * 20;
+	const int kLifeTime_ = 60 * 20;
 	// デスタイマー
-	int deathTimer_ = kLifeTime;
+	int deathTimer_ = kLifeTime_;
 	// デスフラグ
 	bool isDead_ = false;
 

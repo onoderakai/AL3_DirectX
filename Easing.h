@@ -66,6 +66,11 @@ public:
 	Vector3 EaseOutElastic(
 	    const Vector3& value, const Vector3& start, const Vector3& end, int maxFrame, bool& isEase);
 
+	/// <summary>
+	/// タイムカウントをリセットする
+	/// </summary>
+	void ResetTimeCount() { timeCount_ = 0; }
+
 private:
-	int timeCount = 0;
+	int timeCount_ = 0;
 };

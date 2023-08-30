@@ -85,6 +85,8 @@ public:
 private:
 	//行動状態
 	State state_ = State::EASE;
+	const uint32_t kChangeStateFrame_ = 300;
+	uint32_t moveFrame_ = 0;
 
 	//パーティクルシステム
 	ParticleSystem* particleSystem_ = nullptr;
@@ -112,9 +114,9 @@ private:
 	Vector3 end = {};
 
 	/// <summary>
-	/// 横移動状態の更新処理
+	/// 通常移動状態の更新処理
 	/// </summary>
-	void LateralMoveUpdate();
+	void NormalMoveUpdate();
 
 	/// <summary>
 	/// 縦移動状態の更新処理
@@ -126,5 +128,7 @@ private:
 	/// </summary>
 	void EaseMoveUpdate();
 
-	void Attack();
+	void NormalBulletAttack();
+
+	void HomingBulletAttack();
 };
