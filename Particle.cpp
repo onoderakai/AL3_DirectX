@@ -69,11 +69,6 @@ void Particle::Update() {
 	default:
 		break;
 	}
-	ImGui::Begin("a");
-	ImGui::Text(
-	    "%f,%f,%f", parameter_.world_.rotation_.x, parameter_.world_.rotation_.y,
-	    parameter_.world_.rotation_.z);
-	ImGui::End();
 	parameter_.world_.UpdateMatrix();
 }
 

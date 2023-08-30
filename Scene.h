@@ -6,6 +6,7 @@
 enum class SceneNum {
 	TITLE,
 	EXPLAIN,
+	STAGE_SELECT,
 	STAGE,
 	BOSS_STAGE,
 	CLEAR,

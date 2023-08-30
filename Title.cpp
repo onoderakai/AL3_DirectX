@@ -28,9 +28,9 @@ void Title::Initialize(SceneNum* pScene) {
 }
 
 void Title::Update() {
-	// SPACEでSTAGEシーンに遷移する
+	// SPACEでSTAGE_SELECTシーンに遷移する
 	if (input_->PushKey(DIK_SPACE)) {
-		SceneChange::GetInstance()->Change(SceneNum::STAGE, pScene_);
+		SceneChange::GetInstance()->Change(SceneNum::STAGE_SELECT, pScene_);
 	} else if (input_->PushKey(DIK_RETURN)) {
 		SceneChange::GetInstance()->Change(SceneNum::EXPLAIN, pScene_);
 	}

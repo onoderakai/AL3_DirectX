@@ -32,6 +32,7 @@ GameScene::~GameScene() {
 	delete clear_;
 	delete gameOver_;
 	delete explain_;
+	delete stageSelect_;
 
 	delete debugCamera_;
 }
@@ -40,10 +41,12 @@ void GameScene::Initialize() {
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(WinApp::kWindowWidth, WinApp::kWindowHeight);
+#ifdef _DEBUG
 	// 軸方向表示の表示を有効にする
 	AxisIndicator::GetInstance()->SetVisible(true);
 	// 軸方向表示が参照するビュープロジェクションを指定する（アドレス渡し）
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
+#endif // _DEBUG
 
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
@@ -110,6 +113,8 @@ void GameScene::Initialize() {
 	gameOver_->Initialize(&scene_);
 	explain_ = new OperationExplain();
 	explain_->Initialize(&scene_);
+	stageSelect_ = new StageSelect();
+	stageSelect_->Initialize(&scene_);
 }
 
 void GameScene::SceneInitialize() {
@@ -151,6 +156,7 @@ void GameScene::SceneInitialize() {
 	clear_->Initialize(&scene_);
 	gameOver_->Initialize(&scene_);
 	explain_->Initialize(&scene_);
+	stageSelect_->Initialize(&scene_);
 
 	// コマンドの初期化
 	isDefeat_ = false;
@@ -205,6 +211,9 @@ void GameScene::Update() {
 		break;
 	case SceneNum::EXPLAIN:
 		explain_->Update();
+		break;
+	case SceneNum::STAGE_SELECT:
+		stageSelect_->Update();
 		break;
 	case SceneNum::STAGE:
 		UpdateEnemyPopCommands();
@@ -396,6 +405,9 @@ void GameScene::Draw() {
 	case SceneNum::EXPLAIN:
 		explain_->DrawBackground();
 		break;
+	case SceneNum::STAGE_SELECT:
+		stageSelect_->DrawBackground();
+		break;
 	case SceneNum::STAGE:
 		player_->DrawUI();
 		break;
@@ -499,9 +511,6 @@ void GameScene::UpdateEnemyPopCommands() {
 			enemy;
 			enemyCount++;
 		}
-		ImGui::Begin("enemyCount");
-		ImGui::Text("%d", enemyCount);
-		ImGui::End();
 		if (enemyCount <= 0) {
 			isDefeat_ = false;
 		}
