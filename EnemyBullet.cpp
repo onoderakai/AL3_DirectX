@@ -22,7 +22,6 @@ void EnemyBullet::Initialize(
 	velocity_ = velocity;
 	world_.translation_ = pos;
 	model_ = model;
-	textureHandle_ = TextureManager::Load("white1x1.png");
 
 	// 衝突フィルタリングを設定
 	// このクラスの属性を設定
@@ -57,7 +56,7 @@ void EnemyBullet::Update() {
 }
 
 void EnemyBullet::Draw(const ViewProjection& viewProjection) {
-	model_->Draw(world_, viewProjection, textureHandle_);
+	model_->Draw(world_, viewProjection);
 }
 
 void EnemyBullet::OnCollision() { isDead_ = true; }

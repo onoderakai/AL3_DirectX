@@ -48,7 +48,6 @@ public:
 private:
 	WorldTransform world_;
 	Model* model_ = nullptr;
-	uint32_t textureHandle_ = 0;
 	Vector3 velocity_;
 	float speed_ = 0.0f;
 

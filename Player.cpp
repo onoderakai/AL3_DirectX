@@ -4,6 +4,7 @@
 #include "ImGuiManager.h"
 #include "MathUtility.h"
 #include "ParticleSystem.h"
+#include "Boss.h"
 #include <cassert>
 
 Player::Player() {
@@ -224,7 +225,7 @@ void Player::Attack() {
 			bulletCoolTime_ = kSniperCoolTime_;
 			if (isLockOn) {
 				isLockOn = false;
-				lockOnEnemy_->OnCollision();
+				lockOnCollider_->OnCollision();
 			}
 			bulletSpeed = kSniperBulletSpeed_;
 			break;
@@ -293,10 +294,25 @@ void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
 
 	sprite2DReticle_->SetPosition(Vector2{float(mousePos.x), float(mousePos.y)});
 
-	// 敵のロックオン処理
+	// ロックオン処理
 	isLockOn = false;
 	if (style_ == Style::SNIPER) {
 		nearDis = lockOnDis;
+		if (boss_) {
+			Vector3 bossPos = boss_->GetWorldPosition();
+			bossPos = Transform(bossPos, matViewProjectionViewport);
+			// マウスと敵の距離
+			float mouseToEnemyDis = Length(
+			    Vector2{float(mousePos.x), float(mousePos.y)} - Vector2{bossPos.x, bossPos.y});
+			// lockOnDisの範囲内かつ、一番近い敵をlockOnPosにする
+			if (nearDis >= mouseToEnemyDis) {
+				nearDis = mouseToEnemyDis;
+				lockOnPos = boss_->GetWorldPosition();
+				lockOnCollider_ = boss_;
+				isLockOn = true;
+				sprite2DReticle_->SetPosition(Vector2{bossPos.x, bossPos.y});
+			}
+		}
 		for (Enemy* enemy : enemys_) {
 			Vector3 enemyPos = enemy->GetWorldPosition();
 			enemyPos = Transform(enemyPos, matViewProjectionViewport);
@@ -307,7 +323,7 @@ void Player::WorldToScreen2DReticle(const ViewProjection& viewProjection) {
 			if (nearDis >= mouseToEnemyDis) {
 				nearDis = mouseToEnemyDis;
 				lockOnPos = enemy->GetWorldPosition();
-				lockOnEnemy_ = enemy;
+				lockOnCollider_ = enemy;
 				isLockOn = true;
 				sprite2DReticle_->SetPosition(Vector2{enemyPos.x, enemyPos.y});
 			}

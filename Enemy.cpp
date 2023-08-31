@@ -17,9 +17,10 @@ Enemy::~Enemy() {
 	delete easing_;
 }
 
-void Enemy::Initialize(Model* model, const Vector3& pos) {
+void Enemy::Initialize(Model* model, Model* bulletModel, const Vector3& pos) {
 	(assert(model));
 	model_ = model;
+	bulletModel_ = bulletModel;
 
 	world_.Initialize();
 	world_.translation_ = pos;
@@ -35,16 +36,12 @@ void Enemy::Initialize(Model* model, const Vector3& pos) {
 	SetCollisonMask(kCollisionAttributeEnemy ^ GetCollisionMask());
 }
 
-void Enemy::Initialize(Type type, Model* model, const Vector3& pos) {
+void Enemy::Initialize(Type type, Model* model, Model* bulletModel, const Vector3& pos) {
 	type_ = type;
-	Initialize(model, pos);
+	Initialize(model, bulletModel, pos);
 }
 
 void Enemy::Update() {
-	if (--deathTimer_ <= 0) {
-		// isDead_ = true;
-	}
-
 	// デスフラグがtrueのTimeCallを削除する
 	timeCalls_.remove_if([](TimeCall* timeCall) {
 		if (timeCall->IsFinished()) {
@@ -145,7 +142,7 @@ void Enemy::NormalAttack() {
 	Vector3 bulletVelocity = {0.0f, 0.0f, -3.0f};
 	// 弾を生成
 	EnemyBullet* newBullet = new EnemyBullet();
-	newBullet->Initialize(type_, world_.translation_, bulletVelocity, model_);
+	newBullet->Initialize(type_, world_.translation_, bulletVelocity, bulletModel_);
 	newBullet->SetPlayer(player_);
 	// 生成した弾をリストに追加
 	gameScene_->AddEnemyBullet(newBullet);
@@ -163,6 +160,7 @@ void Enemy::ToPlayerUpdate() {
 		}
 		world_.translation_ = easing_->ConstantEase(world_.translation_, start, end, 120, isEase_);
 	}
+	world_.rotation_ = FaceToDirection(GetWorldPosition() - player_->GetWorldPosition());
 }
 
 void Enemy::ToPlayerAttack() {
@@ -178,7 +176,7 @@ void Enemy::ToPlayerAttack() {
 
 	// 弾を生成
 	EnemyBullet* newBullet = new EnemyBullet();
-	newBullet->Initialize(type_, world_.translation_, bulletVelocity, model_);
+	newBullet->Initialize(type_, world_.translation_, bulletVelocity, bulletModel_);
 	newBullet->SetPlayer(player_);
 	// 生成した弾をリストに追加
 	gameScene_->AddEnemyBullet(newBullet);
@@ -192,6 +190,7 @@ void Enemy::HomingUpdate() {
 			isAttack = true;
 		}
 	}
+	world_.rotation_ = FaceToDirection(GetWorldPosition() - player_->GetWorldPosition());
 }
 
 void Enemy::HomingAttack() {
@@ -207,7 +206,7 @@ void Enemy::HomingAttack() {
 
 	// 弾を生成
 	EnemyBullet* newBullet = new EnemyBullet();
-	newBullet->Initialize(type_, world_.translation_, bulletVelocity, model_);
+	newBullet->Initialize(type_, world_.translation_, bulletVelocity, bulletModel_);
 	newBullet->SetPlayer(player_);
 	// 生成した弾をリストに追加
 	gameScene_->AddEnemyBullet(newBullet);

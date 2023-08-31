@@ -21,7 +21,12 @@ GameScene::~GameScene() {
 	for (EnemyBullet* bullet : enemyBullets_) {
 		delete bullet;
 	}
-	delete enemyModel_;
+	delete enemyNormalModel_;
+	delete enemyToPlayerModel_;
+	delete enemyHomingModel_;
+	delete enemyBulletNormalModel_;
+	delete enemyBulletToPlayerModel_;
+	delete enemyBulletHomingModel_;
 	delete boss_;
 	delete bossModel_;
 	delete skydomeModel_;
@@ -61,7 +66,13 @@ void GameScene::Initialize() {
 	playerSniperModel_ = Model::CreateFromOBJ("SniperPlayer", true);
 
 	// エネミーモデルの生成
-	enemyModel_ = Model::CreateFromOBJ("Enemy1", true);
+	enemyNormalModel_ = Model::CreateFromOBJ("Enemy1", true);
+	enemyToPlayerModel_ = Model::CreateFromOBJ("Enemy2", true);
+	enemyHomingModel_ = Model::CreateFromOBJ("Enemy3", true);
+
+	enemyBulletNormalModel_ = Model::CreateFromOBJ("EnemyBulletNormal", true);
+	enemyBulletToPlayerModel_ = Model::CreateFromOBJ("EnemyBulletToPlayer", true);
+	enemyBulletHomingModel_ = Model::CreateFromOBJ("EnemyBulletHoming", true);
 
 	// ボスモデルの生成
 	bossModel_ = Model::CreateFromOBJ("Boss", true);
@@ -137,6 +148,7 @@ void GameScene::SceneInitialize() {
 	Vector3 playerPos = {0.0f, -7.0f, 20.0f};
 	player_->Initialeze(playerModel_, playerSniperModel_, playerPos);
 	player_->SetEnemys(enemys_);
+	player_->SetBoss(nullptr);
 	player_->SetParticleSystem(particleSystem_);
 
 	boss_->Initialize(bossModel_);
@@ -181,6 +193,7 @@ void GameScene::Update() {
 	}
 #endif // _DEBUG
 	preScene_ = scene_;
+#ifdef _DEBUG
 	// 1でTITLEシーンに遷移する
 	if (input_->PushKey(DIK_1)) {
 		SceneChange::GetInstance()->Change(SceneNum::TITLE, &scene_);
@@ -204,6 +217,7 @@ void GameScene::Update() {
 		stage1EnemyPopCommands.clear();
 		stage1EnemyPopCommands.seekg(0, ios::beg);
 	}
+#endif // _DEBUG
 
 	switch (scene_) {
 	case SceneNum::TITLE:
@@ -287,6 +301,7 @@ void GameScene::Update() {
 				player_->Update(viewProjection_);
 			}
 		}
+		player_->SetBoss(boss_);
 		// ボスの更新処理
 		if (boss_) {
 			if (boss_->GetIsDead()) {
@@ -603,6 +618,20 @@ void GameScene::AddEnemy(Type type, Vector3 pos) {
 	newEnemy->SetPlayer(player_);
 	newEnemy->SetGameScene(this);
 	newEnemy->SetParticleSystem(particleSystem_);
-	newEnemy->Initialize(type, enemyModel_, pos);
+	switch (type) {
+	case Type::NORMAL:
+		newEnemy->Initialize(type, enemyNormalModel_,enemyBulletNormalModel_, pos);
+		break;
+	case Type::TO_PLAYER:
+		newEnemy->Initialize(type, enemyToPlayerModel_,enemyBulletToPlayerModel_, pos);
+		break;
+	case Type::HOMING:
+		newEnemy->Initialize(type, enemyHomingModel_,enemyBulletHomingModel_, pos);
+		break;
+	default:
+		newEnemy->Initialize(type, enemyNormalModel_, enemyBulletNormalModel_, pos);
+		break;
+	}
+	
 	enemys_.push_back(newEnemy);
 }

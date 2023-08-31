@@ -13,7 +13,7 @@ class Player;
 class Boss : public Collider {
 public:
 	enum class State {
-		LATERAL_MOVE,
+		NORMAL_MOVE,
 		VERTICAL_MOVE,
 		EASE
 	};
@@ -99,6 +99,7 @@ private:
 
 	//弾の包含
 	Model* homingBulletModel_ = nullptr;
+	Model* normalBulletModel_ = nullptr;
 	std::list<BossBullet*> bullets_;
 
 	//HP

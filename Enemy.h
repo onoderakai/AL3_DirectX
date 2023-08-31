@@ -30,7 +30,7 @@ public:
 	/// </summary>
 	/// <param name="model">モデル</param>
 	/// <param name="pos">初期座標</param>
-	void Initialize(Model* model, const Vector3& pos);
+	void Initialize(Model* model, Model* bulletModel, const Vector3& pos);
 
 	/// <summary>
 	/// 初期化
@@ -38,7 +38,7 @@ public:
 	/// <param name="type"></param>
 	/// <param name="model"></param>
 	/// <param name="pos"></param>
-	void Initialize(Type type, Model* model, const Vector3& pos);
+	void Initialize(Type type, Model* model, Model* bulletModel, const Vector3& pos);
 
 	/// <summary>
 	/// 更新
@@ -100,6 +100,8 @@ private:
 	WorldTransform world_;
 	// モデル
 	Model* model_ = nullptr;
+	//弾のモデル
+	Model* bulletModel_ = nullptr;
 	// テクスチャハンドル
 	uint32_t particleTextureHandle_ = 0;
 	// 半径

@@ -118,7 +118,14 @@ private: // メンバ変数
 	// 弾の包含
 	std::list<EnemyBullet*> enemyBullets_;
 	//モデル
-	Model* enemyModel_ = nullptr;
+	Model* enemyNormalModel_ = nullptr;
+	Model* enemyToPlayerModel_ = nullptr;
+	Model* enemyHomingModel_ = nullptr;
+
+	Model* enemyBulletNormalModel_ = nullptr;
+	Model* enemyBulletToPlayerModel_ = nullptr;
+	Model* enemyBulletHomingModel_ = nullptr;
+
 	Vector3 enemyGeneratePos_ = {};
 
 	//ボスを包含

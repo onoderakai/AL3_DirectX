@@ -9,6 +9,7 @@
 
 class Enemy;
 class ParticleSystem;
+class Boss;
 
 /// <summary>
 /// 自キャラ
@@ -124,6 +125,12 @@ public:
 	void SetEnemys(std::list<Enemy*> enemys) { enemys_ = enemys; }
 
 	/// <summary>
+	/// ボスのセッター
+	/// </summary>
+	/// <param name="boss"></param>
+	void SetBoss(Boss* boss) { boss_ = boss; }
+
+	/// <summary>
 	/// パーティクルシステムのセッター
 	/// </summary>
 	/// <param name="particleSystem"></param>
@@ -150,6 +157,8 @@ private:
 
 	//敵のリスト
 	std::list<Enemy*> enemys_;
+	//ボス
+	Boss* boss_ = nullptr;
 	//パーティクルシステム
 	ParticleSystem* particleSystem_ = nullptr;
 
@@ -161,8 +170,8 @@ private:
 	float lockOnDis = 100.0f;
 	//一番小さい数値を保存
 	float nearDis = lockOnDis;
-	//ロックオンした敵の情報
-	Enemy* lockOnEnemy_ = nullptr;
+	//ロックオンした情報
+	Collider* lockOnCollider_ = nullptr;
 
 	//弾
 	std::list<PlayerBullet*> bullets_;

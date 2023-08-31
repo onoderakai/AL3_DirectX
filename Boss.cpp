@@ -10,13 +10,19 @@ Boss::Boss() {
 	world_.scale_.x *= 3.0f;
 	world_.scale_.y *= 3.0f;
 	world_.scale_.z *= 3.0f;
-	homingBulletModel_ = Model::Create();
+	//モデルの生成
+	normalBulletModel_ = Model::CreateFromOBJ("BossBulletNormal", true);
+	homingBulletModel_ = Model::CreateFromOBJ("BossBulletHoming", true);
+
+	//HPスプライトの生成
 	uint32_t hpTexture = TextureManager::Load("boss_hp.png");
 	for (uint32_t i = 0; i < kMaxHp_; i++) {
 		hpSprite_[i] =
 		    Sprite::Create(hpTexture, {48 + (56.0f * i), 16}, {1, 1, 1, 1}, {0.5f, 0.5f});
 		hpSprite_[i]->SetSize(hpSprite_[i]->GetSize() * 2.0f);
 	}
+
+	//イージングクラスの作成
 	easing_ = new Easing();
 }
 
@@ -29,6 +35,7 @@ Boss::~Boss() {
 		delete hpSprite_[i];
 	}
 	delete easing_;
+	delete normalBulletModel_;
 }
 
 void Boss::Initialize(Model* model) {
@@ -46,6 +53,7 @@ void Boss::Initialize(Model* model) {
 	isEase_ = false;
 	isDead_ = false;
 	hp_ = kMaxHp_;
+	moveFrame_ = 0;
 
 	// 衝突フィルタリングを設定
 	// このクラスの属性を設定
@@ -71,14 +79,14 @@ void Boss::Update() {
 		moveFrame_ = 0;
 		easing_->ResetTimeCount();
 		isEase_ = false;
-		if (state_ == State::LATERAL_MOVE) {
+		if (state_ == State::NORMAL_MOVE) {
 			state_ = State::EASE;
 		} else {
-			state_ = State::LATERAL_MOVE;
+			state_ = State::NORMAL_MOVE;
 		}
 	}
 	switch (state_) {
-	case Boss::State::LATERAL_MOVE:
+	case Boss::State::NORMAL_MOVE:
 		NormalMoveUpdate();
 		break;
 	case Boss::State::VERTICAL_MOVE:
@@ -148,16 +156,18 @@ void Boss::NormalMoveUpdate() {
 		bulletVelocity.x += 5.0f;
 		bulletVelocity = Normalize(bulletVelocity) * 2.0f;
 		newBullet->Initialize(
-		    homingBulletModel_, BossBullet::AttackType::NORMAL, GetWorldPosition(), bulletVelocity);
+		    normalBulletModel_, BossBullet::AttackType::NORMAL, GetWorldPosition(), bulletVelocity);
 		newBullet->SetPlayer(player_);
+		newBullet->SetRadius(3.0f);
 		bullets_.push_back(newBullet);
 
 		BossBullet* newBullet2 = new BossBullet();
 		bulletVelocity.x -= 0.2f;
 		bulletVelocity = Normalize(bulletVelocity) * 2.0f;
 		newBullet2->Initialize(
-		    homingBulletModel_, BossBullet::AttackType::NORMAL, GetWorldPosition(), bulletVelocity);
+		    normalBulletModel_, BossBullet::AttackType::NORMAL, GetWorldPosition(), bulletVelocity);
 		newBullet2->SetPlayer(player_);
+		newBullet2->SetRadius(3.0f);
 		bullets_.push_back(newBullet2);
 
 		start = GetWorldPosition();
@@ -187,8 +197,9 @@ void Boss::NormalBulletAttack() {
 	Vector3 bulletVelocity = player_->GetWorldPosition() - GetWorldPosition();
 	bulletVelocity = Normalize(bulletVelocity) * 2.0f;
 	newBullet->Initialize(
-	    homingBulletModel_, BossBullet::AttackType::NORMAL, GetWorldPosition(), bulletVelocity);
+	    normalBulletModel_, BossBullet::AttackType::NORMAL, GetWorldPosition(), bulletVelocity);
 	newBullet->SetPlayer(player_);
+	newBullet->SetRadius(3.0f);
 	bullets_.push_back(newBullet);
 }
 

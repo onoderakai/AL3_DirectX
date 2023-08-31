@@ -11,6 +11,7 @@ void BossBullet::Initialize(Model* model, AttackType attackType, const Vector3& 
 	world_.Initialize();
 	attackType_ = attackType;
 	world_.translation_ = pos;
+	world_.scale_ = world_.scale_ * 2.0f;
 
 	// 衝突フィルタリングを設定
 	// このクラスの属性を設定
