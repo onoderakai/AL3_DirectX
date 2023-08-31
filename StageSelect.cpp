@@ -24,10 +24,12 @@ StageSelect::StageSelect() {
 
 	uint32_t arrowRightTextureHandle = TextureManager::Load("select_arrow_right.png");
 	arrowRightSprite_ = Sprite::Create(
-	    arrowRightTextureHandle, Vector2{1280.0f - 170.0f, 380.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	    arrowRightTextureHandle, Vector2{1280.0f - 150.0f, 380.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	arrowRightSprite_->SetSize(arrowRightSprite_->GetSize() * (0.5f));
 	uint32_t arrowLeftTextureHandle = TextureManager::Load("select_arrow_left.png");
 	arrowLeftSprite_ =
-	    Sprite::Create(arrowLeftTextureHandle, Vector2{170.0f, 380.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	    Sprite::Create(arrowLeftTextureHandle, Vector2{150.0f, 380.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	arrowLeftSprite_->SetSize(arrowLeftSprite_->GetSize() * (0.5f));
 
 	uint32_t backTitleTextureHandle = TextureManager::Load("back_title.png");
 	backTitleSprite_ =
