@@ -222,6 +222,7 @@ void Player::Attack() {
 			bulletSpeed = kNormalBulletSpeed_;
 			break;
 		case Player::Style::SNIPER:
+			style_ = Style::NORMAL;
 			bulletCoolTime_ = kSniperCoolTime_;
 			if (isLockOn) {
 				isLockOn = false;

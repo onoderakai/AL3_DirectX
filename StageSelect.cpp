@@ -68,7 +68,7 @@ void StageSelect::Update() {
 		SceneChange::GetInstance()->Change(SceneNum::TITLE, pScene_);
 	}
 
-	if (!isEase_) {
+	if (!isEase_ && !SceneChange::GetInstance()->GetIsLoading()) {
 		if ((input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) &&
 		    stageNum_ < maxStageNum_ - 1) {
 			// イージングフラグをtrueにし、イージングの開始値と終了値を設定する

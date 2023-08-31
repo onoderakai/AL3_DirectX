@@ -177,7 +177,7 @@ private:
 	std::list<PlayerBullet*> bullets_;
 	//弾の発射クールタイム
 	int bulletCoolTime_ = 0;
-	const uint32_t kNormalCoolTime_ = 5;
+	const uint32_t kNormalCoolTime_ = 10;
 	const uint32_t kSniperCoolTime_ = 60;
 
 	//弾の速度
