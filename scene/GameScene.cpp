@@ -157,9 +157,6 @@ void GameScene::SceneInitialize() {
 
 	railCamera_->Initialize({0.0f, 0.0f, -100.0f}, {0.0f, 0.0f, 0.0f});
 
-	// 親子関係を結ぶ
-	player_->SetParent(&railCamera_->GetWorldTransform());
-
 	// ビュープロジェクションの初期化
 	viewProjection_.farZ = 100.0f;
 	viewProjection_.Initialize();

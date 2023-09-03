@@ -70,3 +70,12 @@ Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rot, const Vecto
 /// <param name="matrix"></param>
 /// <returns></returns>
 Matrix4x4 Inverse(const Matrix4x4& matrix);
+
+/// <summary>
+/// 線形補間
+/// </summary>
+/// <param name="p1"></param>
+/// <param name="p2"></param>
+/// <param name="t"></param>
+/// <returns></returns>
+Matrix4x4 Lerp(const Matrix4x4& p1, const Matrix4x4& p2, float t);

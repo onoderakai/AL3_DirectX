@@ -131,6 +131,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneChange.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
+    <ClCompile Include="Shake.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="StageSelect.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneChange.h" />
     <ClInclude Include="scene\GameScene.h" />
+    <ClInclude Include="Shake.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="StageSelect.h" />

@@ -2,7 +2,8 @@
 #include <cmath>
 
 Vector3 Easing::ConstantEase(
-    const Vector3& value, const Vector3& start, const Vector3& end, int maxFrame, bool& isEase) {
+    const Vector3& value, const Vector3& start, const Vector3& end, const uint32_t& maxFrame,
+    bool& isEase) {
 	if (!isEase) {
 		timeCount_ = 0;
 		return value;
@@ -24,7 +25,8 @@ Vector3 Easing::ConstantEase(
 }
 
 Vector3 Easing::EaseInSine(
-    const Vector3& value, const Vector3& start, const Vector3& end, int maxFrame, bool& isEase) {
+    const Vector3& value, const Vector3& start, const Vector3& end, const uint32_t& maxFrame,
+    bool& isEase) {
 	if (!isEase) {
 		timeCount_ = 0;
 		return value;
@@ -46,7 +48,8 @@ Vector3 Easing::EaseInSine(
 }
 
 Vector3 Easing::EaseOutSine(
-    const Vector3& value, const Vector3& start, const Vector3& end, int maxFrame, bool& isEase) {
+    const Vector3& value, const Vector3& start, const Vector3& end, const uint32_t& maxFrame,
+    bool& isEase) {
 	if (!isEase) {
 		timeCount_ = 0;
 		return value;
@@ -68,7 +71,8 @@ Vector3 Easing::EaseOutSine(
 }
 
 Vector2 Easing::EaseOutSine(
-    const Vector2& value, const Vector2& start, const Vector2& end, int maxFrame, bool& isEase) {
+    const Vector2& value, const Vector2& start, const Vector2& end, const uint32_t& maxFrame,
+    bool& isEase) {
 	if (!isEase) {
 		timeCount_ = 0;
 		return value;
@@ -90,7 +94,8 @@ Vector2 Easing::EaseOutSine(
 }
 
 Vector3 Easing::EaseOutElastic(
-    const Vector3& value, const Vector3& start, const Vector3& end, int maxFrame, bool& isEase) {
+    const Vector3& value, const Vector3& start, const Vector3& end, const uint32_t& maxFrame,
+    bool& isEase) {
 	if (!isEase) {
 		timeCount_ = 0;
 		return value;

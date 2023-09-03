@@ -2,9 +2,12 @@
 #include "WorldTransform.h"
 #include "ViewProjection.h"
 #include "Input.h"
+#include "Shake.h"
 
 class RailCamera {
 public:
+	RailCamera();
+	~RailCamera();
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -30,7 +33,8 @@ public:
 	const WorldTransform& GetWorldTransform() { return world_; }
 
 private:
-	Input* input_;
+	Shake* shake_ = nullptr;
+	Input* input_ = nullptr;
 	WorldTransform world_;
 	ViewProjection viewProjection_;
 };

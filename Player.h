@@ -6,6 +6,8 @@
 #include "Sprite.h"
 #include <list>
 #include "Collider.h"
+#include "Shake.h"
+#include "Easing.h"
 
 class Enemy;
 class ParticleSystem;
@@ -116,7 +118,9 @@ public:
 	/// 親となるワールドトランスフォームをセット
 	/// </summary>
 	/// <param name="parent">親となるワールドトランスフォーム</param>
-	void SetParent(const WorldTransform* parent) { world_.parent_ = parent;}
+	void SetParent(const WorldTransform* parent) { world_.parent_ = parent;
+		parent_ = parent;
+	}
 
 	/// <summary>
 	/// 敵のセッター
@@ -137,6 +141,10 @@ public:
 	void SetParticleSystem(ParticleSystem* particleSystem) { particleSystem_ = particleSystem; }
 
 private:
+	Easing* easing_ = nullptr;
+	Shake* shake_ = nullptr;
+	const WorldTransform* parent_ = nullptr;
+
 	Style style_ = Style::NORMAL;
 	//入力
 	Input* input_ = nullptr;

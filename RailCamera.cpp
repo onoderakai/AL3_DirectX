@@ -2,6 +2,10 @@
 #include "ImGuiManager.h"
 #include "MathUtility.h"
 
+RailCamera::RailCamera() { shake_ = new Shake(); }
+
+RailCamera::~RailCamera() { delete shake_; }
+
 void RailCamera::Initialize(Vector3 trans, Vector3 rot) {
 	input_ = Input::GetInstance();
 	world_.Initialize();
@@ -12,6 +16,10 @@ void RailCamera::Initialize(Vector3 trans, Vector3 rot) {
 }
 
 void RailCamera::Update() {
+	if (input_->TriggerKey(DIK_C)) {
+		shake_->SetShaking(true, 300, Vector2{50.0f, 50.0f}, world_.translation_);
+	}
+	
 	Vector3 forward = {0.0f, 0.0f, 1.0f};
 	float speed = 0.1f;
 	// ワールド行列の反映
@@ -59,6 +67,8 @@ void RailCamera::Update() {
 	}
 	// 旋回
 	//world_.rotation_ += rotate;
+
+	world_.translation_ = shake_->EasingShaking(world_);
 
 	world_.UpdateMatrix();
 	viewProjection_.matView = Inverse(world_.matWorld_);

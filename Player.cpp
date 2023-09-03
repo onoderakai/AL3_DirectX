@@ -20,6 +20,9 @@ Player::Player() {
 		hpSprite_[i] =
 		    Sprite::Create(hpTexture, {48 + (48.0f * i), 688}, {1, 1, 1, 1}, {0.5f, 0.5f});
 	}
+
+	shake_ = new Shake();
+	easing_ = new Easing();
 }
 
 Player::~Player() {
@@ -33,6 +36,8 @@ Player::~Player() {
 	for (uint32_t i = 0; i < kMaxHp_; i++) {
 		delete hpSprite_[i];
 	}
+	delete shake_;
+	delete easing_;
 }
 
 void Player::Initialeze(Model* model, Model* sniperModel, const Vector3& pos) {
@@ -67,6 +72,10 @@ void Player::Initialeze(Model* model, Model* sniperModel, const Vector3& pos) {
 }
 
 void Player::Update(const ViewProjection& viewProjection) {
+
+	if (input_->PushKey(DIK_K)) {
+		shake_->SetShaking(true, 60, Vector2{20.0f, 20.0f}, world_.translation_);
+	}
 
 	// デスフラグの立った弾を削除
 	bullets_.remove_if([](PlayerBullet* bullet) {
@@ -113,10 +122,23 @@ void Player::Update(const ViewProjection& viewProjection) {
 	world_.translation_.y = max(world_.translation_.y, -moveLimitY);
 	world_.translation_.y = min(world_.translation_.y, +moveLimitY);
 
+	world_.translation_ = shake_->Shaking(world_);
+
 	world_.UpdateMatrix();
+	//world_.matWorld_ = MakeAffineMatrix(world_.scale_, world_.rotation_, world_.translation_);
+	//Matrix4x4 endEase = world_.matWorld_ * parent_->matWorld_;
+	//Vector3 v =
+	//    Lerp(GetWorldPosition(), Vector3{endEase.m[3][0], endEase.m[3][1], endEase.m[3][2]}, 0.1f);
+
+	//world_.matWorld_.m[3][0] = v.x;
+	//world_.matWorld_.m[3][1] = v.y;
+	//world_.matWorld_.m[3][2] = endEase.m[3][2];
+	////world_.matWorld_ = endEase;
+	//world_.TransferMatrix();
 #ifdef _DEBUG
 	ImGui::Begin("PlayerHp");
 	ImGui::Text("%d", hp_);
+	ImGui::Text("%f", world_.matWorld_.m[3][0]);
 	ImGui::End();
 #endif // _DEBUG
 }
