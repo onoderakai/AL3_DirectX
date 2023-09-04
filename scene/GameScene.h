@@ -87,7 +87,7 @@ private: // メンバ変数
 	/// </summary>
 	
 	//シーン関連
-	SceneNum scene_ = SceneNum::TITLE;
+	SceneNum scene_ = SceneNum::STAGE;
 	Title* title_ = nullptr;
 	//Stage* stage_ = nullptr;
 	Clear* clear_ = nullptr;

@@ -114,6 +114,7 @@
     <ClCompile Include="BossBullet.cpp" />
     <ClCompile Include="Clear.cpp" />
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="Daruma.cpp" />
     <ClCompile Include="Easing.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
@@ -167,6 +168,8 @@
     <ClInclude Include="Clear.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="CollisionConfig.h" />
+    <ClInclude Include="Daruma.h" />
+    <ClInclude Include="DarumaType.h" />
     <ClInclude Include="Easing.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBullet.h" />

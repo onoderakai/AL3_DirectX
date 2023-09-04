@@ -236,51 +236,51 @@ void GameScene::Update() {
 			viewProjection_.TransferMatrix();
 		}
 
-		// プレイヤーの更新処理
-		if (player_) {
-			if (player_->GetIsDead()) {
-				gameOver_->SetPreScene(SceneNum::STAGE);
-				SceneChange::GetInstance()->Change(SceneNum::GAMEOVER, &scene_);
-			} else {
-				player_->Update(viewProjection_);
-			}
-		}
-		// デスフラグがtrueの敵を削除する
-		enemys_.remove_if([](Enemy* enemy) {
-			if (enemy->GetIsDead()) {
-				delete enemy;
-				return true;
-			}
-			return false;
-		});
-		// プレイヤーに敵の情報を渡す
-		player_->SetEnemys(enemys_);
-		// 敵の更新処理を呼ぶ
-		for (Enemy* enemy : enemys_) {
-			if (enemy) {
-				enemy->Update();
-			}
-		}
-		// デスフラグがtrueの弾を削除する
-		enemyBullets_.remove_if([](EnemyBullet* bullet) {
-			if (bullet->GetIsDead()) {
-				delete bullet;
-				return true;
-			}
-			return false;
-		});
-		// 弾の更新処理を呼ぶ
-		for (EnemyBullet* bullet : enemyBullets_) {
-			bullet->Update();
-		}
+		//// プレイヤーの更新処理
+		//if (player_) {
+		//	if (player_->GetIsDead()) {
+		//		gameOver_->SetPreScene(SceneNum::STAGE);
+		//		SceneChange::GetInstance()->Change(SceneNum::GAMEOVER, &scene_);
+		//	} else {
+		//		player_->Update(viewProjection_);
+		//	}
+		//}
+		//// デスフラグがtrueの敵を削除する
+		//enemys_.remove_if([](Enemy* enemy) {
+		//	if (enemy->GetIsDead()) {
+		//		delete enemy;
+		//		return true;
+		//	}
+		//	return false;
+		//});
+		//// プレイヤーに敵の情報を渡す
+		//player_->SetEnemys(enemys_);
+		//// 敵の更新処理を呼ぶ
+		//for (Enemy* enemy : enemys_) {
+		//	if (enemy) {
+		//		enemy->Update();
+		//	}
+		//}
+		//// デスフラグがtrueの弾を削除する
+		//enemyBullets_.remove_if([](EnemyBullet* bullet) {
+		//	if (bullet->GetIsDead()) {
+		//		delete bullet;
+		//		return true;
+		//	}
+		//	return false;
+		//});
+		//// 弾の更新処理を呼ぶ
+		//for (EnemyBullet* bullet : enemyBullets_) {
+		//	bullet->Update();
+		//}
 		// 天球の更新処理
 		if (skydome_) {
 			skydome_->Update();
 		}
 		// パーティクルシステムの更新処理
 		particleSystem_->Update();
-		// 衝突判定
-		CheckAllCollision();
+		//// 衝突判定
+		//CheckAllCollision();
 		break;
 	case SceneNum::BOSS_STAGE:
 		railCamera_->Update();
@@ -363,7 +363,7 @@ void GameScene::Draw() {
 
 		break;
 	case SceneNum::STAGE:
-		if (player_) {
+		/*if (player_) {
 			if (!player_->GetIsDead()) {
 				player_->Draw(viewProjection_);
 			}
@@ -375,7 +375,7 @@ void GameScene::Draw() {
 			if (enemy) {
 				enemy->Draw(viewProjection_);
 			}
-		}
+		}*/
 		if (skydome_) {
 			skydome_->Draw(viewProjection_);
 		}
@@ -421,7 +421,7 @@ void GameScene::Draw() {
 		stageSelect_->DrawBackground();
 		break;
 	case SceneNum::STAGE:
-		player_->DrawUI();
+		/*player_->DrawUI();*/
 		break;
 	case SceneNum::BOSS_STAGE:
 		player_->DrawUI();
