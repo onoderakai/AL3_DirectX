@@ -145,7 +145,7 @@ void Enemy::NormalAttack() {
 	newBullet->Initialize(type_, world_.translation_, bulletVelocity, bulletModel_);
 	newBullet->SetPlayer(player_);
 	// 生成した弾をリストに追加
-	gameScene_->AddEnemyBullet(newBullet);
+	//gameScene_->AddEnemyBullet(newBullet);
 }
 
 void Enemy::ToPlayerUpdate() {
@@ -179,7 +179,7 @@ void Enemy::ToPlayerAttack() {
 	newBullet->Initialize(type_, world_.translation_, bulletVelocity, bulletModel_);
 	newBullet->SetPlayer(player_);
 	// 生成した弾をリストに追加
-	gameScene_->AddEnemyBullet(newBullet);
+	//gameScene_->AddEnemyBullet(newBullet);
 }
 
 void Enemy::HomingUpdate() {
@@ -209,5 +209,5 @@ void Enemy::HomingAttack() {
 	newBullet->Initialize(type_, world_.translation_, bulletVelocity, bulletModel_);
 	newBullet->SetPlayer(player_);
 	// 生成した弾をリストに追加
-	gameScene_->AddEnemyBullet(newBullet);
+	//gameScene_->AddEnemyBullet(newBullet);
 }

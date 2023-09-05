@@ -26,6 +26,8 @@
 #include "ParticleSystem.h"
 
 #include "EnemyType.h"
+#include "Daruma.h"
+#include "DarumaType.h"
 
 using namespace std;
 
@@ -64,18 +66,6 @@ public: // メンバ関数
 	/// 描画
 	/// </summary>
 	void Draw();
-	
-	/// <summary>
-	/// 敵弾を追加する
-	/// </summary>
-	/// <param name="enemyBullet"></param>
-	void AddEnemyBullet(EnemyBullet* enemyBullet);
-
-	/// <summary>
-	/// 敵を追加する
-	/// </summary>
-	/// <param name="pos"></param>
-	void AddEnemy(Type type, Vector3 pos);
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -96,6 +86,22 @@ private: // メンバ変数
 	StageSelect* stageSelect_ = nullptr;
 	SceneNum preScene_ = scene_;
 
+	const uint32_t kMaxDaruma_ = 10;
+	const uint32_t kMaxDarumaNum_ = 3;
+	Model* darumaGreenModel_ = nullptr;
+	Model* darumaRedModel_ = nullptr;
+	Model* darumaBlueModel_ = nullptr;
+	Model* darumaYellowModel_ = nullptr;
+	Daruma* daruma_[3][10];
+
+	Vector3 startDarumaPos[10] = {};
+
+	uint32_t darumaNum_ = 0;
+	uint32_t preDarumaCount_[3] = {};
+	uint32_t darumaCount_[3] = {};
+	//達磨のcsv
+	std::stringstream darumaPopCommands_;
+
 	std::stringstream stage1EnemyPopCommands;
 	//待機中のフラグ
 	bool isWait_ = false;
@@ -107,29 +113,10 @@ private: // メンバ変数
 	bool isDebugCamera = false;
 	DebugCamera* debugCamera_ = nullptr;
 
-	//プレイヤーを包含
-	Player* player_ = nullptr;
 	//モデル
 	Model* playerModel_ = nullptr;
 	Model* playerSniperModel_ = nullptr;
 	
-	//エネミーを包含
-	std::list<Enemy*> enemys_;
-	// 弾の包含
-	std::list<EnemyBullet*> enemyBullets_;
-	//モデル
-	Model* enemyNormalModel_ = nullptr;
-	Model* enemyToPlayerModel_ = nullptr;
-	Model* enemyHomingModel_ = nullptr;
-
-	Model* enemyBulletNormalModel_ = nullptr;
-	Model* enemyBulletToPlayerModel_ = nullptr;
-	Model* enemyBulletHomingModel_ = nullptr;
-
-	Vector3 enemyGeneratePos_ = {};
-
-	//ボスを包含
-	Boss* boss_ = nullptr;
 	// モデル
 	Model* bossModel_ = nullptr;
 	// テクスチャハンドル
@@ -167,8 +154,14 @@ private: // メンバ変数
 	/// </summary>
 	void LoadEnemyPopData();
 
+	void LoadDarumaPopData();
+
+	void UpdateDarumaPopCommands();
+
 	/// <summary>
 	/// 敵発生コマンドの更新処理
 	/// </summary>
 	void UpdateEnemyPopCommands();
+
+	void StageUpdate();
 };
