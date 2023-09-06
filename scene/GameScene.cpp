@@ -6,6 +6,7 @@
 #include "TextureManager.h"
 #include <cassert>
 #include <cmath>
+#include <ctime>
 #include <fstream>
 
 GameScene::GameScene() { LoadDarumaPopData(); }
@@ -107,16 +108,36 @@ void GameScene::Initialize() {
 
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
+			DarumaType randType = DarumaType(rand() % 4);
+			Vector3 popPos = {i * 30.0f - 30.0f, j * 5.0f - 20.0f, -30.0f};
+
 			daruma_[i][j] = new Daruma();
-			daruma_[i][j]->Initialize(
-			    darumaGreenModel_, Vector3{0.0f, j * 5.0f - 10.0f, i * 120.0f - 30.0f}, DarumaType::GREEN);
+			switch (randType) {
+			case DarumaType::GREEN:
+				daruma_[i][j]->Initialize(darumaGreenModel_, popPos, randType);
+				break;
+			case DarumaType::RED:
+				daruma_[i][j]->Initialize(darumaRedModel_, popPos, randType);
+				break;
+			case DarumaType::BLUE:
+				daruma_[i][j]->Initialize(darumaBlueModel_, popPos, randType);
+				break;
+			case DarumaType::YELLOW:
+				daruma_[i][j]->Initialize(darumaYellowModel_, popPos, randType);
+				break;
+			default:
+				break;
+			}
+			darumaType_[i][j] = randType;
 		}
 	}
+
+	// 開始時の座標を保存
 	for (uint32_t i = 0; i < kMaxDaruma_; i++) {
 		startDarumaPos[i] = daruma_[0][i]->GetWorldPosition();
 	}
 
-	UpdateDarumaPopCommands();
+	// UpdateDarumaPopCommands();
 }
 
 void GameScene::SceneInitialize() {
@@ -475,25 +496,22 @@ void GameScene::UpdateDarumaPopCommands() {
 		if (i >= kMaxDaruma_) {
 			break;
 		}
+		Vector3 popPos = {-30.0f, i * 5.0f - 20.0f, -40.0f};
 		if (word.find("RED") == 0) {
 			getline(line_stream, word, ',');
-			daruma_[0][i]->Initialize(
-			    darumaRedModel_, Vector3{0.0f, i * 5.0f - 10.0f, -30.0f}, DarumaType::RED);
+			daruma_[0][i]->Initialize(darumaRedModel_, popPos, DarumaType::RED);
 			i++;
 		} else if (word.find("BLUE") == 0) {
 			getline(line_stream, word, ',');
-			daruma_[0][i]->Initialize(
-			    darumaBlueModel_, Vector3{0.0f, i * 5.0f - 10.0f, -30.0f}, DarumaType::BLUE);
+			daruma_[0][i]->Initialize(darumaBlueModel_, popPos, DarumaType::BLUE);
 			i++;
 		} else if (word.find("GREEN") == 0) {
 			getline(line_stream, word, ',');
-			daruma_[0][i]->Initialize(
-			    darumaGreenModel_, Vector3{0.0f, i * 5.0f - 10.0f, -30.0f}, DarumaType::GREEN);
+			daruma_[0][i]->Initialize(darumaGreenModel_, popPos, DarumaType::GREEN);
 			i++;
 		} else if (word.find("YELLOW") == 0) {
 			getline(line_stream, word, ',');
-			daruma_[0][i]->Initialize(
-			    darumaYellowModel_, Vector3{0.0f, i * 5.0f - 10.0f, -30.0f}, DarumaType::YELLOW);
+			daruma_[0][i]->Initialize(darumaYellowModel_, popPos, DarumaType::YELLOW);
 			i++;
 		}
 	}
@@ -590,28 +608,117 @@ void GameScene::StageUpdate() {
 	for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 		darumaCount_[darumaNum_] += daruma_[darumaNum_][j]->GetIsBreak();
 	}
-	if (darumaCount_[darumaNum_] >= kMaxDaruma_ && darumaNum_ < kMaxDarumaNum_ - 1) {
+
+	// 達磨の選択列を移動できる
+	if (input_->TriggerKey(DIK_LEFT) && darumaNum_ > 0) {
+		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
+			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
+			Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
+			daruma_[darumaNum_][i]->SetMovePos(
+			    Vector3{selectPos.x, selectPos.y, selectPos.z + 10.0f});
+		}
+		darumaNum_--;
+		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
+			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
+			Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
+			daruma_[darumaNum_][i]->SetMovePos(
+			    Vector3{selectPos.x, selectPos.y, selectPos.z - 10.0f});
+		}
+	} else if (input_->TriggerKey(DIK_RIGHT) && darumaNum_ < kMaxDarumaNum_ - 1) {
+		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
+			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
+			Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
+			daruma_[darumaNum_][i]->SetMovePos(
+			    Vector3{selectPos.x, selectPos.y, selectPos.z + 10.0f});
+		}
 		darumaNum_++;
 		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
 			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
-			daruma_[darumaNum_][i]->SetMovePos(startDarumaPos[i]);
+			Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
+			daruma_[darumaNum_][i]->SetMovePos(
+			    Vector3{selectPos.x, selectPos.y, selectPos.z - 10.0f});
 		}
 	}
+
+	// 一列分の達磨を壊したら、次の列の達磨を移動させる
+	/*if (darumaCount_[darumaNum_] >= kMaxDaruma_ && darumaNum_ < kMaxDarumaNum_ - 1) {
+	    darumaNum_++;
+	    for (uint32_t i = 0; i < kMaxDaruma_; i++) {
+	        daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
+	        daruma_[darumaNum_][i]->SetMovePos(startDarumaPos[i]);
+	    }
+	}*/
 
 	// 1フレーム前の達磨カウントと現在の達磨カウントが違うときに、イージングの初期値と終了値を設定する
 	if (darumaCount_[darumaNum_] < kMaxDaruma_ &&
 	    darumaCount_[darumaNum_] != preDarumaCount_[darumaNum_]) {
-		for (uint32_t j = 1; j < kMaxDaruma_; j++) {
-			daruma_[darumaNum_][j]->SetMovePos(daruma_[darumaNum_][j - 1]->GetWorldPosition());
-			daruma_[darumaNum_][j]->SetEaseStartPos(daruma_[darumaNum_][j]->GetWorldPosition());
+		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
+			if (j != preDarumaCount_[darumaNum_]) {
+				daruma_[darumaNum_][j]->SetMovePos(
+				    daruma_[darumaNum_][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
+				daruma_[darumaNum_][j]->SetEaseStartPos(daruma_[darumaNum_][j]->GetWorldPosition());
+			}
 		}
+		StackArray(darumaNum_, 0);
 	}
 	// 達磨カウントの場所の更新処理を呼ぶ
 	// 達磨をイージングさせる
 	if (darumaCount_[darumaNum_] < kMaxDaruma_) {
 		daruma_[darumaNum_][darumaCount_[darumaNum_]]->Update();
-		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
-			daruma_[darumaNum_][j]->Move();
+		for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
+			for (uint32_t j = 0; j < kMaxDaruma_; j++) {
+				daruma_[i][j]->Move();
+			}
+		}
+	}
+
+	// 達磨タイプが一列揃うと消える
+	DarumaType tmpDarumaType;
+	uint32_t sameDarumaTypeCount = 0;
+	for (uint32_t i = 0; i < kMaxDarumaNum_ - 1; i++) {
+		tmpDarumaType = darumaType_[i][0];
+		DarumaType tmpNextDarumaType = darumaType_[i + 1][0];
+		if (tmpDarumaType == tmpNextDarumaType) {
+			sameDarumaTypeCount++;
+			if (sameDarumaTypeCount >= kMaxDarumaNum_ - 1) {
+				for (uint32_t k = 0; k < kMaxDarumaNum_; k++) {
+					darumaType_[k][0] = DarumaType::BREAK;
+					StackArray(k, 0);
+					/*daruma_[k][0]->SetIsBreak(true);
+					for (uint32_t j = 0; j < kMaxDaruma_; j++) {
+						if (j != preDarumaCount_[k]) {
+							daruma_[k][j]->SetMovePos(
+							    daruma_[k][j]->GetWorldPosition() -
+							    Vector3{0.0f, 5.0f, 0.0f});
+							daruma_[k][j]->SetEaseStartPos(
+							    daruma_[k][j]->GetWorldPosition());
+						}
+					}*/
+				}
+			}
+		}
+	}
+
+#ifdef _DEBUG
+	ImGui::Begin("DarumaType");
+	for (uint32_t i = kMaxDaruma_; i > 0; i--) {
+		ImGui::Text(
+		    "%d : %d : %d,\n", darumaType_[0][i - 1], darumaType_[1][i - 1], darumaType_[2][i - 1]);
+	}
+	ImGui::End();
+#endif // _DEBUG
+}
+
+void GameScene::StackArray(uint32_t darumaColumn, uint32_t darumaRow) {
+	// 達磨タイプを入れ替える
+	assert(darumaRow < kMaxDaruma_);
+	assert(darumaColumn < kMaxDarumaNum_);
+
+	for (uint32_t j = darumaRow; j < kMaxDaruma_; j++) {
+		if (j < kMaxDaruma_ - 1) {
+			darumaType_[darumaColumn][j] = darumaType_[darumaColumn][j + 1];
+		} else {
+			darumaType_[darumaColumn][j] = DarumaType::BREAK;
 		}
 	}
 }

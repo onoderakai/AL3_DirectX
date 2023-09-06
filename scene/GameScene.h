@@ -93,6 +93,7 @@ private: // メンバ変数
 	Model* darumaBlueModel_ = nullptr;
 	Model* darumaYellowModel_ = nullptr;
 	Daruma* daruma_[3][10];
+	DarumaType darumaType_[3][10] = {};
 
 	Vector3 startDarumaPos[10] = {};
 
@@ -164,4 +165,11 @@ private: // メンバ変数
 	void UpdateEnemyPopCommands();
 
 	void StageUpdate();
+
+	/// <summary>
+	/// 指定した列かつ、指定した行を一番上に持っていき、それより上の行を下に詰める
+	/// </summary>
+	/// <param name="darumaColumn">列</param>
+	/// <param name="darumaRow">行</param>
+	void StackArray(uint32_t darumaColumn, uint32_t darumaRow);
 };

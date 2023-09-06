@@ -26,6 +26,8 @@ public:
 
 	Vector3 GetWorldPosition();
 
+	void SetIsBreak(bool isBreak) { isBreak_ = isBreak; }
+
 	void SetMovePos(const Vector3& movePos) { movePos_ = movePos; }
 
 	void SetEaseStartPos(const Vector3& easeStartPos) {

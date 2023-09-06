@@ -52,7 +52,8 @@ void Daruma::Move() {
 
 void Daruma::Draw(const ViewProjection& view) {
 	if (isBreak_) {
-		return;
+		//return;
+		world_.translation_.x += -8.0f;
 	}
 	model_->Draw(world_, view);
 }
@@ -70,7 +71,7 @@ void Daruma::UpdateGreen() {
 	else if (input_->TriggerKey(DIK_R) ||
 		input_->TriggerKey(DIK_B) ||
 		input_->TriggerKey(DIK_Y)) {
-		shake_->SetShaking(true, 30, Vector2{30.0f, 30.0f}, GetWorldPosition());
+		shake_->SetShaking(true, 15, Vector2{1.0f, 1.0f}, GetWorldPosition());
 	}
 }
 

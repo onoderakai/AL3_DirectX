@@ -4,5 +4,6 @@ enum class DarumaType {
 	GREEN,
 	RED,
 	BLUE,
-	YELLOW
+	YELLOW,
+	BREAK
 };
