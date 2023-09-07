@@ -1,4 +1,4 @@
-# Blender 3.5.0 MTL File: 'DarumaGreen.blend'
+# Blender 3.5.0 MTL File: 'DarumaTop.blend'
 # www.blender.org
 
 newmtl マテリアル
@@ -9,4 +9,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd DarumaGreen.jpg
+map_Kd R.jpg

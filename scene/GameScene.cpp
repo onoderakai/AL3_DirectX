@@ -22,6 +22,7 @@ GameScene::~GameScene() {
 	delete darumaRedModel_;
 	delete darumaBlueModel_;
 	delete darumaYellowModel_;
+	delete darumaTopModel_;
 
 	delete particleSystem_;
 	delete playerModel_;
@@ -68,6 +69,7 @@ void GameScene::Initialize() {
 	darumaRedModel_ = Model::CreateFromOBJ("DarumaRed", true);
 	darumaBlueModel_ = Model::CreateFromOBJ("DarumaBlue", true);
 	darumaYellowModel_ = Model::CreateFromOBJ("DarumaYellow", true);
+	darumaTopModel_ = Model::CreateFromOBJ("DarumaTop", true);
 
 	// ボスモデルの生成
 	bossModel_ = Model::CreateFromOBJ("Boss", true);
@@ -110,6 +112,9 @@ void GameScene::Initialize() {
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 			DarumaType randType = DarumaType(rand() % 4);
 			Vector3 popPos = {i * 30.0f - 30.0f, j * 5.0f - 20.0f, -30.0f};
+			if (i == darumaNum_) {
+				popPos = {i * 30.0f - 30.0f, j * 5.0f - 20.0f, -40.0f};
+			}
 
 			daruma_[i][j] = new Daruma();
 			switch (randType) {
@@ -130,6 +135,10 @@ void GameScene::Initialize() {
 			}
 			darumaType_[i][j] = randType;
 		}
+	}
+	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
+		daruma_[i][kMaxDaruma_ - 1]->Initialize(
+		    darumaTopModel_, daruma_[i][kMaxDaruma_ - 1]->GetWorldPosition(), DarumaType::RED);
 	}
 
 	// 開始時の座標を保存
@@ -232,43 +241,6 @@ void GameScene::Update() {
 
 		StageUpdate();
 
-		//// プレイヤーの更新処理
-		// if (player_) {
-		//	if (player_->GetIsDead()) {
-		//		gameOver_->SetPreScene(SceneNum::STAGE);
-		//		SceneChange::GetInstance()->Change(SceneNum::GAMEOVER, &scene_);
-		//	} else {
-		//		player_->Update(viewProjection_);
-		//	}
-		// }
-		//// デスフラグがtrueの敵を削除する
-		// enemys_.remove_if([](Enemy* enemy) {
-		//	if (enemy->GetIsDead()) {
-		//		delete enemy;
-		//		return true;
-		//	}
-		//	return false;
-		// });
-		//// プレイヤーに敵の情報を渡す
-		// player_->SetEnemys(enemys_);
-		//// 敵の更新処理を呼ぶ
-		// for (Enemy* enemy : enemys_) {
-		//	if (enemy) {
-		//		enemy->Update();
-		//	}
-		// }
-		//// デスフラグがtrueの弾を削除する
-		// enemyBullets_.remove_if([](EnemyBullet* bullet) {
-		//	if (bullet->GetIsDead()) {
-		//		delete bullet;
-		//		return true;
-		//	}
-		//	return false;
-		// });
-		//// 弾の更新処理を呼ぶ
-		// for (EnemyBullet* bullet : enemyBullets_) {
-		//	bullet->Update();
-		// }
 		//  天球の更新処理
 		if (skydome_) {
 			skydome_->Update();
@@ -602,11 +574,14 @@ void GameScene::UpdateEnemyPopCommands() {
 
 void GameScene::StageUpdate() {
 	// 1フレーム前の達磨カウントを保存
-	preDarumaCount_[darumaNum_] = darumaCount_[darumaNum_];
-	darumaCount_[darumaNum_] = 0;
 
-	for (uint32_t j = 0; j < kMaxDaruma_; j++) {
-		darumaCount_[darumaNum_] += daruma_[darumaNum_][j]->GetIsBreak();
+	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
+		preDarumaCount_[i] = darumaCount_[i];
+		darumaCount_[i] = 0;
+
+		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
+			darumaCount_[i] += daruma_[i][j]->GetIsBreak();
+		}
 	}
 
 	// 達磨の選択列を移動できる
@@ -659,8 +634,12 @@ void GameScene::StageUpdate() {
 				daruma_[darumaNum_][j]->SetEaseStartPos(daruma_[darumaNum_][j]->GetWorldPosition());
 			}
 		}
-		StackArray(darumaNum_, 0);
+		if (!isRowBreak_) {
+			StackArray(darumaNum_, 0);
+		}
+		count2++;
 	}
+
 	// 達磨カウントの場所の更新処理を呼ぶ
 	// 達磨をイージングさせる
 	if (darumaCount_[darumaNum_] < kMaxDaruma_) {
@@ -675,6 +654,7 @@ void GameScene::StageUpdate() {
 	// 達磨タイプが一列揃うと消える
 	DarumaType tmpDarumaType;
 	uint32_t sameDarumaTypeCount = 0;
+	isRowBreak_ = false;
 	for (uint32_t i = 0; i < kMaxDarumaNum_ - 1; i++) {
 		tmpDarumaType = darumaType_[i][0];
 		DarumaType tmpNextDarumaType = darumaType_[i + 1][0];
@@ -684,17 +664,20 @@ void GameScene::StageUpdate() {
 				for (uint32_t k = 0; k < kMaxDarumaNum_; k++) {
 					darumaType_[k][0] = DarumaType::BREAK;
 					StackArray(k, 0);
-					/*daruma_[k][0]->SetIsBreak(true);
+					daruma_[k][darumaCount_[k]]->SetIsBreak(true);
 					for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 						if (j != preDarumaCount_[k]) {
 							daruma_[k][j]->SetMovePos(
-							    daruma_[k][j]->GetWorldPosition() -
-							    Vector3{0.0f, 5.0f, 0.0f});
-							daruma_[k][j]->SetEaseStartPos(
-							    daruma_[k][j]->GetWorldPosition());
+							    daruma_[k][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
+							daruma_[k][j]->SetEaseStartPos(daruma_[k][j]->GetWorldPosition());
 						}
-					}*/
+					}
+					for (uint32_t o = 0; o < kMaxDaruma_; o++) {
+						darumaCount_[k] += daruma_[k][o]->GetIsBreak();
+					}
 				}
+				isRowBreak_ = true;
+				count1++;
 			}
 		}
 	}
@@ -705,6 +688,8 @@ void GameScene::StageUpdate() {
 		ImGui::Text(
 		    "%d : %d : %d,\n", darumaType_[0][i - 1], darumaType_[1][i - 1], darumaType_[2][i - 1]);
 	}
+	ImGui::Text("%d\n\n", count1);
+	ImGui::Text("%d\n\n", count2);
 	ImGui::End();
 #endif // _DEBUG
 }

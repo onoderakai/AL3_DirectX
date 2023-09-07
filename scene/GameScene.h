@@ -86,20 +86,27 @@ private: // メンバ変数
 	StageSelect* stageSelect_ = nullptr;
 	SceneNum preScene_ = scene_;
 
-	const uint32_t kMaxDaruma_ = 10;
+	const uint32_t kMaxDaruma_ = 11;
 	const uint32_t kMaxDarumaNum_ = 3;
 	Model* darumaGreenModel_ = nullptr;
 	Model* darumaRedModel_ = nullptr;
 	Model* darumaBlueModel_ = nullptr;
 	Model* darumaYellowModel_ = nullptr;
-	Daruma* daruma_[3][10];
-	DarumaType darumaType_[3][10] = {};
+	Model* darumaTopModel_ = nullptr;
 
-	Vector3 startDarumaPos[10] = {};
+	Daruma* daruma_[3][11];
+	DarumaType darumaType_[3][11] = {};
+
+	Vector3 startDarumaPos[11] = {};
 
 	uint32_t darumaNum_ = 0;
 	uint32_t preDarumaCount_[3] = {};
 	uint32_t darumaCount_[3] = {};
+
+	bool isRowBreak_ = false;
+
+	int count1 = 0;
+	int count2 = 0;
 	//達磨のcsv
 	std::stringstream darumaPopCommands_;
 
