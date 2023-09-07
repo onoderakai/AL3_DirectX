@@ -13,6 +13,8 @@ public:
 	    const WorldTransform& world);
 	Vector3 EasingShaking(const WorldTransform& world);
 
+	bool GetIsShake() { return isShake_; }
+
 	void SetShaking(
 	    const bool& isShake, const uint32_t& shakeFrame, const Vector2& shakeRange,
 	    const Vector3& startPos);

@@ -174,6 +174,34 @@ void GameScene::SceneInitialize() {
 	isDefeat_ = false;
 	isWait_ = false;
 	waitTime_ = 0;
+
+	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
+		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
+			DarumaType randType = DarumaType(rand() % 4);
+			Vector3 popPos = {i * 30.0f - 30.0f, j * 5.0f - 20.0f, -30.0f};
+			if (i == darumaNum_) {
+				popPos = {i * 30.0f - 30.0f, j * 5.0f - 20.0f, -40.0f};
+			}
+
+			switch (randType) {
+			case DarumaType::GREEN:
+				daruma_[i][j]->Initialize(darumaGreenModel_, popPos, randType);
+				break;
+			case DarumaType::RED:
+				daruma_[i][j]->Initialize(darumaRedModel_, popPos, randType);
+				break;
+			case DarumaType::BLUE:
+				daruma_[i][j]->Initialize(darumaBlueModel_, popPos, randType);
+				break;
+			case DarumaType::YELLOW:
+				daruma_[i][j]->Initialize(darumaYellowModel_, popPos, randType);
+				break;
+			default:
+				break;
+			}
+			darumaType_[i][j] = randType;
+		}
+	}
 }
 
 void GameScene::Update() {
@@ -574,11 +602,11 @@ void GameScene::UpdateEnemyPopCommands() {
 
 void GameScene::StageUpdate() {
 	// 1フレーム前の達磨カウントを保存
-
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		preDarumaCount_[i] = darumaCount_[i];
 		darumaCount_[i] = 0;
 
+		//現在の達磨カウントを計測
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 			darumaCount_[i] += daruma_[i][j]->GetIsBreak();
 		}
@@ -625,19 +653,22 @@ void GameScene::StageUpdate() {
 	}*/
 
 	// 1フレーム前の達磨カウントと現在の達磨カウントが違うときに、イージングの初期値と終了値を設定する
-	if (darumaCount_[darumaNum_] < kMaxDaruma_ &&
-	    darumaCount_[darumaNum_] != preDarumaCount_[darumaNum_]) {
-		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
-			if (j != preDarumaCount_[darumaNum_]) {
-				daruma_[darumaNum_][j]->SetMovePos(
-				    daruma_[darumaNum_][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
-				daruma_[darumaNum_][j]->SetEaseStartPos(daruma_[darumaNum_][j]->GetWorldPosition());
+	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
+		if (darumaCount_[i] < kMaxDaruma_ &&
+		    darumaCount_[i] != preDarumaCount_[i]) {
+			for (uint32_t j = 0; j < kMaxDaruma_; j++) {
+				if (j != preDarumaCount_[i]) {
+					daruma_[i][j]->SetMovePos(
+					    daruma_[i][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
+					daruma_[i][j]->SetEaseStartPos(
+					    daruma_[i][j]->GetWorldPosition());
+				}
 			}
+			if (!isRowBreak_) {
+				StackArray(i, 0);
+			}
+			count2++;
 		}
-		if (!isRowBreak_) {
-			StackArray(darumaNum_, 0);
-		}
-		count2++;
 	}
 
 	// 達磨カウントの場所の更新処理を呼ぶ
@@ -682,6 +713,12 @@ void GameScene::StageUpdate() {
 		}
 	}
 
+	//接続状態を確認
+	if (!Input::GetInstance()->GetJoystickState(0, joyState_)) {
+
+		return;
+	}
+
 #ifdef _DEBUG
 	ImGui::Begin("DarumaType");
 	for (uint32_t i = kMaxDaruma_; i > 0; i--) {
@@ -690,6 +727,10 @@ void GameScene::StageUpdate() {
 	}
 	ImGui::Text("%d\n\n", count1);
 	ImGui::Text("%d\n\n", count2);
+	ImGui::Text("state:%d", joyState_.Gamepad.sThumbRX & XINPUT_GAMEPAD_A);
+	ImGui::Text("state:%d", joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B);
+	ImGui::Text("state:%d", joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X);
+	ImGui::Text("state:%d", joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y);
 	ImGui::End();
 #endif // _DEBUG
 }

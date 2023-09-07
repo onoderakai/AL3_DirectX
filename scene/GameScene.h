@@ -107,6 +107,8 @@ private: // メンバ変数
 
 	int count1 = 0;
 	int count2 = 0;
+
+	XINPUT_STATE joyState_;
 	//達磨のcsv
 	std::stringstream darumaPopCommands_;
 

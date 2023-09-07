@@ -109,8 +109,9 @@ Vector3 Shake::EasingShaking(const WorldTransform& world) {
 void Shake::SetShaking(
     const bool& isShake, const uint32_t& shakeFrame, const Vector2& shakeRange,
     const Vector3& startPos) {
-	if (isShake_) {
-		return;
+	if (!isShake_) {
+		tmpPos_ = startPos;
+		//return;
 	}
 
 	if (shakeFrame != 0) {
@@ -122,5 +123,4 @@ void Shake::SetShaking(
 	isReturnEase_ = false;
 	shakeFrame_ = shakeFrame;
 	shakeRange_ = shakeRange;
-	tmpPos_ = startPos;
 }

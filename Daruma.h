@@ -50,11 +50,14 @@ private:
 	Vector3 easeStartPos_ = {};
 	Vector3 movePos_ = {};
 
-	void UpdateGreen();
+	const uint32_t kMaxPenaltyTime_ = 60;
+	int32_t penaltyTime_ = 0;
 
-	void UpdateRed();
+	void UpdateGreen(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState);
 
-	void UpdateBlue();
+	void UpdateRed(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState);
 
-	void UpdateYellow();
+	void UpdateBlue(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState);
+
+	void UpdateYellow(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState);
 };
