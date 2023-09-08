@@ -26,6 +26,8 @@ public:
 
 	Vector3 GetWorldPosition();
 
+	void SetPenaltyTime(uint32_t penaltyTime) { penaltyTime_ = penaltyTime; }
+
 	void SetIsBreak(bool isBreak) { isBreak_ = isBreak; }
 
 	void SetMovePos(const Vector3& movePos) { movePos_ = movePos; }

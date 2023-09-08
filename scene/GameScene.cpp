@@ -39,6 +39,7 @@ GameScene::~GameScene() {
 	delete stageSelect_;
 
 	delete debugCamera_;
+	delete score_;
 }
 
 void GameScene::Initialize() {
@@ -107,6 +108,9 @@ void GameScene::Initialize() {
 	explain_->Initialize(&scene_);
 	stageSelect_ = new StageSelect();
 	stageSelect_->Initialize(&scene_);
+
+	score_ = new Score();
+	score_->Initialize();
 
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
@@ -606,14 +610,17 @@ void GameScene::StageUpdate() {
 		preDarumaCount_[i] = darumaCount_[i];
 		darumaCount_[i] = 0;
 
-		//現在の達磨カウントを計測
+		// 現在の達磨カウントを計測
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 			darumaCount_[i] += daruma_[i][j]->GetIsBreak();
 		}
 	}
 
 	// 達磨の選択列を移動できる
-	if (input_->TriggerKey(DIK_LEFT) && darumaNum_ > 0) {
+	if ((input_->TriggerKey(DIK_LEFT) ||
+	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER &&
+	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) == 0)) &&
+	    darumaNum_ > 0) {
 		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
 			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
 			Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
@@ -627,7 +634,11 @@ void GameScene::StageUpdate() {
 			daruma_[darumaNum_][i]->SetMovePos(
 			    Vector3{selectPos.x, selectPos.y, selectPos.z - 10.0f});
 		}
-	} else if (input_->TriggerKey(DIK_RIGHT) && darumaNum_ < kMaxDarumaNum_ - 1) {
+	} else if (
+	    (input_->TriggerKey(DIK_RIGHT) ||
+	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER &&
+	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) == 0)) &&
+	    darumaNum_ < kMaxDarumaNum_ - 1) {
 		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
 			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
 			Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
@@ -654,14 +665,12 @@ void GameScene::StageUpdate() {
 
 	// 1フレーム前の達磨カウントと現在の達磨カウントが違うときに、イージングの初期値と終了値を設定する
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
-		if (darumaCount_[i] < kMaxDaruma_ &&
-		    darumaCount_[i] != preDarumaCount_[i]) {
+		if (darumaCount_[i] < kMaxDaruma_ && darumaCount_[i] != preDarumaCount_[i]) {
 			for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 				if (j != preDarumaCount_[i]) {
 					daruma_[i][j]->SetMovePos(
 					    daruma_[i][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
-					daruma_[i][j]->SetEaseStartPos(
-					    daruma_[i][j]->GetWorldPosition());
+					daruma_[i][j]->SetEaseStartPos(daruma_[i][j]->GetWorldPosition());
 				}
 			}
 			if (!isRowBreak_) {
@@ -713,9 +722,9 @@ void GameScene::StageUpdate() {
 		}
 	}
 
-	//接続状態を確認
-	if (!Input::GetInstance()->GetJoystickState(0, joyState_)) {
-
+	// 接続状態を確認
+	if (!Input::GetInstance()->GetJoystickState(0, joyState_) ||
+	    !Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_)) {
 		return;
 	}
 

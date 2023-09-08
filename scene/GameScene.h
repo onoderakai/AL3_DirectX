@@ -28,6 +28,7 @@
 #include "EnemyType.h"
 #include "Daruma.h"
 #include "DarumaType.h"
+#include "Score.h"
 
 using namespace std;
 
@@ -88,6 +89,7 @@ private: // メンバ変数
 
 	const uint32_t kMaxDaruma_ = 11;
 	const uint32_t kMaxDarumaNum_ = 3;
+	Score* score_ = nullptr;
 	Model* darumaGreenModel_ = nullptr;
 	Model* darumaRedModel_ = nullptr;
 	Model* darumaBlueModel_ = nullptr;
@@ -103,12 +105,17 @@ private: // メンバ変数
 	uint32_t preDarumaCount_[3] = {};
 	uint32_t darumaCount_[3] = {};
 
+	const uint32_t kMaxpenaltyTime_ = 60;
+	int32_t penaltyTime_ = 0;
+
 	bool isRowBreak_ = false;
 
 	int count1 = 0;
 	int count2 = 0;
 
 	XINPUT_STATE joyState_;
+	XINPUT_STATE preJoyState_;
+
 	//達磨のcsv
 	std::stringstream darumaPopCommands_;
 
