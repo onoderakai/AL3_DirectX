@@ -18,13 +18,15 @@ public:
 
 	void Update();
 
-	void Move();
+	void InputUpdate();
 
 	void Draw(const ViewProjection& view);
 
 	bool GetIsBreak() { return isBreak_; }
 
 	Vector3 GetWorldPosition();
+
+	int32_t GetPenaltyTime() { return penaltyTime_; }
 
 	void SetPenaltyTime(uint32_t penaltyTime) { penaltyTime_ = penaltyTime; }
 

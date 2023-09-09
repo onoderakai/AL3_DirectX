@@ -4,6 +4,7 @@
 Daruma::Daruma() {
 	input_ = Input::GetInstance();
 	easing_ = new Easing();
+	shake_ = new Shake();
 }
 
 Daruma::~Daruma() {
@@ -18,12 +19,36 @@ void Daruma::Initialize(Model* model, const Vector3& pos, const DarumaType& type
 	movePos_ = pos;
 	type_ = type;
 	world_.scale_ = {5.0f, 5.0f, 5.0f};
-	shake_ = new Shake();
+	arrayNum_ = 0;
+	isBreak_ = false;
+	isEasing_ = false;
+	easeStartPos_ = {};
+	penaltyTime_ = 0;
 
 	world_.UpdateMatrix();
 }
 
 void Daruma::Update() {
+	if (isBreak_) {
+		world_.translation_.x += -8.0f;
+		world_.UpdateMatrix();
+		return;
+	}
+	
+	world_.translation_ =
+	    easing_->EaseOutElastic(world_.translation_, easeStartPos_, movePos_, 10, isEasing_);
+	if (!isEasing_) {
+		world_.translation_ = shake_->Shaking(world_);
+	}
+	world_.UpdateMatrix();
+}
+
+void Daruma::InputUpdate() {
+	// シェイク中とペナルティ中はペナルティタイムを減らし続ける
+	if (!isEasing_ && (shake_->GetIsShake() || penaltyTime_ > 0)) {
+		penaltyTime_--;
+	}
+
 	// ジョイスティックを使う
 	XINPUT_STATE joyState = {};
 	XINPUT_STATE preJoyState = {};
@@ -38,11 +63,6 @@ void Daruma::Update() {
 	ImGui::Begin("a");
 	ImGui::Text("%d", penaltyTime_);
 	ImGui::End();
-
-	// シェイク中とペナルティ中はペナルティタイムを減らし続ける
-	if (shake_->GetIsShake() || penaltyTime_ > 0) {
-		penaltyTime_--;
-	}
 
 	switch (type_) {
 	case DarumaType::GREEN:
@@ -60,23 +80,9 @@ void Daruma::Update() {
 	default:
 		break;
 	}
-	world_.UpdateMatrix();
-}
-
-void Daruma::Move() {
-	world_.translation_ =
-	    easing_->EaseOutElastic(world_.translation_, easeStartPos_, movePos_, 10, isEasing_);
-	if (!isEasing_) {
-		world_.translation_ = shake_->Shaking(world_);
-	}
-
-	world_.UpdateMatrix();
 }
 
 void Daruma::Draw(const ViewProjection& view) {
-	if (isBreak_) {
-		world_.translation_.x += -8.0f;
-	}
 	model_->Draw(world_, view);
 }
 
@@ -87,9 +93,9 @@ Vector3 Daruma::GetWorldPosition() {
 }
 
 void Daruma::UpdateGreen(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
-	if (!shake_->GetIsShake() && (input_->TriggerKey(DIK_G) ||
-	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
-	                                  (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0))) {
+	if (!shake_->GetIsShake() &&
+	    (input_->TriggerKey(DIK_G) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
+	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0))) {
 		isBreak_ = true;
 	} else if (
 	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_Y) ||
@@ -100,14 +106,14 @@ void Daruma::UpdateGreen(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) {
 		penaltyTime_ = kMaxPenaltyTime_;
-		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, GetWorldPosition());
+		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, movePos_);
 	}
 }
 
 void Daruma::UpdateRed(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
-	if (!shake_->GetIsShake() && (input_->TriggerKey(DIK_R) ||
-	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
-	                                  (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0))) {
+	if (!shake_->GetIsShake() &&
+	    (input_->TriggerKey(DIK_R) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
+	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0))) {
 		isBreak_ = true;
 	} else if (
 	    input_->TriggerKey(DIK_G) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_Y) ||
@@ -118,14 +124,14 @@ void Daruma::UpdateRed(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) {
 		penaltyTime_ = kMaxPenaltyTime_;
-		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, GetWorldPosition());
+		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, movePos_);
 	}
 }
 
 void Daruma::UpdateBlue(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
-	if (!shake_->GetIsShake() && (input_->TriggerKey(DIK_B) ||
-	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
-	                                  (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0))) {
+	if (!shake_->GetIsShake() &&
+	    (input_->TriggerKey(DIK_B) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
+	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0))) {
 		isBreak_ = true;
 	} else if (
 	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_G) || input_->TriggerKey(DIK_Y) ||
@@ -136,14 +142,14 @@ void Daruma::UpdateBlue(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) {
 		penaltyTime_ = kMaxPenaltyTime_;
-		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, GetWorldPosition());
+		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, movePos_);
 	}
 }
 
 void Daruma::UpdateYellow(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
-	if (!shake_->GetIsShake() && (input_->TriggerKey(DIK_Y) ||
-	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
-	                                  (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0))) {
+	if (!shake_->GetIsShake() &&
+	    (input_->TriggerKey(DIK_Y) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
+	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0))) {
 		isBreak_ = true;
 	} else if (
 	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_G) ||
@@ -154,6 +160,6 @@ void Daruma::UpdateYellow(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0)) {
 		penaltyTime_ = kMaxPenaltyTime_;
-		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, GetWorldPosition());
+		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, movePos_);
 	}
 }

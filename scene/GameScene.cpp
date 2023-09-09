@@ -115,12 +115,21 @@ void GameScene::Initialize() {
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 			DarumaType randType = DarumaType(rand() % 4);
-			Vector3 popPos = {i * 30.0f - 30.0f, j * 5.0f - 20.0f, -30.0f};
+			// 一番上の達磨の時の設定
+			if (j >= kMaxDaruma_ - 1) {
+				randType = DarumaType::TOP;
+			}
+			Vector3 popPos = {
+			    i * 30.0f + kDarumaOffset.x, j * kDarumaRowSpacingY + kDarumaOffset.y,
+			    kNoSelectDarumaZ};
 			if (i == darumaNum_) {
-				popPos = {i * 30.0f - 30.0f, j * 5.0f - 20.0f, -40.0f};
+				popPos = {
+				    i * 30.0f + kDarumaOffset.x, j * kDarumaRowSpacingY + kDarumaOffset.y,
+				    kSelectDarumaZ};
 			}
 
 			daruma_[i][j] = new Daruma();
+
 			switch (randType) {
 			case DarumaType::GREEN:
 				daruma_[i][j]->Initialize(darumaGreenModel_, popPos, randType);
@@ -134,15 +143,14 @@ void GameScene::Initialize() {
 			case DarumaType::YELLOW:
 				daruma_[i][j]->Initialize(darumaYellowModel_, popPos, randType);
 				break;
+			case DarumaType::TOP:
+				daruma_[i][j]->Initialize(darumaTopModel_, popPos, randType);
+				break;
 			default:
 				break;
 			}
 			darumaType_[i][j] = randType;
 		}
-	}
-	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
-		daruma_[i][kMaxDaruma_ - 1]->Initialize(
-		    darumaTopModel_, daruma_[i][kMaxDaruma_ - 1]->GetWorldPosition(), DarumaType::RED);
 	}
 
 	// 開始時の座標を保存
@@ -179,12 +187,31 @@ void GameScene::SceneInitialize() {
 	isWait_ = false;
 	waitTime_ = 0;
 
+	// 達磨関係の変数を初期化
+	darumaNum_ = 0;
+	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
+		preDarumaCount_[i] = 0;
+		darumaCount_[i] = 0;
+	}
+	penaltyTime_ = 0;
+	scorePoint_ = 0;
+
+	isRowBreak_ = false;
+
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 			DarumaType randType = DarumaType(rand() % 4);
-			Vector3 popPos = {i * 30.0f - 30.0f, j * 5.0f - 20.0f, -30.0f};
+			// 一番上の達磨の時の設定
+			if (j >= kMaxDaruma_ - 1) {
+				randType = DarumaType::TOP;
+			}
+			Vector3 popPos = {
+			    i * 30.0f + kDarumaOffset.x, j * kDarumaRowSpacingY + kDarumaOffset.y,
+			    kNoSelectDarumaZ};
 			if (i == darumaNum_) {
-				popPos = {i * 30.0f - 30.0f, j * 5.0f - 20.0f, -40.0f};
+				popPos = {
+				    i * 30.0f + kDarumaOffset.x, j * kDarumaRowSpacingY + kDarumaOffset.y,
+				    kSelectDarumaZ};
 			}
 
 			switch (randType) {
@@ -199,6 +226,9 @@ void GameScene::SceneInitialize() {
 				break;
 			case DarumaType::YELLOW:
 				daruma_[i][j]->Initialize(darumaYellowModel_, popPos, randType);
+				break;
+			case DarumaType::TOP:
+				daruma_[i][j]->Initialize(darumaTopModel_, popPos, randType);
 				break;
 			default:
 				break;
@@ -390,6 +420,7 @@ void GameScene::Draw() {
 		stageSelect_->DrawBackground();
 		break;
 	case SceneNum::STAGE:
+		score_->DrawScoreUI(scorePoint_);
 		/*player_->DrawUI();*/
 		break;
 	case SceneNum::BOSS_STAGE:
@@ -616,42 +647,18 @@ void GameScene::StageUpdate() {
 		}
 	}
 
-	// 達磨の選択列を移動できる
+	// 達磨の選択列を移動する
 	if ((input_->TriggerKey(DIK_LEFT) ||
 	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER &&
 	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) == 0)) &&
-	    darumaNum_ > 0) {
-		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
-			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
-			Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
-			daruma_[darumaNum_][i]->SetMovePos(
-			    Vector3{selectPos.x, selectPos.y, selectPos.z + 10.0f});
-		}
-		darumaNum_--;
-		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
-			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
-			Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
-			daruma_[darumaNum_][i]->SetMovePos(
-			    Vector3{selectPos.x, selectPos.y, selectPos.z - 10.0f});
-		}
+	    penaltyTime_ <= 0) {
+		SelectDarumaChange(-1);
 	} else if (
 	    (input_->TriggerKey(DIK_RIGHT) ||
 	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER &&
 	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) == 0)) &&
-	    darumaNum_ < kMaxDarumaNum_ - 1) {
-		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
-			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
-			Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
-			daruma_[darumaNum_][i]->SetMovePos(
-			    Vector3{selectPos.x, selectPos.y, selectPos.z + 10.0f});
-		}
-		darumaNum_++;
-		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
-			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
-			Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
-			daruma_[darumaNum_][i]->SetMovePos(
-			    Vector3{selectPos.x, selectPos.y, selectPos.z - 10.0f});
-		}
+	    penaltyTime_ <= 0) {
+		SelectDarumaChange(1);
 	}
 
 	// 一列分の達磨を壊したら、次の列の達磨を移動させる
@@ -665,29 +672,34 @@ void GameScene::StageUpdate() {
 
 	// 1フレーム前の達磨カウントと現在の達磨カウントが違うときに、イージングの初期値と終了値を設定する
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
-		if (darumaCount_[i] < kMaxDaruma_ && darumaCount_[i] != preDarumaCount_[i]) {
+		if (darumaCount_[i] <= kMaxDaruma_ && darumaCount_[i] != preDarumaCount_[i]) {
 			for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 				if (j != preDarumaCount_[i]) {
-					daruma_[i][j]->SetMovePos(
-					    daruma_[i][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
+					daruma_[i][j]->SetMovePos(Vector3{
+					    daruma_[i][j]->GetWorldPosition().x,
+					    j * kDarumaRowSpacingY - darumaCount_[i] * kDarumaRowSpacingY +
+					        kDarumaOffset.y,
+					    daruma_[i][j]->GetWorldPosition().z});
 					daruma_[i][j]->SetEaseStartPos(daruma_[i][j]->GetWorldPosition());
 				}
 			}
 			if (!isRowBreak_) {
 				StackArray(i, 0);
+				scorePoint_ += 100;
 			}
 			count2++;
 		}
 	}
 
-	// 達磨カウントの場所の更新処理を呼ぶ
-	// 達磨をイージングさせる
+	// 達磨カウントの場所の入力処理
 	if (darumaCount_[darumaNum_] < kMaxDaruma_) {
-		daruma_[darumaNum_][darumaCount_[darumaNum_]]->Update();
-		for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
-			for (uint32_t j = 0; j < kMaxDaruma_; j++) {
-				daruma_[i][j]->Move();
-			}
+		daruma_[darumaNum_][darumaCount_[darumaNum_]]->InputUpdate();
+		penaltyTime_ = daruma_[darumaNum_][darumaCount_[darumaNum_]]->GetPenaltyTime();
+	}
+	// 達磨を動かす
+	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
+		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
+			daruma_[i][j]->Update();
 		}
 	}
 
@@ -697,6 +709,10 @@ void GameScene::StageUpdate() {
 	isRowBreak_ = false;
 	for (uint32_t i = 0; i < kMaxDarumaNum_ - 1; i++) {
 		tmpDarumaType = darumaType_[i][0];
+		// BREAKタイプだと一行揃わないようにする
+		if (tmpDarumaType == DarumaType::BREAK) {
+			break;
+		}
 		DarumaType tmpNextDarumaType = darumaType_[i + 1][0];
 		if (tmpDarumaType == tmpNextDarumaType) {
 			sameDarumaTypeCount++;
@@ -716,6 +732,7 @@ void GameScene::StageUpdate() {
 						darumaCount_[k] += daruma_[k][o]->GetIsBreak();
 					}
 				}
+				scorePoint_ += 1000;
 				isRowBreak_ = true;
 				count1++;
 			}
@@ -755,5 +772,44 @@ void GameScene::StackArray(uint32_t darumaColumn, uint32_t darumaRow) {
 		} else {
 			darumaType_[darumaColumn][j] = DarumaType::BREAK;
 		}
+	}
+}
+
+void GameScene::SelectDarumaChange(int32_t move) {
+	if ((darumaNum_ + move) < 0 || (darumaNum_ + move) > kMaxDarumaNum_ - 1) {
+		return;
+	}
+
+	// 達磨の選択列を移動できる
+	for (uint32_t i = 0; i < kMaxDaruma_; i++) {
+		daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
+		Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
+		daruma_[darumaNum_][i]->SetMovePos(Vector3{selectPos.x, selectPos.y, kNoSelectDarumaZ});
+	}
+	uint32_t tmpDarumaNum = darumaNum_;
+	darumaNum_ += move;
+	if (darumaCount_[darumaNum_] >= kMaxDaruma_) {
+		if (move > 0) {
+			darumaNum_++;
+		} else {
+			darumaNum_--;
+		}
+		if (darumaNum_ > kMaxDarumaNum_ - 1) {
+			darumaNum_ = kMaxDarumaNum_ - 1;
+		} else if (darumaNum_ < 0) {
+			darumaNum_ = 0;
+		}
+
+		if (darumaCount_[darumaNum_] >= kMaxDaruma_ && darumaNum_ >= kMaxDarumaNum_ - 1) {
+			darumaNum_ = tmpDarumaNum;
+		} else if (darumaCount_[darumaNum_] >= kMaxDaruma_ && darumaNum_ <= 0) {
+			darumaNum_ = 1;
+		}
+	}
+
+	for (uint32_t i = 0; i < kMaxDaruma_; i++) {
+		daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
+		Vector3 selectPos = daruma_[darumaNum_][i]->GetWorldPosition();
+		daruma_[darumaNum_][i]->SetMovePos(Vector3{selectPos.x, selectPos.y, kSelectDarumaZ});
 	}
 }

@@ -105,7 +105,17 @@ private: // メンバ変数
 	uint32_t preDarumaCount_[3] = {};
 	uint32_t darumaCount_[3] = {};
 
-	const uint32_t kMaxpenaltyTime_ = 60;
+	const float kSelectDarumaZ = -40.0f;
+	const float kNoSelectDarumaZ = -30.0f;
+
+	//一列の達磨同士の間隔
+	const float kDarumaRowSpacingY = 5.0f;
+
+	//オフセット値
+	const Vector3 kDarumaOffset = {-30.0f, -20.0f, 0.0f};
+
+	uint32_t scorePoint_ = 0;
+
 	int32_t penaltyTime_ = 0;
 
 	bool isRowBreak_ = false;
@@ -188,4 +198,10 @@ private: // メンバ変数
 	/// <param name="darumaColumn">列</param>
 	/// <param name="darumaRow">行</param>
 	void StackArray(uint32_t darumaColumn, uint32_t darumaRow);
+
+	/// <summary>
+	/// 達磨の選択列を移動
+	/// </summary>
+	/// <param name="move">移動量(+1なら右に移動。-1なら左に移動。)</param>
+	void SelectDarumaChange(int32_t move);
 };
