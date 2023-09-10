@@ -28,6 +28,7 @@
 #include "EnemyType.h"
 #include "Daruma.h"
 #include "DarumaType.h"
+#include "IChatch.h"
 #include "Score.h"
 
 using namespace std;
@@ -78,7 +79,7 @@ private: // メンバ変数
 	/// </summary>
 	
 	//シーン関連
-	SceneNum scene_ = SceneNum::STAGE;
+	SceneNum scene_ = SceneNum::SCORE_ATTACK_STAGE;
 	Title* title_ = nullptr;
 	//Stage* stage_ = nullptr;
 	Clear* clear_ = nullptr;
@@ -90,6 +91,8 @@ private: // メンバ変数
 	const uint32_t kMaxDaruma_ = 11;
 	const uint32_t kMaxDarumaNum_ = 3;
 	Score* score_ = nullptr;
+	IChatch* iChatch_ = nullptr;
+
 	Model* darumaGreenModel_ = nullptr;
 	Model* darumaRedModel_ = nullptr;
 	Model* darumaBlueModel_ = nullptr;
@@ -115,6 +118,7 @@ private: // メンバ変数
 	const Vector3 kDarumaOffset = {-30.0f, -20.0f, 0.0f};
 
 	uint32_t scorePoint_ = 0;
+	uint32_t timeCount_ = 0;
 
 	int32_t penaltyTime_ = 0;
 
@@ -190,7 +194,9 @@ private: // メンバ変数
 	/// </summary>
 	void UpdateEnemyPopCommands();
 
-	void StageUpdate();
+	void ScoreAttackUpdate();
+
+	void TimeAttackUpdate();
 
 	/// <summary>
 	/// 指定した列かつ、指定した行を一番上に持っていき、それより上の行を下に詰める

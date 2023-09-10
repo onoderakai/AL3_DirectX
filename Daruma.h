@@ -41,6 +41,10 @@ public:
 
 private:
 	Input* input_ = nullptr;
+	// ジョイスティックを使う
+	XINPUT_STATE joyState_ = {};
+	XINPUT_STATE preJoyState_ = {};
+
 	Easing* easing_ = nullptr;
 	Shake* shake_ = nullptr;
 

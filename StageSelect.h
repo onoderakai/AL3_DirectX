@@ -32,6 +32,8 @@ public:
 
 private:
 	Input* input_ = nullptr;
+	XINPUT_STATE joyState_;
+	XINPUT_STATE preJoyState_;
 	// シーン変数のポインタ
 	SceneNum* pScene_ = nullptr;
 

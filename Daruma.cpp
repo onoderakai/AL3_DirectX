@@ -24,6 +24,7 @@ void Daruma::Initialize(Model* model, const Vector3& pos, const DarumaType& type
 	isEasing_ = false;
 	easeStartPos_ = {};
 	penaltyTime_ = 0;
+	easing_->Initialize();
 
 	world_.UpdateMatrix();
 }
@@ -36,7 +37,7 @@ void Daruma::Update() {
 	}
 	
 	world_.translation_ =
-	    easing_->EaseOutElastic(world_.translation_, easeStartPos_, movePos_, 10, isEasing_);
+	    easing_->EaseOutElastic(world_.translation_, easeStartPos_, movePos_, 30, isEasing_);
 	if (!isEasing_) {
 		world_.translation_ = shake_->Shaking(world_);
 	}
@@ -49,36 +50,33 @@ void Daruma::InputUpdate() {
 		penaltyTime_--;
 	}
 
-	// ジョイスティックを使う
-	XINPUT_STATE joyState = {};
-	XINPUT_STATE preJoyState = {};
-	// 接続状態を確認
-	if (!Input::GetInstance()->GetJoystickState(0, joyState)) {
-		return;
-	}
-	if (!Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState)) {
-		return;
-	}
-
 	ImGui::Begin("a");
 	ImGui::Text("%d", penaltyTime_);
 	ImGui::End();
 
 	switch (type_) {
 	case DarumaType::GREEN:
-		UpdateGreen(joyState, preJoyState);
+		UpdateGreen(joyState_, preJoyState_);
 		break;
 	case DarumaType::RED:
-		UpdateRed(joyState, preJoyState);
+		UpdateRed(joyState_, preJoyState_);
 		break;
 	case DarumaType::BLUE:
-		UpdateBlue(joyState, preJoyState);
+		UpdateBlue(joyState_, preJoyState_);
 		break;
 	case DarumaType::YELLOW:
-		UpdateYellow(joyState, preJoyState);
+		UpdateYellow(joyState_, preJoyState_);
 		break;
 	default:
 		break;
+	}
+
+	// 接続状態を確認
+	if (!Input::GetInstance()->GetJoystickState(0, joyState_)) {
+		return;
+	}
+	if (!Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_)) {
+		return;
 	}
 }
 

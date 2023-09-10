@@ -9,8 +9,7 @@ StageSelect::StageSelect() {
 	uint32_t stageSelectBgTextureHandle_ = TextureManager::Load("stage_select_bg.png");
 	stageSelectBgSprite_ = Sprite::Create(stageSelectBgTextureHandle_, Vector2{0.0f, 0.0f});
 	uint32_t pushNextTextureHandle = TextureManager::Load("push_next.png");
-	pushNextSprite_ = Sprite::Create(
-	    pushNextTextureHandle, Vector2{}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	pushNextSprite_ = Sprite::Create(pushNextTextureHandle, Vector2{}, {1, 1, 1, 1}, {0.5f, 0.5f});
 
 	uint32_t stage1SelectTextureHandle = TextureManager::Load("stage1_select.png");
 	stageSprite_[0] = Sprite::Create(
@@ -59,19 +58,23 @@ void StageSelect::Initialize(SceneNum* pScene) {
 
 void StageSelect::Update() {
 	// SPACEで選択したシーンに遷移する
-	if (input_->PushKey(DIK_SPACE) && !isEase_) {
+	if ((input_->PushKey(DIK_SPACE) ||
+	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
+	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0)) &&
+	    !isEase_) {
 		if (stageNum_ == 0) {
-			SceneChange::GetInstance()->Change(SceneNum::STAGE, pScene_);
+			SceneChange::GetInstance()->Change(SceneNum::TIME_ATTACK_STAGE, pScene_);
 		} else if (stageNum_ == 1) {
-			SceneChange::GetInstance()->Change(SceneNum::BOSS_STAGE, pScene_);
+			SceneChange::GetInstance()->Change(SceneNum::SCORE_ATTACK_STAGE, pScene_);
 		}
-	}
-	else if (input_->PushKey(DIK_ESCAPE)) {
+	} else if (input_->PushKey(DIK_ESCAPE)) {
 		SceneChange::GetInstance()->Change(SceneNum::TITLE, pScene_);
 	}
 
 	if (!isEase_ && !SceneChange::GetInstance()->GetIsLoading()) {
-		if ((input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D)) &&
+		if ((input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D) ||
+		     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER &&
+		      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) == 0)) &&
 		    stageNum_ < maxStageNum_ - 1) {
 			// イージングフラグをtrueにし、イージングの開始値と終了値を設定する
 			isEase_ = true;
@@ -79,7 +82,11 @@ void StageSelect::Update() {
 			stageNum_++;
 			end = stageSprite_[stageNum_]->GetPosition();
 
-		} else if ((input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A)) && stageNum_ > 0) {
+		} else if (
+		    (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A) ||
+		     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER &&
+		      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) == 0)) &&
+		    stageNum_ > 0) {
 			// イージングフラグをtrueにし、イージングの開始値と終了値を設定する
 			isEase_ = true;
 			start = stageSprite_[stageNum_]->GetPosition();
@@ -92,6 +99,12 @@ void StageSelect::Update() {
 	selectPos = easing_->EaseOutSine(selectPos, start, end, 10, isEase_);
 	selectSprite_->SetPosition(selectPos);
 	pushNextSprite_->SetPosition(selectPos + Vector2{0.0f, 100.0f});
+
+	// 接続状態を確認
+	if (!Input::GetInstance()->GetJoystickState(0, joyState_) ||
+	    !Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_)) {
+		return;
+	}
 }
 
 void StageSelect::DrawBackground() {

@@ -37,6 +37,8 @@ public:
 	/// </summary>
 	void Update();
 
+	void Update2();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -73,6 +75,12 @@ private:
 	//遷移画像
 	uint32_t loadingTextureHandle_ = 0;
 	Sprite* loadingSprite_ = nullptr;
+
+	Sprite* loadingSprite2_ = nullptr;
+	//1フレームの移動量
+	float moveValue_ = 0.0f;
+	bool isMoveIn_ = false;
+
 	//遷移画像の色
 	Vector4 color = {0.0f, 0.0f, 0.0f, 0.0f};
 	float addAlpha_ = 0.0f;
