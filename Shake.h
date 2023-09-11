@@ -9,6 +9,9 @@ class Shake {
 public:
 	Shake();
 	~Shake();
+
+	void Initialize();
+
 	Vector3 Shaking(
 	    const WorldTransform& world);
 	Vector3 EasingShaking(const WorldTransform& world);

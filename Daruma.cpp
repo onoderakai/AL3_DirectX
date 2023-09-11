@@ -25,6 +25,7 @@ void Daruma::Initialize(Model* model, const Vector3& pos, const DarumaType& type
 	easeStartPos_ = {};
 	penaltyTime_ = 0;
 	easing_->Initialize();
+	shake_->Initialize();
 
 	world_.UpdateMatrix();
 }

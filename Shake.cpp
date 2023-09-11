@@ -5,6 +5,14 @@ Shake::Shake() { easing_ = new Easing(); }
 
 Shake::~Shake() { delete easing_; }
 
+void Shake::Initialize() {
+	shakeFrame_ = 0;
+	shakeRangeSubtract_ = {};
+	isShake_ = false;
+	isEase_ = false;
+	isReturnEase_ = false;
+}
+
 Vector3 Shake::Shaking(const WorldTransform& world) {
 	if (!isShake_) {
 		return world.translation_;

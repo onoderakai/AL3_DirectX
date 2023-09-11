@@ -3,6 +3,8 @@
 #include "Sprite.h"
 #include "Input.h"
 
+class GameScene;
+
 class SceneChange final{
 public:
 	/// <summary>
@@ -50,6 +52,12 @@ public:
 	/// <returns></returns>
 	bool GetIsLoading() { return isLoading_; }
 
+	/// <summary>
+	/// ゲームシーンのセッター
+	/// </summary>
+	/// <param name="gameScene"></param>
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
+
 private:
 
 	/// <summary>
@@ -61,6 +69,8 @@ private:
 	/// デストラクタ
 	/// </summary>
 	~SceneChange();
+
+	GameScene* gameScene_ = nullptr;
 
 	//遷移フラグ
 	bool isLoading_ = false;

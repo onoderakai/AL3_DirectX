@@ -88,8 +88,7 @@ private: // メンバ変数
 	GameOver* gameOver_ = nullptr;
 	OperationExplain* explain_ = nullptr;
 	StageSelect* stageSelect_ = nullptr;
-	SceneNum preScene_ = scene_;
-
+	
 	//一列の達磨の最大数
 	const uint32_t kMaxDaruma_ = 11;
 	//達磨の最大数
@@ -144,9 +143,6 @@ private: // メンバ変数
 
 	//行消ししたときのフラグ
 	bool isRowBreak_ = false;
-
-	int count1 = 0;
-	int count2 = 0;
 
 	XINPUT_STATE joyState_;
 	XINPUT_STATE preJoyState_;

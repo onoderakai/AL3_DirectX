@@ -92,6 +92,8 @@ void GameScene::Initialize() {
 	// レティクル画像読み込み
 	TextureManager::Load("target.png");
 
+	SceneChange::GetInstance()->SetGameScene(this);
+
 	// シーン関連の生成
 	title_ = new Title();
 	title_->Initialize(&scene_);
@@ -176,10 +178,6 @@ void GameScene::Initialize() {
 }
 
 void GameScene::SceneInitialize() {
-	//// ファイルの読み込み行を0行目に戻す
-	//stage1EnemyPopCommands.clear();
-	//stage1EnemyPopCommands.seekg(0, ios::beg);
-
 	particleSystem_->Initialize();
 
 	skydome_->Initialize(skydomeModel_);
@@ -270,9 +268,7 @@ void GameScene::Update() {
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 		viewProjection_.TransferMatrix();
 	}
-#endif // _DEBUG
-	preScene_ = scene_;
-#ifdef _DEBUG
+
 	// 1でTITLEシーンに遷移する
 	if (input_->PushKey(DIK_1)) {
 		SceneChange::GetInstance()->Change(SceneNum::TITLE, &scene_);
@@ -355,9 +351,6 @@ void GameScene::Update() {
 	}
 
 	SceneChange::GetInstance()->Update2();
-	if (preScene_ != scene_) {
-		SceneInitialize();
-	}
 }
 
 void GameScene::Draw() {
@@ -445,7 +438,7 @@ void GameScene::Draw() {
 		score_->DrawScoreUI(timeCount_);
 		// リザルト描画
 		if (finish_->GetIsResult()) {
-			result_->TimeAttackDraw();
+			result_->TimeAttackDraw(scorePoint_);
 		}
 		finish_->Draw();
 		break;
@@ -456,7 +449,7 @@ void GameScene::Draw() {
 		score_->DrawScoreUI(scorePoint_);
 		// リザルト描画
 		if (finish_->GetIsResult()) {
-			result_->ScoreAttackDraw();
+			result_->ScoreAttackDraw(scorePoint_);
 		}
 		finish_->Draw();
 		break;
@@ -586,27 +579,27 @@ void GameScene::UpdateDarumaPopCommands() {
 
 void GameScene::UpdateEnemyPopCommands() {
 	//// 待機処理
-	//if (isDefeat_) {
+	// if (isDefeat_) {
 	//	uint32_t enemyCount = 0;
 	//	if (enemyCount <= 0) {
 	//		isDefeat_ = false;
 	//	}
 	//	return;
-	//}
+	// }
 
-	//if (isWait_) {
+	// if (isWait_) {
 	//	waitTime_--;
 	//	if (waitTime_ <= 0) {
 	//		isWait_ = false;
 	//	}
 	//	return;
-	//}
+	// }
 
 	//// 1行分の文字列を入れる変数
-	//string line;
+	// string line;
 
 	//// コマンド実行ループ
-	//while (getline(stage1EnemyPopCommands, line)) {
+	// while (getline(stage1EnemyPopCommands, line)) {
 
 	//	istringstream line_stream(line);
 
@@ -674,10 +667,11 @@ void GameScene::ScoreAttackUpdate() {
 	finish_->Update();
 
 	if (finish_->GetIsResult()) {
+		result_->SetPreScene(scene_);
 		result_->Update();
 		return;
 	}
-	if (finish_->GetIsFinish()) {	
+	if (finish_->GetIsFinish()) {
 		return;
 	}
 
@@ -706,15 +700,6 @@ void GameScene::ScoreAttackUpdate() {
 		SelectDarumaChange(1);
 	}
 
-	// 一列分の達磨を壊したら、次の列の達磨を移動させる
-	/*if (darumaCount_[darumaNum_] >= kMaxDaruma_ && darumaNum_ < kMaxDarumaNum_ - 1) {
-	    darumaNum_++;
-	    for (uint32_t i = 0; i < kMaxDaruma_; i++) {
-	        daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
-	        daruma_[darumaNum_][i]->SetMovePos(startDarumaPos[i]);
-	    }
-	}*/
-
 	// 1フレーム前の達磨カウントと現在の達磨カウントが違うときに、イージングの初期値と終了値を設定する
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		if (darumaCount_[i] <= kMaxDaruma_ && darumaCount_[i] != preDarumaCount_[i]) {
@@ -732,7 +717,6 @@ void GameScene::ScoreAttackUpdate() {
 				StackArray(i, 0);
 				scorePoint_ += 100;
 			}
-			count2++;
 		}
 	}
 
@@ -771,15 +755,22 @@ void GameScene::ScoreAttackUpdate() {
 							daruma_[k][j]->SetMovePos(
 							    daruma_[k][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
 							daruma_[k][j]->SetEaseStartPos(daruma_[k][j]->GetWorldPosition());
+
+							/*daruma_[k][j]->SetMovePos(Vector3{
+							    daruma_[k][j]->GetWorldPosition().x,
+							    j * kDarumaRowSpacingY - darumaCount_[k] * kDarumaRowSpacingY +
+							        kDarumaOffset.y,
+							    daruma_[k][j]->GetWorldPosition().z});
+							daruma_[k][j]->SetEaseStartPos(daruma_[k][j]->GetWorldPosition());*/
 						}
 					}
+					/*darumaCount_[k] = 0;
 					for (uint32_t o = 0; o < kMaxDaruma_; o++) {
 						darumaCount_[k] += daruma_[k][o]->GetIsBreak();
-					}
+					}*/
 				}
 				scorePoint_ += 1000;
 				isRowBreak_ = true;
-				count1++;
 			}
 		}
 	}
@@ -796,8 +787,6 @@ void GameScene::ScoreAttackUpdate() {
 		ImGui::Text(
 		    "%d : %d : %d,\n", darumaType_[0][i - 1], darumaType_[1][i - 1], darumaType_[2][i - 1]);
 	}
-	ImGui::Text("%d\n\n", count1);
-	ImGui::Text("%d\n\n", count2);
 	ImGui::Text("state:%d", joyState_.Gamepad.sThumbRX & XINPUT_GAMEPAD_A);
 	ImGui::Text("state:%d", joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B);
 	ImGui::Text("state:%d", joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X);
@@ -813,6 +802,7 @@ void GameScene::TimeAttackUpdate() {
 	finish_->Update();
 
 	if (finish_->GetIsResult()) {
+		result_->SetPreScene(scene_);
 		result_->Update();
 		return;
 	}
@@ -830,20 +820,6 @@ void GameScene::TimeAttackUpdate() {
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 			darumaCount_[i] += daruma_[i][j]->GetIsBreak();
 		}
-	}
-
-	// 達磨の選択列を移動する
-	if ((input_->TriggerKey(DIK_LEFT) ||
-	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER &&
-	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) == 0)) &&
-	    penaltyTime_ <= 0) {
-		SelectDarumaChange(-1);
-	} else if (
-	    (input_->TriggerKey(DIK_RIGHT) ||
-	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER &&
-	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) == 0)) &&
-	    penaltyTime_ <= 0) {
-		SelectDarumaChange(1);
 	}
 
 	// 一列分の達磨を壊したら、次の列の達磨を移動させる
@@ -872,7 +848,6 @@ void GameScene::TimeAttackUpdate() {
 				StackArray(i, 0);
 				scorePoint_ += 100;
 			}
-			count2++;
 		}
 	}
 
@@ -888,41 +863,41 @@ void GameScene::TimeAttackUpdate() {
 		}
 	}
 
-	// 達磨タイプが一列揃うと消える
-	DarumaType tmpDarumaType;
-	uint32_t sameDarumaTypeCount = 0;
-	isRowBreak_ = false;
-	for (uint32_t i = 0; i < kMaxDarumaNum_ - 1; i++) {
-		tmpDarumaType = darumaType_[i][0];
-		// BREAKタイプだと一行揃わないようにする
-		if (tmpDarumaType == DarumaType::BREAK) {
-			break;
-		}
-		DarumaType tmpNextDarumaType = darumaType_[i + 1][0];
-		if (tmpDarumaType == tmpNextDarumaType) {
-			sameDarumaTypeCount++;
-			if (sameDarumaTypeCount >= kMaxDarumaNum_ - 1) {
-				for (uint32_t k = 0; k < kMaxDarumaNum_; k++) {
-					darumaType_[k][0] = DarumaType::BREAK;
-					StackArray(k, 0);
-					daruma_[k][darumaCount_[k]]->SetIsBreak(true);
-					for (uint32_t j = 0; j < kMaxDaruma_; j++) {
-						if (j != preDarumaCount_[k]) {
-							daruma_[k][j]->SetMovePos(
-							    daruma_[k][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
-							daruma_[k][j]->SetEaseStartPos(daruma_[k][j]->GetWorldPosition());
-						}
-					}
-					for (uint32_t o = 0; o < kMaxDaruma_; o++) {
-						darumaCount_[k] += daruma_[k][o]->GetIsBreak();
-					}
-				}
-				scorePoint_ += 1000;
-				isRowBreak_ = true;
-				count1++;
-			}
-		}
-	}
+	//// 達磨タイプが一列揃うと消える
+	// DarumaType tmpDarumaType;
+	// uint32_t sameDarumaTypeCount = 0;
+	// isRowBreak_ = false;
+	// for (uint32_t i = 0; i < kMaxDarumaNum_ - 1; i++) {
+	//	tmpDarumaType = darumaType_[i][0];
+	//	// BREAKタイプだと一行揃わないようにする
+	//	if (tmpDarumaType == DarumaType::BREAK) {
+	//		break;
+	//	}
+	//	DarumaType tmpNextDarumaType = darumaType_[i + 1][0];
+	//	if (tmpDarumaType == tmpNextDarumaType) {
+	//		sameDarumaTypeCount++;
+	//		if (sameDarumaTypeCount >= kMaxDarumaNum_ - 1) {
+	//			for (uint32_t k = 0; k < kMaxDarumaNum_; k++) {
+	//				darumaType_[k][0] = DarumaType::BREAK;
+	//				StackArray(k, 0);
+	//				daruma_[k][darumaCount_[k]]->SetIsBreak(true);
+	//				for (uint32_t j = 0; j < kMaxDaruma_; j++) {
+	//					if (j != preDarumaCount_[k]) {
+	//						daruma_[k][j]->SetMovePos(
+	//						    daruma_[k][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
+	//						daruma_[k][j]->SetEaseStartPos(daruma_[k][j]->GetWorldPosition());
+	//					}
+	//				}
+	//				for (uint32_t o = 0; o < kMaxDaruma_; o++) {
+	//					darumaCount_[k] += daruma_[k][o]->GetIsBreak();
+	//				}
+	//			}
+	//			scorePoint_ += 1000;
+	//			isRowBreak_ = true;
+	//			count1++;
+	//		}
+	//	}
+	// }
 
 	// 接続状態を確認
 	if (!Input::GetInstance()->GetJoystickState(0, joyState_) ||
@@ -936,8 +911,6 @@ void GameScene::TimeAttackUpdate() {
 		ImGui::Text(
 		    "%d : %d : %d,\n", darumaType_[0][i - 1], darumaType_[1][i - 1], darumaType_[2][i - 1]);
 	}
-	ImGui::Text("%d\n\n", count1);
-	ImGui::Text("%d\n\n", count2);
 	ImGui::Text("state:%d", joyState_.Gamepad.sThumbRX & XINPUT_GAMEPAD_A);
 	ImGui::Text("state:%d", joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B);
 	ImGui::Text("state:%d", joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X);

@@ -1,5 +1,6 @@
 ﻿#include "SceneChange.h"
 #include "TextureManager.h"
+#include "GameScene.h"
 
 SceneChange* SceneChange::GetInstance() {
 	static SceneChange instance;
@@ -27,6 +28,7 @@ void SceneChange::Update() {
 	if (color.w >= 1.0f) {
 		addAlpha_ *= -1.0f;
 		*pScene_ = nextScene_;
+		gameScene_->SceneInitialize();
 		return;
 	}
 	if (color.w <= 0.0f) {
@@ -49,6 +51,7 @@ void SceneChange::Update2() {
 	if (frameCount_ >= float(transitionFrame_ / 2.0f) && !isMoveIn_) {
 		isMoveIn_ = true;
 		*pScene_ = nextScene_;
+		gameScene_->SceneInitialize();
 		return;
 	}
 	if (frameCount_ >= transitionFrame_ && isMoveIn_) {
