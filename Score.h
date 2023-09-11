@@ -5,13 +5,17 @@
 class Score {
 public:
 	/// <summary>
-	/// initialize
+	/// コンストラク
 	/// </summary>
-	void Initialize();
+	Score();
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
 	~Score();
+	/// <summary>
+	/// initialize
+	/// </summary>
+	void Initialize();
 
 	void DrawScoreUI(int score);
 	void DrawScoreUIResult(int score);
@@ -19,4 +23,8 @@ public:
 private:
 	Sprite* sprite2DNum_[4][10];
 	Sprite* sprite2DNumResult_[4][10];
+
+	int32_t tmpScore_ = 0;
+	int32_t preScore_ = 0;
+	int32_t addTmpScore_ = 0;
 };

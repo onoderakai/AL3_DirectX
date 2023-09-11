@@ -30,6 +30,8 @@
 #include "DarumaType.h"
 #include "IChatch.h"
 #include "Score.h"
+#include "Finish.h"
+#include "GameResult.h"
 
 using namespace std;
 
@@ -88,11 +90,16 @@ private: // メンバ変数
 	StageSelect* stageSelect_ = nullptr;
 	SceneNum preScene_ = scene_;
 
+	//一列の達磨の最大数
 	const uint32_t kMaxDaruma_ = 11;
+	//達磨の最大数
 	const uint32_t kMaxDarumaNum_ = 3;
 	Score* score_ = nullptr;
 	IChatch* iChatch_ = nullptr;
+	Finish* finish_ = nullptr;
+	GameResult* result_ = nullptr;
 
+	//達磨モデル
 	Model* darumaGreenModel_ = nullptr;
 	Model* darumaRedModel_ = nullptr;
 	Model* darumaBlueModel_ = nullptr;
@@ -102,26 +109,40 @@ private: // メンバ変数
 	Daruma* daruma_[3][11];
 	DarumaType darumaType_[3][11] = {};
 
+	//LB、RBの画像
+	Sprite* LBSprite_ = nullptr;
+	Sprite* RBSprite_ = nullptr;
+
+	//達磨の初期位置を保存
 	Vector3 startDarumaPos[11] = {};
 
+	//何列目の達磨を選択してるかの変数
 	uint32_t darumaNum_ = 0;
+
+	//壊れた達磨の数
 	uint32_t preDarumaCount_[3] = {};
 	uint32_t darumaCount_[3] = {};
 
+	//選択している達磨のオフセット値
 	const float kSelectDarumaZ = -40.0f;
+	// 選択していない達磨のオフセット値
 	const float kNoSelectDarumaZ = -30.0f;
 
 	//一列の達磨同士の間隔
 	const float kDarumaRowSpacingY = 5.0f;
 
-	//オフセット値
+	//達磨を生成するときのオフセット値
 	const Vector3 kDarumaOffset = {-30.0f, -20.0f, 0.0f};
 
+	//スコア
 	uint32_t scorePoint_ = 0;
+	//経過時間
 	uint32_t timeCount_ = 0;
 
+	//ミスタッチをしたときのペナルティタイム
 	int32_t penaltyTime_ = 0;
 
+	//行消ししたときのフラグ
 	bool isRowBreak_ = false;
 
 	int count1 = 0;
@@ -132,26 +153,9 @@ private: // メンバ変数
 
 	//達磨のcsv
 	std::stringstream darumaPopCommands_;
-
-	std::stringstream stage1EnemyPopCommands;
-	//待機中のフラグ
-	bool isWait_ = false;
-	//待機中の時間
-	int32_t waitTime_ = 0;
-	//撃破フラグ
-	bool isDefeat_ = false;
 	
 	bool isDebugCamera = false;
 	DebugCamera* debugCamera_ = nullptr;
-
-	//モデル
-	Model* playerModel_ = nullptr;
-	Model* playerSniperModel_ = nullptr;
-	
-	// モデル
-	Model* bossModel_ = nullptr;
-	// テクスチャハンドル
-	uint32_t bossTextureHandle_ = 0;
 
 	//天球を包含
 	Skydome* skydome_ = nullptr;

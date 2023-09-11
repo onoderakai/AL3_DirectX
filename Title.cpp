@@ -6,9 +6,13 @@
 Title::Title() {
 	// 画像を読み込み、スプライトを生成する
 	titleTextureHandle_ = TextureManager::Load("title2.png");
+	uint32_t titleBgTextureHandle_ = TextureManager::Load("title_bg.png");
+	uint32_t titleDarumaTextureHandle_ = TextureManager::Load("title_daruma.png");
 	titleSprite_ = Sprite::Create(
 	    titleTextureHandle_, Vector2{640.0f, 240.0f}, Vector4{1.0f, 1.0f, 1.0f, 1.0f},
 	    Vector2{0.5f, 0.5f});
+	titleBgSprite_ = Sprite::Create(titleBgTextureHandle_, Vector2{0.0f, 0.0f});
+	titleDarumaSprite_ = Sprite::Create(titleDarumaTextureHandle_, Vector2{0.0f, 0.0f});
 	
 	uint32_t pushNextTextureHandle = TextureManager::Load("push_next.png");
 	pushNextSprite_ =
@@ -20,8 +24,10 @@ Title::Title() {
 
 Title::~Title() {
 	delete titleSprite_;
+	delete titleBgSprite_;
 	delete pushNextSprite_;
 	delete pushExplainSprite_;
+	delete titleDarumaSprite_;
 }
 
 void Title::Initialize(SceneNum* pScene) {
@@ -30,8 +36,19 @@ void Title::Initialize(SceneNum* pScene) {
 }
 
 void Title::Update() {
-	// SPACEでSTAGE_SELECTシーンに遷移する
-	if (input_->PushKey(DIK_SPACE)) {
+	// 接続状態を確認
+	Input::GetInstance()->GetJoystickState(0, joyState_);
+	Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_);
+
+	// SPACEかABXYボタンでSTAGE_SELECTシーンに遷移する
+	if (input_->PushKey(DIK_SPACE) || (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
+	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0) ||
+	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
+	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0) ||
+	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
+	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0) ||
+	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
+	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) {
 		SceneChange::GetInstance()->Change(SceneNum::STAGE_SELECT, pScene_);
 	} else if (input_->PushKey(DIK_RETURN)) {
 		SceneChange::GetInstance()->Change(SceneNum::EXPLAIN, pScene_);
@@ -59,6 +76,8 @@ void Title::Update() {
 }
 
 void Title::DrawBackground() {
+	titleBgSprite_->Draw();
+	titleDarumaSprite_->Draw();
 	titleSprite_->Draw();
 	pushNextSprite_->Draw();
 	pushExplainSprite_->Draw();

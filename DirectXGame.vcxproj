@@ -118,7 +118,9 @@
     <ClCompile Include="Easing.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBullet.cpp" />
+    <ClCompile Include="Finish.cpp" />
     <ClCompile Include="GameOver.cpp" />
+    <ClCompile Include="GameResult.cpp" />
     <ClCompile Include="IChatch.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MathUtility.cpp" />
@@ -176,7 +178,9 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBullet.h" />
     <ClInclude Include="EnemyType.h" />
+    <ClInclude Include="Finish.h" />
     <ClInclude Include="GameOver.h" />
+    <ClInclude Include="GameResult.h" />
     <ClInclude Include="IChatch.h" />
     <ClInclude Include="input\Input.h" />
     <ClInclude Include="MathUtility.h" />

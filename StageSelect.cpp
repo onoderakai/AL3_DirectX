@@ -6,7 +6,7 @@ StageSelect::StageSelect() {
 	easing_ = new Easing();
 
 	// 画像を読み込み、スプライトを生成する
-	uint32_t stageSelectBgTextureHandle_ = TextureManager::Load("stage_select_bg.png");
+	uint32_t stageSelectBgTextureHandle_ = TextureManager::Load("title_bg.png");
 	stageSelectBgSprite_ = Sprite::Create(stageSelectBgTextureHandle_, Vector2{0.0f, 0.0f});
 	uint32_t pushNextTextureHandle = TextureManager::Load("push_next.png");
 	pushNextSprite_ = Sprite::Create(pushNextTextureHandle, Vector2{}, {1, 1, 1, 1}, {0.5f, 0.5f});
@@ -57,10 +57,20 @@ void StageSelect::Initialize(SceneNum* pScene) {
 }
 
 void StageSelect::Update() {
-	// SPACEで選択したシーンに遷移する
+	// 接続状態を確認
+	Input::GetInstance()->GetJoystickState(0, joyState_);
+	Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_);
+
+	// SPACEかABXYボタンで選択したシーンに遷移する
 	if ((input_->PushKey(DIK_SPACE) ||
 	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
-	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0)) &&
+	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0) ||
+	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
+	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0) ||
+	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
+	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0) ||
+	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
+	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) &&
 	    !isEase_) {
 		if (stageNum_ == 0) {
 			SceneChange::GetInstance()->Change(SceneNum::TIME_ATTACK_STAGE, pScene_);
@@ -99,12 +109,6 @@ void StageSelect::Update() {
 	selectPos = easing_->EaseOutSine(selectPos, start, end, 10, isEase_);
 	selectSprite_->SetPosition(selectPos);
 	pushNextSprite_->SetPosition(selectPos + Vector2{0.0f, 100.0f});
-
-	// 接続状態を確認
-	if (!Input::GetInstance()->GetJoystickState(0, joyState_) ||
-	    !Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_)) {
-		return;
-	}
 }
 
 void StageSelect::DrawBackground() {

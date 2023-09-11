@@ -32,12 +32,18 @@ public:
 
 private:
 	Input* input_ = nullptr;
+	// ジョイスティックを使う
+	XINPUT_STATE joyState_ = {};
+	XINPUT_STATE preJoyState_ = {};
+
 	//シーン変数のポインタ
 	SceneNum* pScene_ = nullptr;
 
 	//タイトル画像関連
 	uint32_t titleTextureHandle_ = 0;
 	Sprite* titleSprite_ = nullptr;
+	Sprite* titleBgSprite_ = nullptr;
+	Sprite* titleDarumaSprite_ = nullptr;
 	//次に進む
 	Sprite* pushNextSprite_ = nullptr;
 	//操作説明に進む

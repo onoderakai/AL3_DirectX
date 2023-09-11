@@ -25,9 +25,6 @@ GameScene::~GameScene() {
 	delete darumaTopModel_;
 
 	delete particleSystem_;
-	delete playerModel_;
-	delete playerSniperModel_;
-	delete bossModel_;
 	delete skydomeModel_;
 	delete skydome_;
 	delete railCamera_;
@@ -41,6 +38,10 @@ GameScene::~GameScene() {
 	delete debugCamera_;
 	delete score_;
 	delete iChatch_;
+	delete LBSprite_;
+	delete RBSprite_;
+	delete finish_;
+	delete result_;
 }
 
 void GameScene::Initialize() {
@@ -62,19 +63,12 @@ void GameScene::Initialize() {
 	particleSystem_ = new ParticleSystem();
 	particleSystem_->Initialize();
 
-	// プレイヤーモデルの生成
-	playerModel_ = Model::CreateFromOBJ("Player", true);
-	playerSniperModel_ = Model::CreateFromOBJ("SniperPlayer", true);
-
 	// 達磨モデルの生成
 	darumaGreenModel_ = Model::CreateFromOBJ("DarumaGreen", true);
 	darumaRedModel_ = Model::CreateFromOBJ("DarumaRed", true);
 	darumaBlueModel_ = Model::CreateFromOBJ("DarumaBlue", true);
 	darumaYellowModel_ = Model::CreateFromOBJ("DarumaYellow", true);
 	darumaTopModel_ = Model::CreateFromOBJ("DarumaTop", true);
-
-	// ボスモデルの生成
-	bossModel_ = Model::CreateFromOBJ("Boss", true);
 
 	// 天球のモデルを生成
 	skydomeModel_ = Model::CreateFromOBJ("skydome", true);
@@ -115,6 +109,22 @@ void GameScene::Initialize() {
 
 	iChatch_ = new IChatch();
 	iChatch_->Initialize();
+
+	// 画像の読み込み、スプライトを生成
+	uint32_t RBTex = TextureManager::Load("RB.png");
+	uint32_t LBTex = TextureManager::Load("LB.png");
+
+	finish_ = new Finish();
+	finish_->Initialize();
+	result_ = new GameResult();
+	result_->Initialize(&scene_);
+
+	RBSprite_ = Sprite::Create(
+	    RBTex, Vector2{640.0f + 200.0f, 600.0f}, Vector4{1.0f, 1.0f, 1.0f, 1.0f},
+	    Vector2{0.5f, 0.5});
+	LBSprite_ = Sprite::Create(
+	    LBTex, Vector2{640.0f - 200.0f, 600.0f}, Vector4{1.0f, 1.0f, 1.0f, 1.0f},
+	    Vector2{0.5f, 0.5});
 
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
@@ -166,9 +176,9 @@ void GameScene::Initialize() {
 }
 
 void GameScene::SceneInitialize() {
-	// ファイルの読み込み行を0行目に戻す
-	stage1EnemyPopCommands.clear();
-	stage1EnemyPopCommands.seekg(0, ios::beg);
+	//// ファイルの読み込み行を0行目に戻す
+	//stage1EnemyPopCommands.clear();
+	//stage1EnemyPopCommands.seekg(0, ios::beg);
 
 	particleSystem_->Initialize();
 
@@ -186,17 +196,15 @@ void GameScene::SceneInitialize() {
 	explain_->Initialize(&scene_);
 	stageSelect_->Initialize(&scene_);
 
-	// コマンドの初期化
-	isDefeat_ = false;
-	isWait_ = false;
-	waitTime_ = 0;
-
 	// 達磨関係の変数を初期化
 	darumaNum_ = 0;
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		preDarumaCount_[i] = 0;
 		darumaCount_[i] = 0;
 	}
+
+	score_->Initialize();
+
 	penaltyTime_ = 0;
 	scorePoint_ = 0;
 	timeCount_ = 0;
@@ -204,6 +212,8 @@ void GameScene::SceneInitialize() {
 	isRowBreak_ = false;
 
 	iChatch_->Initialize();
+	finish_->Initialize();
+	result_->Initialize(&scene_);
 
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
@@ -282,9 +292,6 @@ void GameScene::Update() {
 	// 5でGAMEOVERシーンに遷移する
 	else if (input_->PushKey(DIK_5)) {
 		SceneChange::GetInstance()->Change(SceneNum::GAMEOVER, &scene_);
-	} else if (input_->PushKey(DIK_6)) {
-		stage1EnemyPopCommands.clear();
-		stage1EnemyPopCommands.seekg(0, ios::beg);
 	}
 #endif // _DEBUG
 
@@ -299,8 +306,6 @@ void GameScene::Update() {
 		stageSelect_->Update();
 		break;
 	case SceneNum::TIME_ATTACK_STAGE:
-		// UpdateEnemyPopCommands();
-
 		iChatch_->Update();
 
 		railCamera_->Update();
@@ -311,15 +316,14 @@ void GameScene::Update() {
 		}
 
 		TimeAttackUpdate();
-		
+
 		//  天球の更新処理
 		if (skydome_) {
 			skydome_->Update();
 		}
 		// パーティクルシステムの更新処理
 		particleSystem_->Update();
-		//// 衝突判定
-		// CheckAllCollision();
+
 		break;
 	case SceneNum::SCORE_ATTACK_STAGE:
 		railCamera_->Update();
@@ -338,8 +342,7 @@ void GameScene::Update() {
 		}
 		// パーティクルシステムの更新処理
 		particleSystem_->Update();
-		// 衝突判定
-		CheckAllCollision();
+
 		break;
 	case SceneNum::CLEAR:
 		clear_->Update();
@@ -440,10 +443,22 @@ void GameScene::Draw() {
 	case SceneNum::TIME_ATTACK_STAGE:
 		iChatch_->Draw();
 		score_->DrawScoreUI(timeCount_);
+		// リザルト描画
+		if (finish_->GetIsResult()) {
+			result_->TimeAttackDraw();
+		}
+		finish_->Draw();
 		break;
 	case SceneNum::SCORE_ATTACK_STAGE:
 		iChatch_->Draw();
+		RBSprite_->Draw();
+		LBSprite_->Draw();
 		score_->DrawScoreUI(scorePoint_);
+		// リザルト描画
+		if (finish_->GetIsResult()) {
+			result_->ScoreAttackDraw();
+		}
+		finish_->Draw();
 		break;
 	case SceneNum::CLEAR:
 		clear_->DrawBackground();
@@ -511,8 +526,6 @@ void GameScene::LoadEnemyPopData() {
 	ifstream file;
 	file.open("./Resources/enemyPop.csv");
 	assert(file.is_open());
-	// ファイルをコピー
-	stage1EnemyPopCommands << file.rdbuf();
 	// ファイルを閉じる
 	file.close();
 }
@@ -572,90 +585,99 @@ void GameScene::UpdateDarumaPopCommands() {
 }
 
 void GameScene::UpdateEnemyPopCommands() {
-	// 待機処理
-	if (isDefeat_) {
-		uint32_t enemyCount = 0;
-		if (enemyCount <= 0) {
-			isDefeat_ = false;
-		}
-		return;
-	}
+	//// 待機処理
+	//if (isDefeat_) {
+	//	uint32_t enemyCount = 0;
+	//	if (enemyCount <= 0) {
+	//		isDefeat_ = false;
+	//	}
+	//	return;
+	//}
 
-	if (isWait_) {
-		waitTime_--;
-		if (waitTime_ <= 0) {
-			isWait_ = false;
-		}
-		return;
-	}
+	//if (isWait_) {
+	//	waitTime_--;
+	//	if (waitTime_ <= 0) {
+	//		isWait_ = false;
+	//	}
+	//	return;
+	//}
 
-	// 1行分の文字列を入れる変数
-	string line;
+	//// 1行分の文字列を入れる変数
+	//string line;
 
-	// コマンド実行ループ
-	while (getline(stage1EnemyPopCommands, line)) {
+	//// コマンド実行ループ
+	//while (getline(stage1EnemyPopCommands, line)) {
 
-		istringstream line_stream(line);
+	//	istringstream line_stream(line);
 
-		string word;
-		getline(line_stream, word, ',');
+	//	string word;
+	//	getline(line_stream, word, ',');
 
-		// //から始まる行はコメントのため飛ばす
-		if (word.find("//") == 0) {
-			// コメント行を飛ばす
-			continue;
-		}
+	//	// //から始まる行はコメントのため飛ばす
+	//	if (word.find("//") == 0) {
+	//		// コメント行を飛ばす
+	//		continue;
+	//	}
 
-		if (word.find("POP") == 0) {
-			//// X座標
-			// getline(line_stream, word, ',');
-			// float x = (float)atof(word.c_str());
-			//// Y座標
-			// getline(line_stream, word, ',');
-			// float y = (float)atof(word.c_str());
-			//// Z座標
-			// getline(line_stream, word, ',');
-			// float z = (float)atof(word.c_str());
+	//	if (word.find("POP") == 0) {
+	//		//// X座標
+	//		// getline(line_stream, word, ',');
+	//		// float x = (float)atof(word.c_str());
+	//		//// Y座標
+	//		// getline(line_stream, word, ',');
+	//		// float y = (float)atof(word.c_str());
+	//		//// Z座標
+	//		// getline(line_stream, word, ',');
+	//		// float z = (float)atof(word.c_str());
 
-			// 敵のタイプ
-			Type enemyType = Type::NORMAL;
-			getline(line_stream, word, ',');
-			if (word.find("NORMAL") == 0) {
-				enemyType = Type::NORMAL;
-			} else if (word.find("TO_PLAYER") == 0) {
-				enemyType = Type::TO_PLAYER;
-			} else if (word.find("HOMING") == 0) {
-				enemyType = Type::HOMING;
-			}
-			// AddEnemy(enemyType, {x, y, z});
-		} else if (word.find("WAIT") == 0) {
+	//		// 敵のタイプ
+	//		Type enemyType = Type::NORMAL;
+	//		getline(line_stream, word, ',');
+	//		if (word.find("NORMAL") == 0) {
+	//			enemyType = Type::NORMAL;
+	//		} else if (word.find("TO_PLAYER") == 0) {
+	//			enemyType = Type::TO_PLAYER;
+	//		} else if (word.find("HOMING") == 0) {
+	//			enemyType = Type::HOMING;
+	//		}
+	//		// AddEnemy(enemyType, {x, y, z});
+	//	} else if (word.find("WAIT") == 0) {
 
-			getline(line_stream, word, ',');
+	//		getline(line_stream, word, ',');
 
-			int32_t waitTime = atoi(word.c_str());
+	//		int32_t waitTime = atoi(word.c_str());
 
-			isWait_ = true;
-			waitTime_ = waitTime;
+	//		isWait_ = true;
+	//		waitTime_ = waitTime;
 
-			// コマンドループを抜ける
-			break;
-		} else if (word.find("DEFEAT") == 0) {
-			getline(line_stream, word, ',');
-			isDefeat_ = true;
+	//		// コマンドループを抜ける
+	//		break;
+	//	} else if (word.find("DEFEAT") == 0) {
+	//		getline(line_stream, word, ',');
+	//		isDefeat_ = true;
 
-			// コマンドループを抜ける
-			break;
-		} else if (word.find("CLEAR") == 0) {
-			getline(line_stream, word, ',');
-			SceneChange::GetInstance()->Change(SceneNum::CLEAR, &scene_);
-			// コマンドループを抜ける
-			break;
-		}
-	}
+	//		// コマンドループを抜ける
+	//		break;
+	//	} else if (word.find("CLEAR") == 0) {
+	//		getline(line_stream, word, ',');
+	//		SceneChange::GetInstance()->Change(SceneNum::CLEAR, &scene_);
+	//		// コマンドループを抜ける
+	//		break;
+	//	}
+	//}
 }
 
 void GameScene::ScoreAttackUpdate() {
 	if (!iChatch_->GetIsEnd()) {
+		return;
+	}
+	finish_->Update();
+
+	if (finish_->GetIsResult()) {
+		result_->Update();
+		return;
+	}
+	if (finish_->GetIsFinish()) {	
 		return;
 	}
 
@@ -788,6 +810,15 @@ void GameScene::TimeAttackUpdate() {
 	if (!iChatch_->GetIsEnd()) {
 		return;
 	}
+	finish_->Update();
+
+	if (finish_->GetIsResult()) {
+		result_->Update();
+		return;
+	}
+	if (finish_->GetIsFinish()) {
+		return;
+	}
 	timeCount_++;
 
 	// 1フレーム前の達磨カウントを保存
@@ -817,11 +848,11 @@ void GameScene::TimeAttackUpdate() {
 
 	// 一列分の達磨を壊したら、次の列の達磨を移動させる
 	if (darumaCount_[darumaNum_] >= kMaxDaruma_ && darumaNum_ < kMaxDarumaNum_ - 1) {
-	    darumaNum_++;
-	    for (uint32_t i = 0; i < kMaxDaruma_; i++) {
-	        daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
-	        daruma_[darumaNum_][i]->SetMovePos(startDarumaPos[i]);
-	    }
+		darumaNum_++;
+		for (uint32_t i = 0; i < kMaxDaruma_; i++) {
+			daruma_[darumaNum_][i]->SetEaseStartPos(daruma_[darumaNum_][i]->GetWorldPosition());
+			daruma_[darumaNum_][i]->SetMovePos(startDarumaPos[i]);
+		}
 	}
 
 	// 1フレーム前の達磨カウントと現在の達磨カウントが違うときに、イージングの初期値と終了値を設定する
@@ -913,7 +944,6 @@ void GameScene::TimeAttackUpdate() {
 	ImGui::Text("state:%d", joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y);
 	ImGui::End();
 #endif // _DEBUG
-
 }
 
 void GameScene::StackArray(uint32_t darumaColumn, uint32_t darumaRow) {

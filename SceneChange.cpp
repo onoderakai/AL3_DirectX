@@ -79,11 +79,9 @@ SceneChange::SceneChange() {
 	isMoveIn_ = false;
 
 	// 画像を読み込み、スプライトを生成する
-	loadingTextureHandle_ = TextureManager::Load("white1x1.png");
+	loadingTextureHandle_ = TextureManager::Load("now_loading.png");
 	loadingSprite_ = Sprite::Create(loadingTextureHandle_, Vector2{0.0f, 0.0f});
 	loadingSprite2_ = Sprite::Create(loadingTextureHandle_, Vector2{0.0f, 0.0f});
-	loadingSprite_->SetSize(Vector2{1280.0f, 720.0f});
-	loadingSprite2_->SetSize(Vector2{1280.0f, 720.0f});
 	loadingSprite_->SetColor(color);
 	loadingSprite2_->SetPosition(Vector2{1280.0f, 0.0f});
 	input_ = Input::GetInstance();
