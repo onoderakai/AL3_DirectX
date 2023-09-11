@@ -22,7 +22,7 @@ private:
 	Easing* easing_ = nullptr;
 	Sprite* finishSprite_ = nullptr;
 
-	const uint32_t kMaxFinishCount_ = 60;
+	const uint32_t kMaxFinishCount_ = 600;
 	uint32_t finishCount_ = 0;
 	const uint32_t kMaxFinishStopCount_ = 60;
 	int32_t finishStopCount_ = kMaxFinishStopCount_;

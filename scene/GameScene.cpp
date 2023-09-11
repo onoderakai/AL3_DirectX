@@ -661,6 +661,10 @@ void GameScene::UpdateEnemyPopCommands() {
 }
 
 void GameScene::ScoreAttackUpdate() {
+	// 接続状態を確認
+	Input::GetInstance()->GetJoystickState(0, joyState_);
+	Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_);
+
 	if (!iChatch_->GetIsEnd()) {
 		return;
 	}
@@ -775,12 +779,6 @@ void GameScene::ScoreAttackUpdate() {
 		}
 	}
 
-	// 接続状態を確認
-	if (!Input::GetInstance()->GetJoystickState(0, joyState_) ||
-	    !Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_)) {
-		return;
-	}
-
 #ifdef _DEBUG
 	ImGui::Begin("DarumaType");
 	for (uint32_t i = kMaxDaruma_; i > 0; i--) {
@@ -796,6 +794,10 @@ void GameScene::ScoreAttackUpdate() {
 }
 
 void GameScene::TimeAttackUpdate() {
+	// 接続状態を確認
+	Input::GetInstance()->GetJoystickState(0, joyState_);
+	Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_);
+
 	if (!iChatch_->GetIsEnd()) {
 		return;
 	}
@@ -898,12 +900,6 @@ void GameScene::TimeAttackUpdate() {
 	//		}
 	//	}
 	// }
-
-	// 接続状態を確認
-	if (!Input::GetInstance()->GetJoystickState(0, joyState_) ||
-	    !Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_)) {
-		return;
-	}
 
 #ifdef _DEBUG
 	ImGui::Begin("DarumaType");

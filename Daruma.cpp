@@ -5,11 +5,13 @@ Daruma::Daruma() {
 	input_ = Input::GetInstance();
 	easing_ = new Easing();
 	shake_ = new Shake();
+	sound_ = new SoundManager();
 }
 
 Daruma::~Daruma() {
 	delete easing_;
 	delete shake_;
+	delete sound_;
 }
 
 void Daruma::Initialize(Model* model, const Vector3& pos, const DarumaType& type) {
@@ -96,6 +98,7 @@ void Daruma::UpdateGreen(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (input_->TriggerKey(DIK_G) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0))) {
 		isBreak_ = true;
+		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
 	} else if (
 	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_Y) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
@@ -114,6 +117,7 @@ void Daruma::UpdateRed(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (input_->TriggerKey(DIK_R) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0))) {
 		isBreak_ = true;
+		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
 	} else if (
 	    input_->TriggerKey(DIK_G) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_Y) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
@@ -132,6 +136,7 @@ void Daruma::UpdateBlue(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (input_->TriggerKey(DIK_B) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0))) {
 		isBreak_ = true;
+		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
 	} else if (
 	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_G) || input_->TriggerKey(DIK_Y) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
@@ -150,6 +155,7 @@ void Daruma::UpdateYellow(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (input_->TriggerKey(DIK_Y) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0))) {
 		isBreak_ = true;
+		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
 	} else if (
 	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_G) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&

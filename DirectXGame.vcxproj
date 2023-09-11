@@ -138,6 +138,7 @@
     <ClCompile Include="Score.cpp" />
     <ClCompile Include="Shake.cpp" />
     <ClCompile Include="Skydome.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="StageSelect.cpp" />
     <ClCompile Include="TimeCall.cpp" />
@@ -200,6 +201,7 @@
     <ClInclude Include="Score.h" />
     <ClInclude Include="Shake.h" />
     <ClInclude Include="Skydome.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="StageSelect.h" />
     <ClInclude Include="TimeCall.h" />

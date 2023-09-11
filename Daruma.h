@@ -7,6 +7,7 @@
 #include "WorldTransform.h"
 #include "Shake.h"
 #include <cstdint>
+#include "SoundManager.h"
 
 class Daruma {
 public:
@@ -45,6 +46,7 @@ private:
 	XINPUT_STATE joyState_ = {};
 	XINPUT_STATE preJoyState_ = {};
 
+	SoundManager* sound_ = nullptr;
 	Easing* easing_ = nullptr;
 	Shake* shake_ = nullptr;
 
