@@ -4,7 +4,7 @@
 
 class Particle {
 public:
-	enum class Type { CIRCLE, SPHERE, SCALE_CHANGE };
+	enum class Type { CIRCLE, SPHERE, SCALE_CHANGE, RIGHT_PARTICLE };
 
 	struct Parameter {
 		// パーティクルの種類
@@ -19,8 +19,7 @@ public:
 
 	Particle();
 
-	void Initialize(
-	    const Parameter& parameter, const Vector3& velocity, Model* model);
+	void Initialize(const Parameter& parameter, const Vector3& velocity, Model* model);
 
 	void Initialize(
 	    const Parameter& parameter, const Vector3& velocity, Model* model, uint32_t textureHandle);

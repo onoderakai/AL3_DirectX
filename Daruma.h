@@ -8,6 +8,7 @@
 #include "Shake.h"
 #include <cstdint>
 #include "SoundManager.h"
+#include "ParticleSystem.h"
 
 class Daruma {
 public:
@@ -29,6 +30,8 @@ public:
 
 	int32_t GetPenaltyTime() { return penaltyTime_; }
 
+	void SetParticleSystem(ParticleSystem* particleSystem) { particleSystem_ = particleSystem; }
+
 	void SetPenaltyTime(uint32_t penaltyTime) { penaltyTime_ = penaltyTime; }
 
 	void SetIsBreak(bool isBreak) { isBreak_ = isBreak; }
@@ -37,6 +40,7 @@ public:
 
 	void SetEaseStartPos(const Vector3& easeStartPos) {
 		easeStartPos_ = easeStartPos;
+		easing_->ResetTimeCount();
 		isEasing_ = true;
 	}
 
@@ -46,6 +50,7 @@ private:
 	XINPUT_STATE joyState_ = {};
 	XINPUT_STATE preJoyState_ = {};
 
+	ParticleSystem* particleSystem_ = nullptr;
 	SoundManager* sound_ = nullptr;
 	Easing* easing_ = nullptr;
 	Shake* shake_ = nullptr;

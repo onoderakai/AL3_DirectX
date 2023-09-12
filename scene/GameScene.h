@@ -32,6 +32,7 @@
 #include "Score.h"
 #include "Finish.h"
 #include "GameResult.h"
+#include "SoundManager.h"
 
 using namespace std;
 
@@ -90,7 +91,7 @@ private: // メンバ変数
 	StageSelect* stageSelect_ = nullptr;
 	
 	//一列の達磨の最大数
-	const uint32_t kMaxDaruma_ = 11;
+	const uint32_t kMaxDaruma_ = 12;
 	//達磨の最大数
 	const uint32_t kMaxDarumaNum_ = 3;
 	Score* score_ = nullptr;
@@ -105,15 +106,15 @@ private: // メンバ変数
 	Model* darumaYellowModel_ = nullptr;
 	Model* darumaTopModel_ = nullptr;
 
-	Daruma* daruma_[3][11];
-	DarumaType darumaType_[3][11] = {};
+	Daruma* daruma_[3][12];
+	DarumaType darumaType_[3][12] = {};
 
 	//LB、RBの画像
 	Sprite* LBSprite_ = nullptr;
 	Sprite* RBSprite_ = nullptr;
 
 	//達磨の初期位置を保存
-	Vector3 startDarumaPos[11] = {};
+	Vector3 startDarumaPos[12] = {};
 
 	//何列目の達磨を選択してるかの変数
 	uint32_t darumaNum_ = 0;
@@ -137,6 +138,12 @@ private: // メンバ変数
 	uint32_t scorePoint_ = 0;
 	//経過時間
 	uint32_t timeCount_ = 0;
+	const uint32_t kMaxScoreModeTime_ = 900;
+	int32_t scoreModeTimeCount_ = kMaxScoreModeTime_;
+
+	bool isMakeFinish_ = false;
+	const uint32_t kMaxMakeFinishCount_ = 30;
+	uint32_t makeFinishCount_ = kMaxMakeFinishCount_;
 
 	//ミスタッチをしたときのペナルティタイム
 	int32_t penaltyTime_ = 0;

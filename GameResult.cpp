@@ -16,15 +16,19 @@ GameResult::GameResult() {
 
 	// 背景画像
 	uint32_t bgTex = TextureManager::Load("white1x1.png");
-	// 次に進む画像
-	uint32_t pushNextTextureHandle = TextureManager::Load("push_next.png");
+	// リトライ画像
+	uint32_t pushNextTextureHandle = TextureManager::Load("A_retry.png");
+	// タイトルに戻る画像
+	uint32_t returnTitleTextureHandle = TextureManager::Load("B_return_title.png");
 
 	// スプライトを生成
 	backGround_ = Sprite::Create(bgTex, Vector2{0.0f, 0.0f}, Vector4{0.0f, 0.0f, 0.0f, 0.9f});
 	backGround_->SetSize(Vector2{1280.0f, 720.0f});
 
-	pushNextSprite_ =
-	    Sprite::Create(pushNextTextureHandle, Vector2{640.0f, 620.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	retrySprite_ = Sprite::Create(
+	    pushNextTextureHandle, Vector2{640.0f - 200.0f, 620.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	returnTitleSprite_ = Sprite::Create(
+	    returnTitleTextureHandle, Vector2{640.0f + 200.0f, 620.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
 
 	for (uint32_t i = 0; i < 4; i++) {
 		resultSprite_[i] = Sprite::Create(resultTex_[i], Vector2{});
@@ -37,11 +41,14 @@ GameResult::~GameResult() {
 		delete resultSprite_[i];
 	}
 	delete backGround_;
-	delete pushNextSprite_;
+	delete returnTitleSprite_;
+	delete retrySprite_;
 }
 
 void GameResult::Initialize(SceneNum* pScene) {
 	pScene_ = pScene;
+	isScoreDraw_ = true;
+	drawCount_ = kMaxDrawCount_;
 	resultScore_->Initialize();
 }
 
@@ -65,11 +72,12 @@ void GameResult::Update() {
 	isChange_ = SceneChange::GetInstance()->GetIsLoading();
 	// シーン遷移中なら透明度を変えない
 	if (isChange_) {
-		pushNextSprite_->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+		retrySprite_->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+		returnTitleSprite_->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
 		return;
 	}
 	// 透明度を徐々に変える
-	Vector4 tmpColor = pushNextSprite_->GetColor();
+	Vector4 tmpColor = retrySprite_->GetColor();
 	tmpColor.w += flashSpeed_;
 	if (tmpColor.w <= 0.1f) {
 		tmpColor.w = 0.1f;
@@ -78,7 +86,8 @@ void GameResult::Update() {
 		tmpColor.w = 1.0f;
 		flashSpeed_ *= -1.0f;
 	}
-	pushNextSprite_->SetColor(tmpColor);
+	retrySprite_->SetColor(tmpColor);
+	returnTitleSprite_->SetColor(tmpColor);
 }
 
 void GameResult::TimeAttackDraw(const uint32_t& score) {
@@ -88,9 +97,20 @@ void GameResult::TimeAttackDraw(const uint32_t& score) {
 	for (uint32_t i = 0; i < 4; i++) {
 		resultSprite_[i]->Draw();
 	}
-	resultScore_->DrawScoreUIResult(score);
+
+	resultScore_->DrawScoreUIResult(score, isScoreDraw_);
 	if (resultScore_->GetIsScoreDecision()) {
-		pushNextSprite_->Draw();
+		if (isScoreDraw_) {
+			drawCount_--;
+		} else {
+			drawCount_ -= 3;
+		}
+		if (drawCount_ <= 0) {
+			drawCount_ = kMaxDrawCount_;
+			isScoreDraw_ = !isScoreDraw_;
+		}
+		retrySprite_->Draw();
+		returnTitleSprite_->Draw();
 	}
 }
 
@@ -101,8 +121,18 @@ void GameResult::ScoreAttackDraw(const uint32_t& score) {
 	for (uint32_t i = 0; i < 4; i++) {
 		resultSprite_[i]->Draw();
 	}
-	resultScore_->DrawScoreUIResult(score);
+	resultScore_->DrawScoreUIResult(score, isScoreDraw_);
 	if (resultScore_->GetIsScoreDecision()) {
-		pushNextSprite_->Draw();
+		if (isScoreDraw_) {
+			drawCount_--;
+		} else {
+			drawCount_ -= 3;
+		}
+		if (drawCount_ <= 0) {
+			drawCount_ = kMaxDrawCount_;
+			isScoreDraw_ = !isScoreDraw_;
+		}
+		retrySprite_->Draw();
+		returnTitleSprite_->Draw();
 	}
 }

@@ -68,7 +68,7 @@ void GameScene::Initialize() {
 	darumaRedModel_ = Model::CreateFromOBJ("DarumaRed", true);
 	darumaBlueModel_ = Model::CreateFromOBJ("DarumaBlue", true);
 	darumaYellowModel_ = Model::CreateFromOBJ("DarumaYellow", true);
-	darumaTopModel_ = Model::CreateFromOBJ("DarumaTop", true);
+	darumaTopModel_ = Model::CreateFromOBJ("DarumaCat", true);
 
 	// 天球のモデルを生成
 	skydomeModel_ = Model::CreateFromOBJ("skydome", true);
@@ -111,6 +111,9 @@ void GameScene::Initialize() {
 
 	iChatch_ = new IChatch();
 	iChatch_->Initialize();
+	scoreModeTimeCount_ = kMaxScoreModeTime_;
+	makeFinishCount_ = kMaxMakeFinishCount_;
+	isMakeFinish_ = false;
 
 	// 画像の読み込み、スプライトを生成
 	uint32_t RBTex = TextureManager::Load("RB.png");
@@ -118,6 +121,20 @@ void GameScene::Initialize() {
 
 	finish_ = new Finish();
 	finish_->Initialize();
+	finish_->SetFinishTime(kMaxScoreModeTime_ + 1);
+
+	// finishを時間タイム制にするかどうかを設定
+	switch (scene_) {
+	case SceneNum::TIME_ATTACK_STAGE:
+		finish_->SetIsTimeSystem(false);
+		break;
+	case SceneNum::SCORE_ATTACK_STAGE:
+		finish_->SetIsTimeSystem(true);
+		break;
+	default:
+		break;
+	}
+
 	result_ = new GameResult();
 	result_->Initialize(&scene_);
 
@@ -166,6 +183,7 @@ void GameScene::Initialize() {
 				break;
 			}
 			darumaType_[i][j] = randType;
+			daruma_[i][j]->SetParticleSystem(particleSystem_);
 		}
 	}
 
@@ -174,7 +192,8 @@ void GameScene::Initialize() {
 		startDarumaPos[i] = daruma_[0][i]->GetWorldPosition();
 	}
 
-	// UpdateDarumaPopCommands();
+	SoundManager::GetInstance()->AllStopSound();
+	SoundManager::GetInstance()->OnPlayBGM(SoundManager::BGM::BGM_TITLE);
 }
 
 void GameScene::SceneInitialize() {
@@ -206,11 +225,28 @@ void GameScene::SceneInitialize() {
 	penaltyTime_ = 0;
 	scorePoint_ = 0;
 	timeCount_ = 0;
+	scoreModeTimeCount_ = kMaxScoreModeTime_;
+	makeFinishCount_ = kMaxMakeFinishCount_;
+	isMakeFinish_ = false;
 
 	isRowBreak_ = false;
 
 	iChatch_->Initialize();
 	finish_->Initialize();
+	finish_->SetFinishTime(kMaxScoreModeTime_ + 1);
+
+	// finishを時間タイム制にするかどうかを設定
+	switch (scene_) {
+	case SceneNum::TIME_ATTACK_STAGE:
+		finish_->SetIsTimeSystem(false);
+		break;
+	case SceneNum::SCORE_ATTACK_STAGE:
+		finish_->SetIsTimeSystem(true);
+		break;
+	default:
+		break;
+	}
+
 	result_->Initialize(&scene_);
 
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
@@ -249,6 +285,52 @@ void GameScene::SceneInitialize() {
 				break;
 			}
 			darumaType_[i][j] = randType;
+			daruma_[i][j]->SetParticleSystem(particleSystem_);
+		}
+	}
+
+	// 初期化時に達磨タイプが一列揃わないようにする
+	DarumaType tmpDarumaType;
+	uint32_t sameDarumaTypeCount = 0;
+	for (uint32_t i = 0; i < kMaxDarumaNum_ - 1; i++) {
+		tmpDarumaType = darumaType_[i][0];
+		// BREAKタイプだと一行揃わないようにする
+		if (tmpDarumaType == DarumaType::BREAK) {
+			break;
+		}
+		DarumaType tmpNextDarumaType = darumaType_[i + 1][0];
+		if (tmpDarumaType == tmpNextDarumaType) {
+			sameDarumaTypeCount++;
+			if (sameDarumaTypeCount >= kMaxDarumaNum_ - 1) {
+				for (uint32_t k = 0; k < kMaxDarumaNum_; k++) {
+					DarumaType randType = DarumaType(k);
+					switch (randType) {
+					case DarumaType::GREEN:
+						daruma_[k][0]->Initialize(
+						    darumaGreenModel_, daruma_[k][0]->GetWorldPosition(), randType);
+						break;
+					case DarumaType::RED:
+						daruma_[k][0]->Initialize(
+						    darumaRedModel_, daruma_[k][0]->GetWorldPosition(), randType);
+						break;
+					case DarumaType::BLUE:
+						daruma_[k][0]->Initialize(
+						    darumaBlueModel_, daruma_[k][0]->GetWorldPosition(), randType);
+						break;
+					case DarumaType::YELLOW:
+						daruma_[k][0]->Initialize(
+						    darumaYellowModel_, daruma_[k][0]->GetWorldPosition(), randType);
+						break;
+					case DarumaType::TOP:
+						daruma_[k][0]->Initialize(
+						    darumaTopModel_, daruma_[k][0]->GetWorldPosition(), randType);
+						break;
+					default:
+						break;
+					}
+					darumaType_[k][0] = randType;
+				}
+			}
 		}
 	}
 }
@@ -313,10 +395,6 @@ void GameScene::Update() {
 
 		TimeAttackUpdate();
 
-		//  天球の更新処理
-		if (skydome_) {
-			skydome_->Update();
-		}
 		// パーティクルシステムの更新処理
 		particleSystem_->Update();
 
@@ -332,10 +410,6 @@ void GameScene::Update() {
 		iChatch_->Update();
 		ScoreAttackUpdate();
 
-		// 天球の更新処理
-		if (skydome_) {
-			skydome_->Update();
-		}
 		// パーティクルシステムの更新処理
 		particleSystem_->Update();
 
@@ -435,10 +509,10 @@ void GameScene::Draw() {
 		break;
 	case SceneNum::TIME_ATTACK_STAGE:
 		iChatch_->Draw();
-		score_->DrawScoreUI(timeCount_);
+		score_->DrawTimeUI(timeCount_);
 		// リザルト描画
 		if (finish_->GetIsResult()) {
-			result_->TimeAttackDraw(scorePoint_);
+			result_->TimeAttackDraw(timeCount_);
 		}
 		finish_->Draw();
 		break;
@@ -447,6 +521,7 @@ void GameScene::Draw() {
 		RBSprite_->Draw();
 		LBSprite_->Draw();
 		score_->DrawScoreUI(scorePoint_);
+		score_->DrawTimeUI(scoreModeTimeCount_);
 		// リザルト描画
 		if (finish_->GetIsResult()) {
 			result_->ScoreAttackDraw(scorePoint_);
@@ -668,6 +743,7 @@ void GameScene::ScoreAttackUpdate() {
 	if (!iChatch_->GetIsEnd()) {
 		return;
 	}
+
 	finish_->Update();
 
 	if (finish_->GetIsResult()) {
@@ -679,7 +755,14 @@ void GameScene::ScoreAttackUpdate() {
 		return;
 	}
 
+	// 時間経過
+	scoreModeTimeCount_--;
+	if (scoreModeTimeCount_ <= 0) {
+		scoreModeTimeCount_ = 0;
+	}
+
 	// 1フレーム前の達磨カウントを保存
+	uint32_t breakDarumaColumnCount_ = 0;
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		preDarumaCount_[i] = darumaCount_[i];
 		darumaCount_[i] = 0;
@@ -687,6 +770,22 @@ void GameScene::ScoreAttackUpdate() {
 		// 現在の達磨カウントを計測
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 			darumaCount_[i] += daruma_[i][j]->GetIsBreak();
+		}
+
+		// 強制的にフィニッシュさせるフラグをtrueにする
+		if (darumaCount_[i] >= kMaxDaruma_) {
+			breakDarumaColumnCount_++;
+			if (breakDarumaColumnCount_ >= kMaxDarumaNum_) {
+				isMakeFinish_ = true;
+			}
+		}
+	}
+
+	// 強制的にフィニッシュさせる
+	if (isMakeFinish_) {
+		makeFinishCount_--;
+		if (makeFinishCount_ <= 0) {
+			finish_->SetFinishTime(0);
 		}
 	}
 
@@ -759,24 +858,23 @@ void GameScene::ScoreAttackUpdate() {
 							daruma_[k][j]->SetMovePos(
 							    daruma_[k][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
 							daruma_[k][j]->SetEaseStartPos(daruma_[k][j]->GetWorldPosition());
-
-							/*daruma_[k][j]->SetMovePos(Vector3{
-							    daruma_[k][j]->GetWorldPosition().x,
-							    j * kDarumaRowSpacingY - darumaCount_[k] * kDarumaRowSpacingY +
-							        kDarumaOffset.y,
-							    daruma_[k][j]->GetWorldPosition().z});
-							daruma_[k][j]->SetEaseStartPos(daruma_[k][j]->GetWorldPosition());*/
 						}
 					}
-					/*darumaCount_[k] = 0;
-					for (uint32_t o = 0; o < kMaxDaruma_; o++) {
-						darumaCount_[k] += daruma_[k][o]->GetIsBreak();
-					}*/
 				}
-				scorePoint_ += 1000;
-				isRowBreak_ = true;
+				if (tmpDarumaType == DarumaType::TOP) {
+					scorePoint_ += 4000;
+					isRowBreak_ = true;
+				} else {
+					scorePoint_ += 1000;
+					isRowBreak_ = true;
+				}
 			}
 		}
+	}
+
+	//  天球の更新処理
+	if (skydome_) {
+		skydome_->Update();
 	}
 
 #ifdef _DEBUG
@@ -814,6 +912,7 @@ void GameScene::TimeAttackUpdate() {
 	timeCount_++;
 
 	// 1フレーム前の達磨カウントを保存
+	uint32_t breakDarumaColumnCount_ = 0;
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		preDarumaCount_[i] = darumaCount_[i];
 		darumaCount_[i] = 0;
@@ -821,6 +920,23 @@ void GameScene::TimeAttackUpdate() {
 		// 現在の達磨カウントを計測
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 			darumaCount_[i] += daruma_[i][j]->GetIsBreak();
+		}
+
+		// 強制的にフィニッシュさせるフラグをtrueにする
+		if (darumaCount_[i] >= kMaxDaruma_) {
+			breakDarumaColumnCount_++;
+			if (breakDarumaColumnCount_ >= kMaxDarumaNum_) {
+				isMakeFinish_ = true;
+			}
+		}
+	}
+
+	// 強制的にフィニッシュさせる
+	if (isMakeFinish_) {
+		makeFinishCount_--;
+		if (makeFinishCount_ <= 0) {
+			finish_->SetIsTimeSystem(true);
+			finish_->SetFinishTime(0);
 		}
 	}
 
@@ -848,7 +964,6 @@ void GameScene::TimeAttackUpdate() {
 			}
 			if (!isRowBreak_) {
 				StackArray(i, 0);
-				scorePoint_ += 100;
 			}
 		}
 	}
@@ -865,41 +980,10 @@ void GameScene::TimeAttackUpdate() {
 		}
 	}
 
-	//// 達磨タイプが一列揃うと消える
-	// DarumaType tmpDarumaType;
-	// uint32_t sameDarumaTypeCount = 0;
-	// isRowBreak_ = false;
-	// for (uint32_t i = 0; i < kMaxDarumaNum_ - 1; i++) {
-	//	tmpDarumaType = darumaType_[i][0];
-	//	// BREAKタイプだと一行揃わないようにする
-	//	if (tmpDarumaType == DarumaType::BREAK) {
-	//		break;
-	//	}
-	//	DarumaType tmpNextDarumaType = darumaType_[i + 1][0];
-	//	if (tmpDarumaType == tmpNextDarumaType) {
-	//		sameDarumaTypeCount++;
-	//		if (sameDarumaTypeCount >= kMaxDarumaNum_ - 1) {
-	//			for (uint32_t k = 0; k < kMaxDarumaNum_; k++) {
-	//				darumaType_[k][0] = DarumaType::BREAK;
-	//				StackArray(k, 0);
-	//				daruma_[k][darumaCount_[k]]->SetIsBreak(true);
-	//				for (uint32_t j = 0; j < kMaxDaruma_; j++) {
-	//					if (j != preDarumaCount_[k]) {
-	//						daruma_[k][j]->SetMovePos(
-	//						    daruma_[k][j]->GetWorldPosition() - Vector3{0.0f, 5.0f, 0.0f});
-	//						daruma_[k][j]->SetEaseStartPos(daruma_[k][j]->GetWorldPosition());
-	//					}
-	//				}
-	//				for (uint32_t o = 0; o < kMaxDaruma_; o++) {
-	//					darumaCount_[k] += daruma_[k][o]->GetIsBreak();
-	//				}
-	//			}
-	//			scorePoint_ += 1000;
-	//			isRowBreak_ = true;
-	//			count1++;
-	//		}
-	//	}
-	// }
+	//  天球の更新処理
+	if (skydome_) {
+		skydome_->Update();
+	}
 
 #ifdef _DEBUG
 	ImGui::Begin("DarumaType");

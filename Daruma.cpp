@@ -5,13 +5,12 @@ Daruma::Daruma() {
 	input_ = Input::GetInstance();
 	easing_ = new Easing();
 	shake_ = new Shake();
-	sound_ = new SoundManager();
+	sound_ = SoundManager::GetInstance();
 }
 
 Daruma::~Daruma() {
 	delete easing_;
 	delete shake_;
-	delete sound_;
 }
 
 void Daruma::Initialize(Model* model, const Vector3& pos, const DarumaType& type) {
@@ -38,7 +37,27 @@ void Daruma::Update() {
 		world_.UpdateMatrix();
 		return;
 	}
-	
+	switch (type_) {
+	case DarumaType::GREEN:
+		world_.rotation_.y += 0.005f;
+		break;
+	case DarumaType::RED:
+		world_.rotation_.y += 0.005f;
+		break;
+	case DarumaType::BLUE:
+		world_.rotation_.y += 0.005f;
+		break;
+	case DarumaType::YELLOW:
+		world_.rotation_.y += 0.005f;
+		break;
+	case DarumaType::TOP:
+		world_.rotation_.y += 0.005f;
+		break;
+	case DarumaType::BREAK:
+		break;
+	default:
+		break;
+	}
 	world_.translation_ =
 	    easing_->EaseOutElastic(world_.translation_, easeStartPos_, movePos_, 30, isEasing_);
 	if (!isEasing_) {
@@ -99,6 +118,11 @@ void Daruma::UpdateGreen(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0))) {
 		isBreak_ = true;
 		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
+
+		Particle::Parameter para = {};
+		para.world_.translation_ = GetWorldPosition();
+		para.type_ = Particle::Type::RIGHT_PARTICLE;
+		particleSystem_->Generate(para, 10);
 	} else if (
 	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_Y) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
@@ -108,6 +132,7 @@ void Daruma::UpdateGreen(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) {
 		penaltyTime_ = kMaxPenaltyTime_;
+		sound_->OnPlaySound(SoundManager::Sound::SE_MISS_TOUCH);
 		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, movePos_);
 	}
 }
@@ -118,6 +143,11 @@ void Daruma::UpdateRed(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0))) {
 		isBreak_ = true;
 		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
+
+		Particle::Parameter para = {};
+		para.world_.translation_ = GetWorldPosition();
+		para.type_ = Particle::Type::RIGHT_PARTICLE;
+		particleSystem_->Generate(para, 10);
 	} else if (
 	    input_->TriggerKey(DIK_G) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_Y) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
@@ -127,6 +157,7 @@ void Daruma::UpdateRed(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) {
 		penaltyTime_ = kMaxPenaltyTime_;
+		sound_->OnPlaySound(SoundManager::Sound::SE_MISS_TOUCH);
 		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, movePos_);
 	}
 }
@@ -137,6 +168,12 @@ void Daruma::UpdateBlue(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0))) {
 		isBreak_ = true;
 		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
+
+		Particle::Parameter para = {};
+		para.world_.translation_ = GetWorldPosition();
+		para.type_ = Particle::Type::RIGHT_PARTICLE;
+		particleSystem_->Generate(para, 10);
+
 	} else if (
 	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_G) || input_->TriggerKey(DIK_Y) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
@@ -146,6 +183,7 @@ void Daruma::UpdateBlue(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) {
 		penaltyTime_ = kMaxPenaltyTime_;
+		sound_->OnPlaySound(SoundManager::Sound::SE_MISS_TOUCH);
 		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, movePos_);
 	}
 }
@@ -156,6 +194,11 @@ void Daruma::UpdateYellow(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0))) {
 		isBreak_ = true;
 		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
+
+		Particle::Parameter para = {};
+		para.world_.translation_ = GetWorldPosition();
+		para.type_ = Particle::Type::RIGHT_PARTICLE;
+		particleSystem_->Generate(para, 10);
 	} else if (
 	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_G) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
@@ -165,6 +208,7 @@ void Daruma::UpdateYellow(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0)) {
 		penaltyTime_ = kMaxPenaltyTime_;
+		sound_->OnPlaySound(SoundManager::Sound::SE_MISS_TOUCH);
 		shake_->SetShaking(true, 30, Vector2{1.0f, 1.0f}, movePos_);
 	}
 }

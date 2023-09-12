@@ -1,10 +1,12 @@
 ﻿#include "IChatch.h"
 
 IChatch::IChatch() {
+	sound_ = SoundManager::GetInstance();
+
 	uint32_t iChatch3Tex = TextureManager::Load("num/3.png");
 	uint32_t iChatch2Tex = TextureManager::Load("num/2.png");
 	uint32_t iChatch1Tex = TextureManager::Load("num/1.png");
-	uint32_t iChatch0Tex = TextureManager::Load("num/0.png");
+	uint32_t iChatch0Tex = TextureManager::Load("ichatch_start.png");
 	uint32_t bgTex = TextureManager::Load("white1x1.png");
 	easing_ = new Easing();
 
@@ -20,7 +22,7 @@ IChatch::IChatch() {
 	    iChatch0Tex, Vector2{0.0f, -720.0f}, Vector4{1.0f, 1.0f, 1.0f, 1.0f}, Vector2{0.5f, 0.5f});
 	iChatch_[0]->SetSize(Vector2{});
 
-	//大きさを保存
+	// 大きさを保存
 	for (uint32_t i = 0; i < 4; i++) {
 		startSize_[i] = iChatch_[i]->GetSize();
 	}
@@ -59,9 +61,16 @@ void IChatch::Update() {
 	Vector2 size = {};
 	switch (count_) {
 	case IChatch::IChatchCount::START:
-		iChatch_[0]->SetSize(easing_->EaseOutElastic(
-		    iChatch_[0]->GetSize(), Vector2{}, Vector2{300.0f, 300.0f}, kMaxEasingTime_,
-		    isEase_));
+		if (stopTime_ > 0) {
+			stopTime_--;
+			if (stopTime_ <= 0) {
+				sound_->OnPlaySound(SoundManager::Sound::SE_ICHATCH_START);
+			}
+		} else {
+			iChatch_[0]->SetSize(easing_->EaseOutElastic(
+			    iChatch_[0]->GetSize(), Vector2{}, Vector2{768.0f, 256.0f}, kMaxEasingTime_,
+			    isEase_));
+		}
 
 		// ひとつ前のカウントの画像を徐々に透明にしつつ、大きくする
 		color = iChatch_[1]->GetColor();
@@ -77,8 +86,6 @@ void IChatch::Update() {
 		if (!isEase_ && stopTime_ <= 0) {
 			stopTime_ = kMaxStopTime_;
 			isEnd_ = true;
-		} else if (!isEase_) {
-			stopTime_--;
 		}
 		break;
 	case IChatch::IChatchCount::COUNT_1:
@@ -97,8 +104,9 @@ void IChatch::Update() {
 		iChatch_[2]->SetSize(size);
 
 		if (!isEase_ && stopTime_ <= 0) {
-			stopTime_ = kMaxStopTime_;
+			stopTime_ = kMaxEasingTime_ * 2 - kMaxStopTime_;
 			isEase_ = true;
+			sound_->OnPlaySound(SoundManager::Sound::SE_ICHATCH_COUNT);
 			count_ = IChatchCount::START;
 		} else if (!isEase_) {
 			stopTime_--;
@@ -108,7 +116,7 @@ void IChatch::Update() {
 		iChatch_[2]->SetPosition(easing_->EaseOutSine(
 		    iChatch_[2]->GetPosition(), start_, end_, kMaxEasingTime_, isEase_));
 
-		//ひとつ前のカウントの画像を徐々に透明にしつつ、大きくする
+		// ひとつ前のカウントの画像を徐々に透明にしつつ、大きくする
 		color = iChatch_[3]->GetColor();
 		size = iChatch_[3]->GetSize();
 		color.w -= 1.0f / kMaxStopTime_;
@@ -122,6 +130,7 @@ void IChatch::Update() {
 		if (!isEase_ && stopTime_ <= 0) {
 			stopTime_ = kMaxStopTime_;
 			isEase_ = true;
+			sound_->OnPlaySound(SoundManager::Sound::SE_ICHATCH_COUNT);
 			count_ = IChatchCount::COUNT_1;
 		} else if (!isEase_) {
 			stopTime_--;
@@ -133,6 +142,7 @@ void IChatch::Update() {
 		if (!isEase_ && stopTime_ <= 0) {
 			stopTime_ = kMaxStopTime_;
 			isEase_ = true;
+			sound_->OnPlaySound(SoundManager::Sound::SE_ICHATCH_COUNT);
 			count_ = IChatchCount::COUNT_2;
 		} else if (!isEase_) {
 			stopTime_--;

@@ -43,7 +43,11 @@ private:
 	XINPUT_STATE joyState_ = {};
 	XINPUT_STATE preJoyState_ = {};
 
+	//スコア表示
+	bool isScoreDraw_ = true;
 	Score* resultScore_ = nullptr;
+	const uint32_t kMaxDrawCount_ = 30;
+	int32_t drawCount_ = kMaxDrawCount_;
 
 	// シーン変数のポインタ
 	SceneNum* pScene_ = nullptr;
@@ -56,8 +60,10 @@ private:
 	Sprite* resultSprite_[4];
 	//背景
 	Sprite* backGround_ = nullptr;
-	//次に進む画像
-	Sprite* pushNextSprite_ = nullptr;
+	//タイトルに戻るボタン画像
+	Sprite* returnTitleSprite_ = nullptr;
+	//リトライボタン画像
+	Sprite* retrySprite_ = nullptr;
 
 	//シーン遷移中かどうかのフラグ
 	bool isChange_ = false;

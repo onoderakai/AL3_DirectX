@@ -2,6 +2,7 @@
 #include "Sprite.h"
 #include "TextureManager.h"
 #include "Easing.h"
+#include "SoundManager.h"
 
 class IChatch {
 public:
@@ -25,6 +26,7 @@ public:
 	bool GetIsEnd() { return isEnd_; }
 
 private:
+	SoundManager* sound_ = nullptr;
 	Easing* easing_ = nullptr;
 	Sprite* iChatch_[4];
 	Sprite* backGround_ = nullptr;

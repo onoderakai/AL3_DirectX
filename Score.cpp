@@ -29,6 +29,8 @@ Score::Score() {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 10; j++) {
 			sprite2DNum_[i][j] =
+			    Sprite::Create(textureNum[j], {posX, 100}, {1, 1, 1, 1}, {(0.0f), (0.0f)});
+			sprite2DTime_[i][j] =
 			    Sprite::Create(textureNum[j], {posX, 25}, {1, 1, 1, 1}, {(0.0f), (0.0f)});
 			sprite2DNumResult_[i][j] =
 			    Sprite::Create(textureNum2[j], {posXResult, 400}, {1, 1, 1, 1}, {(0.0f), (0.0f)});
@@ -46,6 +48,7 @@ Score::~Score() {
 		for (int j = 0; j < 10; j++) {
 			delete easing_[i][j];
 			delete sprite2DNum_[i][j];
+			delete sprite2DTime_[i][j];
 			delete sprite2DNumResult_[i][j];
 		}
 	}
@@ -62,6 +65,24 @@ void Score::Initialize() {
 			isEase_[i][j] = true;
 		}
 	}
+}
+
+void Score::DrawTimeUI(int score) {
+	if (score >= 10000) {
+		score = 9999;
+	}
+
+	int eachNumber[4]{};
+	int digit = 1000;
+	for (int i = 0; i < 4; i++) {
+		eachNumber[i] = score / digit;
+		score -= eachNumber[i] * digit;
+		digit /= 10;
+	}
+	sprite2DTime_[0][eachNumber[3]]->Draw();
+	sprite2DTime_[1][eachNumber[2]]->Draw();
+	sprite2DTime_[2][eachNumber[1]]->Draw();
+	sprite2DTime_[3][eachNumber[0]]->Draw();
 }
 
 void Score::DrawScoreUI(int score) {
@@ -92,7 +113,8 @@ void Score::DrawScoreUI(int score) {
 	sprite2DNum_[2][eachNumber[1]]->Draw();
 	sprite2DNum_[3][eachNumber[0]]->Draw();
 }
-void Score::DrawScoreUIResult(int score) {
+
+void Score::DrawScoreUIResult(int score, const bool& isDraw) {
 	if (score >= 10000) {
 		score = 9999;
 	}
@@ -127,12 +149,15 @@ void Score::DrawScoreUIResult(int score) {
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 10; j++) {
 				sprite2DNumResult_[i][j]->SetSize(easing_[i][j]->EaseOutElastic(
-				    sprite2DNumResult_[i][j]->GetSize(), Vector2{1.0f, 1.0f}, spriteSize_[i][j],
-				    60, isEase_[i][j]));
+				    sprite2DNumResult_[i][j]->GetSize(), Vector2{1.0f, 1.0f}, spriteSize_[i][j], 60,
+				    isEase_[i][j]));
 			}
 		}
 	}
 
+	if (!isDraw) {
+		return;
+	}
 	sprite2DNumResult_[0][eachNumber[3]]->Draw();
 	sprite2DNumResult_[1][eachNumber[2]]->Draw();
 	sprite2DNumResult_[2][eachNumber[1]]->Draw();

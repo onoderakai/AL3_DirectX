@@ -25,6 +25,19 @@ public:
 	    bool& isEase);
 
 	/// <summary>
+	/// コンスタントイージング
+	/// </summary>
+	/// <param name="value">イージングさせたい</param>
+	/// <param name="start"></param>
+	/// <param name="end"></param>
+	/// <param name="maxFrame">終了するまでのフレーム数</param>
+	/// <param name="isEase">イージングするかどうか</param>
+	/// <returns></returns>
+	Vector2 ConstantEase(
+	    const Vector2& value, const Vector2& start, const Vector2& end, const uint32_t& maxFrame,
+	    bool& isEase);
+
+	/// <summary>
 	/// イーズイン
 	/// </summary>
 	/// <param name="value">イージングさせたい</param>
@@ -35,6 +48,19 @@ public:
 	/// <returns></returns>
 	Vector3 EaseInSine(
 	    const Vector3& value, const Vector3& start, const Vector3& end, const uint32_t& maxFrame,
+	    bool& isEase);
+
+	/// <summary>
+	/// イーズイン
+	/// </summary>
+	/// <param name="value">イージングさせたい</param>
+	/// <param name="start"></param>
+	/// <param name="end"></param>
+	/// <param name="maxFrame">終了するまでのフレーム数</param>
+	/// <param name="isEase">イージングするかどうか</param>
+	/// <returns></returns>
+	Vector2 EaseInSine(
+	    const Vector2& value, const Vector2& start, const Vector2& end, const uint32_t& maxFrame,
 	    bool& isEase);
 
 	/// <summary>

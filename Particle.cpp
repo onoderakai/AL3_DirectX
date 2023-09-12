@@ -38,6 +38,15 @@ void Particle::Initialize(
 		sizeChange.y = float(2.0f / parameter_.deathTimer_) * targetScale_.y;
 		sizeChange.z = float(2.0f / parameter_.deathTimer_) * targetScale_.z;
 		break;
+	case Type::RIGHT_PARTICLE:
+		parameter_.world_.scale_ = parameter.world_.scale_;
+		sizeChange.x = float(parameter_.world_.scale_.x / parameter_.deathTimer_);
+		sizeChange.y = float(parameter_.world_.scale_.y / parameter_.deathTimer_);
+		sizeChange.z = float(parameter_.world_.scale_.z / parameter_.deathTimer_);
+		if (velocity_.x < 0) {
+			velocity_.x *= -1.0f;
+		}
+		break;
 	default:
 		break;
 	}
@@ -65,6 +74,9 @@ void Particle::Update() {
 		break;
 	case Particle::Type::SCALE_CHANGE:
 		TypeScaleChangeUpdate();
+		break;
+	case Particle::Type::RIGHT_PARTICLE:
+		TypeSphereUpdate();
 		break;
 	default:
 		break;

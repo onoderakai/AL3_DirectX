@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Sprite.h"
 #include "Input.h"
+#include "SoundManager.h"
 
 class GameScene;
 
@@ -71,6 +72,7 @@ private:
 	~SceneChange();
 
 	GameScene* gameScene_ = nullptr;
+	SoundManager* sound_ = nullptr;
 
 	//遷移フラグ
 	bool isLoading_ = false;

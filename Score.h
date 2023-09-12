@@ -1,7 +1,7 @@
 ﻿#pragma once
+#include "Easing.h"
 #include <Model.h>
 #include <Sprite.h>
-#include "Easing.h"
 
 class Score {
 public:
@@ -19,7 +19,10 @@ public:
 	void Initialize();
 
 	void DrawScoreUI(int score);
-	void DrawScoreUIResult(int score);
+
+	void DrawTimeUI(int score);
+
+	void DrawScoreUIResult(int score, const bool& isDraw);
 
 	/// <summary>
 	/// スコアが決定したフラグのゲッター
@@ -32,10 +35,11 @@ private:
 
 	Sprite* sprite2DNum_[4][10];
 	Sprite* sprite2DNumResult_[4][10];
+	Sprite* sprite2DTime_[4][10];
 
 	Vector2 spriteSize_[4][10] = {};
 
-	//スコアが決定したときのフラグ
+	// スコアが決定したときのフラグ
 	bool isScoreDecision_ = false;
 	bool isEase_[4][10] = {};
 

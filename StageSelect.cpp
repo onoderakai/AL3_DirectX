@@ -4,12 +4,28 @@
 
 StageSelect::StageSelect() {
 	easing_ = new Easing();
+	sound_ = SoundManager::GetInstance();
 
 	// 画像を読み込み、スプライトを生成する
 	uint32_t stageSelectBgTextureHandle_ = TextureManager::Load("title_bg.png");
 	stageSelectBgSprite_ = Sprite::Create(stageSelectBgTextureHandle_, Vector2{0.0f, 0.0f});
-	uint32_t pushNextTextureHandle = TextureManager::Load("push_next.png");
+	uint32_t pushNextTextureHandle = TextureManager::Load("A_push.png");
 	pushNextSprite_ = Sprite::Create(pushNextTextureHandle, Vector2{}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	// 操作説明を開くための画像
+	uint32_t pushExplainTextureHandle = TextureManager::Load("X_explain.png");
+	pushExplainSprite_ = Sprite::Create(
+	    pushExplainTextureHandle, Vector2{200.0f, 80.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	// 操作説明画像
+	uint32_t explain1TextureHandle = TextureManager::Load("left_explain.png");
+	explainSprite_[0] = Sprite::Create(
+	    explain1TextureHandle, Vector2{640.0f, 360.0f - 150.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	uint32_t explain2TextureHandle = TextureManager::Load("right_explain.png");
+	explainSprite_[1] = Sprite::Create(
+	    explain2TextureHandle, Vector2{640.0f, 360.0f + 150.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	// 操作説明背景
+	uint32_t bgTex = TextureManager::Load("white1x1.png");
+	backGround_ = Sprite::Create(bgTex, Vector2{0.0f, 0.0f}, Vector4{0.0f, 0.0f, 0.0f, 0.9f});
+	backGround_->SetSize(Vector2{1280.0f, 720.0f});
 
 	uint32_t stage1SelectTextureHandle = TextureManager::Load("stage1_select.png");
 	stageSprite_[0] = Sprite::Create(
@@ -21,18 +37,12 @@ StageSelect::StageSelect() {
 	selectSprite_ = Sprite::Create(
 	    selectTextureHandle, stageSprite_[0]->GetPosition(), {1, 1, 1, 1}, {0.5f, 0.5f});
 
-	uint32_t arrowRightTextureHandle = TextureManager::Load("select_arrow_right.png");
+	uint32_t arrowRightTextureHandle = TextureManager::Load("RB.png");
 	arrowRightSprite_ = Sprite::Create(
-	    arrowRightTextureHandle, Vector2{1280.0f - 150.0f, 380.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
-	arrowRightSprite_->SetSize(arrowRightSprite_->GetSize() * (0.5f));
-	uint32_t arrowLeftTextureHandle = TextureManager::Load("select_arrow_left.png");
+	    arrowRightTextureHandle, Vector2{1280.0f - 130.0f, 380.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	uint32_t arrowLeftTextureHandle = TextureManager::Load("LB.png");
 	arrowLeftSprite_ =
-	    Sprite::Create(arrowLeftTextureHandle, Vector2{150.0f, 380.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
-	arrowLeftSprite_->SetSize(arrowLeftSprite_->GetSize() * (0.5f));
-
-	uint32_t backTitleTextureHandle = TextureManager::Load("back_title.png");
-	backTitleSprite_ =
-	    Sprite::Create(backTitleTextureHandle, Vector2{80.0f, 80.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	    Sprite::Create(arrowLeftTextureHandle, Vector2{130.0f, 380.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
 }
 
 StageSelect::~StageSelect() {
@@ -45,12 +55,17 @@ StageSelect::~StageSelect() {
 	delete arrowRightSprite_;
 	delete arrowLeftSprite_;
 	delete pushNextSprite_;
-	delete backTitleSprite_;
+	delete pushExplainSprite_;
+	for (uint32_t i = 0; i < 2; i++) {
+		delete explainSprite_[i];
+	}
+	delete backGround_;
 }
 
 void StageSelect::Initialize(SceneNum* pScene) {
 	selectSprite_->SetPosition(stageSprite_[0]->GetPosition());
 	stageNum_ = 0;
+	isExplain_ = false;
 	isEase_ = false;
 	input_ = Input::GetInstance();
 	pScene_ = pScene;
@@ -61,24 +76,41 @@ void StageSelect::Update() {
 	Input::GetInstance()->GetJoystickState(0, joyState_);
 	Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_);
 
-	// SPACEかABXYボタンで選択したシーンに遷移する
-	if ((input_->PushKey(DIK_SPACE) ||
-	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
-	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0) ||
-	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
-	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0) ||
-	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
-	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0) ||
-	     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
-	      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) &&
-	    !isEase_) {
-		if (stageNum_ == 0) {
-			SceneChange::GetInstance()->Change(SceneNum::TIME_ATTACK_STAGE, pScene_);
-		} else if (stageNum_ == 1) {
-			SceneChange::GetInstance()->Change(SceneNum::SCORE_ATTACK_STAGE, pScene_);
+	// SPACEかAボタンで選択したシーンに遷移する
+	if (!isExplain_) {
+		if ((input_->TriggerKey(DIK_SPACE) ||
+		     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
+		      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0)) &&
+		    !isEase_) {
+			sound_->OnPlaySound(SoundManager::Sound::SE_EXPLAIN);
+			if (stageNum_ == 0) {
+				SceneChange::GetInstance()->Change(SceneNum::TIME_ATTACK_STAGE, pScene_);
+			} else if (stageNum_ == 1) {
+				SceneChange::GetInstance()->Change(SceneNum::SCORE_ATTACK_STAGE, pScene_);
+			}
+		} else if (input_->PushKey(DIK_ESCAPE)) {
+			SceneChange::GetInstance()->Change(SceneNum::TITLE, pScene_);
 		}
-	} else if (input_->PushKey(DIK_ESCAPE)) {
-		SceneChange::GetInstance()->Change(SceneNum::TITLE, pScene_);
+	}
+
+	// XボタンかENTERで操作説明を開く
+	if (!isExplain_ && (input_->TriggerKey(DIK_RETURN) ||
+	                   (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
+	                    (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0))) {
+		sound_->OnPlaySound(SoundManager::Sound::SE_EXPLAIN);
+		isExplain_ = true;
+	} else if (
+	    input_->TriggerKey(DIK_RETURN) ||
+	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
+	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0) ||
+	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
+	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0) ||
+	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
+	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0) ||
+	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
+	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) {
+		sound_->OnPlaySound(SoundManager::Sound::SE_EXPLAIN);
+		isExplain_ = false;
 	}
 
 	if (!isEase_ && !SceneChange::GetInstance()->GetIsLoading()) {
@@ -86,6 +118,7 @@ void StageSelect::Update() {
 		     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER &&
 		      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) == 0)) &&
 		    stageNum_ < maxStageNum_ - 1) {
+			sound_->OnPlaySound(SoundManager::Sound::SE_SELECT_RB_LB);
 			// イージングフラグをtrueにし、イージングの開始値と終了値を設定する
 			isEase_ = true;
 			start = stageSprite_[stageNum_]->GetPosition();
@@ -97,6 +130,7 @@ void StageSelect::Update() {
 		     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER &&
 		      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) == 0)) &&
 		    stageNum_ > 0) {
+			sound_->OnPlaySound(SoundManager::Sound::SE_SELECT_RB_LB);
 			// イージングフラグをtrueにし、イージングの開始値と終了値を設定する
 			isEase_ = true;
 			start = stageSprite_[stageNum_]->GetPosition();
@@ -108,7 +142,7 @@ void StageSelect::Update() {
 	Vector2 selectPos = selectSprite_->GetPosition();
 	selectPos = easing_->EaseOutSine(selectPos, start, end, 10, isEase_);
 	selectSprite_->SetPosition(selectPos);
-	pushNextSprite_->SetPosition(selectPos + Vector2{0.0f, 100.0f});
+	pushNextSprite_->SetPosition(selectPos + Vector2{0.0f, 200.0f});
 }
 
 void StageSelect::DrawBackground() {
@@ -120,5 +154,13 @@ void StageSelect::DrawBackground() {
 	}
 	selectSprite_->Draw();
 	pushNextSprite_->Draw();
-	backTitleSprite_->Draw();
+	pushExplainSprite_->Draw();
+
+	// 説明画面が出てるときだけ
+	if (isExplain_) {
+		backGround_->Draw();
+		for (uint32_t i = 0; i < 2; i++) {
+			explainSprite_[i]->Draw();
+		}
+	}
 }

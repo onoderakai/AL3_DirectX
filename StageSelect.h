@@ -3,6 +3,7 @@
 #include "Input.h"
 #include "Sprite.h"
 #include "Easing.h"
+#include "SoundManager.h"
 
 class StageSelect {
 public:
@@ -34,6 +35,8 @@ private:
 	Input* input_ = nullptr;
 	XINPUT_STATE joyState_;
 	XINPUT_STATE preJoyState_;
+
+	SoundManager* sound_ = nullptr;
 	// シーン変数のポインタ
 	SceneNum* pScene_ = nullptr;
 
@@ -55,5 +58,10 @@ private:
 	Sprite* stageSprite_[2] = {};
 	Sprite* arrowRightSprite_ = nullptr;
 	Sprite* arrowLeftSprite_ = nullptr;
-	Sprite* backTitleSprite_ = nullptr;
+	Sprite* pushExplainSprite_ = nullptr;
+
+	bool isExplain_ = false;
+	Sprite* explainSprite_[2];
+	// 説明画面が出ているときの背景
+	Sprite* backGround_ = nullptr;
 };
