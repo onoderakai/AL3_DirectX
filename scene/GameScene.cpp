@@ -9,14 +9,48 @@
 #include <ctime>
 #include <fstream>
 
-GameScene::GameScene() { LoadDarumaPopData(); }
+GameScene::GameScene() {
+	catEasing_ = new Easing();
+	uint32_t signboardTex = TextureManager::Load("signboard.png");
+	signboardSprite_ = Sprite::Create(signboardTex, Vector2{}, Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+	uint32_t signboard2Tex = TextureManager::Load("signboard2.png");
+	signboardSprite2_ = Sprite::Create(signboard2Tex, Vector2{}, Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+
+	uint32_t aTex = TextureManager::Load("A_push.png");
+	uint32_t bTex = TextureManager::Load("B_push.png");
+	uint32_t xTex = TextureManager::Load("X_push.png");
+	uint32_t yTex = TextureManager::Load("Y_push.png");
+	buttonSprite_[0] = Sprite::Create(aTex, Vector2{100.0f, 500.0f});
+	buttonSprite_[1] = Sprite::Create(bTex, Vector2{100.0f, 500.0f});
+	buttonSprite_[2] = Sprite::Create(xTex, Vector2{100.0f, 500.0f});
+	buttonSprite_[3] = Sprite::Create(yTex, Vector2{100.0f, 500.0f});
+
+	uint32_t catLineUpTex = TextureManager::Load("cat_line_up.png");
+	catLineUpSprite_ = Sprite::Create(
+	    catLineUpTex, {640.0f, 360.0f}, Vector4{1.0f, 1.0f, 1.0f, 1.0f}, Vector2{0.5f, 0.5f});
+	redParticleTex_ = TextureManager::Load("red1x1.png");
+	greenParticleTex_ = TextureManager::Load("green1x1.png");
+	blueParticleTex_ = TextureManager::Load("blue1x1.png");
+	yellowParticleTex_ = TextureManager::Load("yellow1x1.png");
+	LoadDarumaPopData();
+	sound_ = SoundManager::GetInstance();
+	sound_->OnPlayBGM(SoundManager::BGM::BGM_TITLE);
+}
 
 GameScene::~GameScene() {
+	delete signboardSprite_;
+	delete signboardSprite2_;
+	delete catEasing_;
+	for (uint32_t i = 0; i < 4; i++) {
+		delete buttonSprite_[i];
+	}
+
 	for (uint32_t i = 0; i < kMaxDarumaNum_; i++) {
 		for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 			delete daruma_[i][j];
 		}
 	}
+	delete catLineUpSprite_;
 
 	delete darumaGreenModel_;
 	delete darumaRedModel_;
@@ -191,12 +225,14 @@ void GameScene::Initialize() {
 	for (uint32_t i = 0; i < kMaxDaruma_; i++) {
 		startDarumaPos[i] = daruma_[0][i]->GetWorldPosition();
 	}
-
-	SoundManager::GetInstance()->AllStopSound();
-	SoundManager::GetInstance()->OnPlayBGM(SoundManager::BGM::BGM_TITLE);
 }
 
 void GameScene::SceneInitialize() {
+	isCatEase_ = true;
+	catEasing_->Initialize();
+	catEasing_->ResetTimeCount();
+	catLineUpSprite_->SetSize(Vector2{});
+
 	particleSystem_->Initialize();
 
 	skydome_->Initialize(skydomeModel_);
@@ -228,7 +264,7 @@ void GameScene::SceneInitialize() {
 	scoreModeTimeCount_ = kMaxScoreModeTime_;
 	makeFinishCount_ = kMaxMakeFinishCount_;
 	isMakeFinish_ = false;
-
+	isCatLineUp_ = false;
 	isRowBreak_ = false;
 
 	iChatch_->Initialize();
@@ -508,6 +544,25 @@ void GameScene::Draw() {
 		stageSelect_->DrawBackground();
 		break;
 	case SceneNum::TIME_ATTACK_STAGE:
+		signboardSprite2_->Draw();
+		if (iChatch_->GetIsEnd() && penaltyTime_ <= 0 && !finish_->GetIsFinish()) {
+			switch (selectDarumaType_) {
+			case DarumaType::GREEN:
+				buttonSprite_[0]->Draw();
+				break;
+			case DarumaType::RED:
+				buttonSprite_[1]->Draw();
+				break;
+			case DarumaType::BLUE:
+				buttonSprite_[2]->Draw();
+				break;
+			case DarumaType::YELLOW:
+				buttonSprite_[3]->Draw();
+				break;
+			default:
+				break;
+			}
+		}
 		iChatch_->Draw();
 		score_->DrawTimeUI(timeCount_);
 		// リザルト描画
@@ -517,11 +572,34 @@ void GameScene::Draw() {
 		finish_->Draw();
 		break;
 	case SceneNum::SCORE_ATTACK_STAGE:
+		signboardSprite_->Draw();
+		// ボタンの描画
+		if (iChatch_->GetIsEnd() && penaltyTime_ <= 0) {
+			switch (selectDarumaType_) {
+			case DarumaType::GREEN:
+				buttonSprite_[0]->Draw();
+				break;
+			case DarumaType::RED:
+				buttonSprite_[1]->Draw();
+				break;
+			case DarumaType::BLUE:
+				buttonSprite_[2]->Draw();
+				break;
+			case DarumaType::YELLOW:
+				buttonSprite_[3]->Draw();
+				break;
+			default:
+				break;
+			}
+		}
 		iChatch_->Draw();
 		RBSprite_->Draw();
 		LBSprite_->Draw();
 		score_->DrawScoreUI(scorePoint_);
 		score_->DrawTimeUI(scoreModeTimeCount_);
+		if (isCatLineUp_) {
+			catLineUpSprite_->Draw();
+		}
 		// リザルト描画
 		if (finish_->GetIsResult()) {
 			result_->ScoreAttackDraw(scorePoint_);
@@ -736,6 +814,11 @@ void GameScene::UpdateEnemyPopCommands() {
 }
 
 void GameScene::ScoreAttackUpdate() {
+	if (isCatLineUp_) {
+		catLineUpSprite_->SetSize(catEasing_->ConstantEase(
+		    catLineUpSprite_->GetSize(), Vector2{}, Vector2{1280.0f, 720.0f}, 30, isCatEase_));
+	}
+
 	// 接続状態を確認
 	Input::GetInstance()->GetJoystickState(0, joyState_);
 	Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_);
@@ -756,9 +839,11 @@ void GameScene::ScoreAttackUpdate() {
 	}
 
 	// 時間経過
-	scoreModeTimeCount_--;
-	if (scoreModeTimeCount_ <= 0) {
-		scoreModeTimeCount_ = 0;
+	if (!isMakeFinish_) {
+		scoreModeTimeCount_--;
+		if (scoreModeTimeCount_ <= 0) {
+			scoreModeTimeCount_ = 0;
+		}
 	}
 
 	// 1フレーム前の達磨カウントを保存
@@ -825,6 +910,10 @@ void GameScene::ScoreAttackUpdate() {
 
 	// 達磨カウントの場所の入力処理
 	if (darumaCount_[darumaNum_] < kMaxDaruma_) {
+		selectDarumaType_ = darumaType_[darumaNum_][0];
+		for (uint32_t i = 0; i < 4; i++) {
+			buttonSprite_[i]->SetPosition(Vector2{darumaNum_ * 440.0f + 150.0f, 630.0f});
+		}
 		daruma_[darumaNum_][darumaCount_[darumaNum_]]->InputUpdate();
 		penaltyTime_ = daruma_[darumaNum_][darumaCount_[darumaNum_]]->GetPenaltyTime();
 	}
@@ -849,9 +938,89 @@ void GameScene::ScoreAttackUpdate() {
 		if (tmpDarumaType == tmpNextDarumaType) {
 			sameDarumaTypeCount++;
 			if (sameDarumaTypeCount >= kMaxDarumaNum_ - 1) {
+				sound_->OnPlaySound(SoundManager::Sound::SE_LINE_UP);
+				uint32_t particleTex = 0;
+				switch (tmpNextDarumaType) {
+				case DarumaType::GREEN:
+					particleTex = greenParticleTex_;
+					break;
+				case DarumaType::RED:
+					particleTex = redParticleTex_;
+					break;
+				case DarumaType::BLUE:
+					particleTex = blueParticleTex_;
+					break;
+				case DarumaType::YELLOW:
+					particleTex = yellowParticleTex_;
+					break;
+				case DarumaType::TOP:
+					isCatLineUp_ = true;
+					particleTex = yellowParticleTex_;
+					break;
+				default:
+					break;
+				}
 				for (uint32_t k = 0; k < kMaxDarumaNum_; k++) {
 					darumaType_[k][0] = DarumaType::BREAK;
 					StackArray(k, 0);
+					// パーティクル生成
+					if (tmpNextDarumaType == DarumaType::TOP) {
+						Particle::Parameter para = {};
+						para.world_.translation_ = daruma_[k][darumaCount_[k]]->GetWorldPosition();
+
+						para.type_ = Particle::Type::GATHER_PARTICLE;
+						para.deathTimer_ = 40;
+						para.world_.scale_ = {3.0f, 3.0f, 3.0f};
+						para.speed_ = 0.1f;
+						particleSystem_->Generate(para, 5, greenParticleTex_);
+						para.type_ = Particle::Type::SCALE_CHANGE;
+						para.deathTimer_ = 20;
+						para.world_.scale_ = {1.0f, 1.0f, 1.0f};
+						particleSystem_->Generate(para, 5, greenParticleTex_);
+
+						para.type_ = Particle::Type::GATHER_PARTICLE;
+						para.deathTimer_ = 40;
+						para.world_.scale_ = {3.0f, 3.0f, 3.0f};
+						para.speed_ = 0.1f;
+						particleSystem_->Generate(para, 5, redParticleTex_);
+						para.type_ = Particle::Type::SCALE_CHANGE;
+						para.deathTimer_ = 20;
+						para.world_.scale_ = {1.0f, 1.0f, 1.0f};
+						particleSystem_->Generate(para, 5, redParticleTex_);
+
+						para.type_ = Particle::Type::GATHER_PARTICLE;
+						para.deathTimer_ = 40;
+						para.world_.scale_ = {3.0f, 3.0f, 3.0f};
+						para.speed_ = 0.1f;
+						particleSystem_->Generate(para, 5, blueParticleTex_);
+						para.type_ = Particle::Type::SCALE_CHANGE;
+						para.deathTimer_ = 20;
+						para.world_.scale_ = {1.0f, 1.0f, 1.0f};
+						particleSystem_->Generate(para, 5, blueParticleTex_);
+
+						para.type_ = Particle::Type::GATHER_PARTICLE;
+						para.deathTimer_ = 40;
+						para.world_.scale_ = {3.0f, 3.0f, 3.0f};
+						para.speed_ = 0.1f;
+						particleSystem_->Generate(para, 5, yellowParticleTex_);
+						para.type_ = Particle::Type::SCALE_CHANGE;
+						para.deathTimer_ = 20;
+						para.world_.scale_ = {1.0f, 1.0f, 1.0f};
+						particleSystem_->Generate(para, 5, yellowParticleTex_);
+					} else {
+						Particle::Parameter para = {};
+						para.world_.translation_ = daruma_[k][darumaCount_[k]]->GetWorldPosition();
+						para.type_ = Particle::Type::GATHER_PARTICLE;
+						para.deathTimer_ = 40;
+						para.world_.scale_ = {3.0f, 3.0f, 3.0f};
+						para.speed_ = 0.1f;
+						particleSystem_->Generate(para, 10, particleTex);
+						para.type_ = Particle::Type::SCALE_CHANGE;
+						para.deathTimer_ = 20;
+						para.world_.scale_ = {1.0f, 1.0f, 1.0f};
+						particleSystem_->Generate(para, 10, particleTex);
+					}
+
 					daruma_[k][darumaCount_[k]]->SetIsBreak(true);
 					for (uint32_t j = 0; j < kMaxDaruma_; j++) {
 						if (j != preDarumaCount_[k]) {
@@ -909,7 +1078,10 @@ void GameScene::TimeAttackUpdate() {
 	if (finish_->GetIsFinish()) {
 		return;
 	}
-	timeCount_++;
+
+	if (!isMakeFinish_) {
+		timeCount_++;
+	}
 
 	// 1フレーム前の達磨カウントを保存
 	uint32_t breakDarumaColumnCount_ = 0;
@@ -970,6 +1142,10 @@ void GameScene::TimeAttackUpdate() {
 
 	// 達磨カウントの場所の入力処理
 	if (darumaCount_[darumaNum_] < kMaxDaruma_) {
+		selectDarumaType_ = darumaType_[darumaNum_][0];
+		for (uint32_t i = 0; i < 4; i++) {
+			buttonSprite_[i]->SetPosition(Vector2{150.0f, 630.0f});
+		}
 		daruma_[darumaNum_][darumaCount_[darumaNum_]]->InputUpdate();
 		penaltyTime_ = daruma_[darumaNum_][darumaCount_[darumaNum_]]->GetPenaltyTime();
 	}

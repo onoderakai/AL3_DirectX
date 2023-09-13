@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "Input.h"
 #include "Score.h"
+#include "SoundManager.h"
 
 class GameResult {
 public:
@@ -42,6 +43,9 @@ private:
 	// ジョイスティックを使う
 	XINPUT_STATE joyState_ = {};
 	XINPUT_STATE preJoyState_ = {};
+
+	bool isSound_ = false;
+	SoundManager* sound_ = nullptr;
 
 	//スコア表示
 	bool isScoreDraw_ = true;

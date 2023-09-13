@@ -82,7 +82,7 @@ private: // メンバ変数
 	/// </summary>
 	
 	//シーン関連
-	SceneNum scene_ = SceneNum::SCORE_ATTACK_STAGE;
+	SceneNum scene_ = SceneNum::TITLE;
 	Title* title_ = nullptr;
 	//Stage* stage_ = nullptr;
 	Clear* clear_ = nullptr;
@@ -90,6 +90,11 @@ private: // メンバ変数
 	OperationExplain* explain_ = nullptr;
 	StageSelect* stageSelect_ = nullptr;
 	
+	uint32_t redParticleTex_ = 0;
+	uint32_t greenParticleTex_ = 0;
+	uint32_t blueParticleTex_ = 0;
+	uint32_t yellowParticleTex_ = 0;
+	SoundManager* sound_ = nullptr;
 	//一列の達磨の最大数
 	const uint32_t kMaxDaruma_ = 12;
 	//達磨の最大数
@@ -109,19 +114,32 @@ private: // メンバ変数
 	Daruma* daruma_[3][12];
 	DarumaType darumaType_[3][12] = {};
 
+	// 達磨の初期位置を保存
+	Vector3 startDarumaPos[12] = {};
+
+	// 何列目の達磨を選択してるかの変数
+	uint32_t darumaNum_ = 0;
+
+	// 壊れた達磨の数
+	uint32_t preDarumaCount_[3] = {};
+	uint32_t darumaCount_[3] = {};
+
 	//LB、RBの画像
 	Sprite* LBSprite_ = nullptr;
 	Sprite* RBSprite_ = nullptr;
+	//猫の画像
+	Sprite* catLineUpSprite_ = nullptr;
+	Easing* catEasing_ = nullptr;
+	bool isCatEase_ = false;
+	//ボタン画像
+	Sprite* buttonSprite_[4];
+	DarumaType selectDarumaType_ = DarumaType::GREEN;
 
-	//達磨の初期位置を保存
-	Vector3 startDarumaPos[12] = {};
+	//看板画像
+	Sprite* signboardSprite_ = nullptr;
+	Sprite* signboardSprite2_ = nullptr;
 
-	//何列目の達磨を選択してるかの変数
-	uint32_t darumaNum_ = 0;
-
-	//壊れた達磨の数
-	uint32_t preDarumaCount_[3] = {};
-	uint32_t darumaCount_[3] = {};
+	bool isCatLineUp_ = false;
 
 	//選択している達磨のオフセット値
 	const float kSelectDarumaZ = -40.0f;
@@ -138,7 +156,7 @@ private: // メンバ変数
 	uint32_t scorePoint_ = 0;
 	//経過時間
 	uint32_t timeCount_ = 0;
-	const uint32_t kMaxScoreModeTime_ = 900;
+	const uint32_t kMaxScoreModeTime_ = 1222;
 	int32_t scoreModeTimeCount_ = kMaxScoreModeTime_;
 
 	bool isMakeFinish_ = false;

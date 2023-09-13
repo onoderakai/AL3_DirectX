@@ -61,7 +61,7 @@ private:
 	Sprite* pushExplainSprite_ = nullptr;
 
 	bool isExplain_ = false;
-	Sprite* explainSprite_[2];
+	Sprite* explainSprite_[3];
 	// 説明画面が出ているときの背景
 	Sprite* backGround_ = nullptr;
 };

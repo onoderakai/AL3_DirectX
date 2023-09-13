@@ -30,6 +30,9 @@ public:
 		SE_SELECT_RB_LB,
 		SE_EXPLAIN,
 		SE_FINISH,
+		SE_CONFIRM,
+		SE_LINE_UP,
+		SE_RESULT,
 	};
 
 	enum class BGM {
@@ -41,7 +44,7 @@ public:
 
 	void OnPlayBGM(const BGM& bgmType);
 
-	void AllStopSound();
+	//void AllStopSound();
 
 private:
 	SoundManager();
@@ -55,7 +58,10 @@ private:
 	uint32_t seIchatchCountData_ = 0;
 	uint32_t seIchatchStartData_ = 0;
 	uint32_t seSelectRBLBData_ = 0;
+	uint32_t seLineUpData = 0;
+	uint32_t seResultData = 0;
 	uint32_t seExplainData_ = 0;
+	uint32_t seConfirmData_ = 0;
 	uint32_t seFinishData_ = 0;
 	uint32_t bgmTitleData_ = 0;
 	uint32_t bgmStageData_ = 0;

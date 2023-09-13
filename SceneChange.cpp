@@ -29,16 +29,16 @@ void SceneChange::Update() {
 		addAlpha_ *= -1.0f;
 		*pScene_ = nextScene_;
 
-		sound_->AllStopSound();
+		//sound_->AllStopSound();
 		switch (nextScene_) {
 		case SceneNum::TITLE:
-			sound_->OnPlayBGM(SoundManager::BGM::BGM_TITLE);
+			//sound_->OnPlayBGM(SoundManager::BGM::BGM_TITLE);
 			break;
 		case SceneNum::STAGE_SELECT:
-			sound_->OnPlayBGM(SoundManager::BGM::BGM_TIME_ATTACK);
+			//sound_->OnPlayBGM(SoundManager::BGM::BGM_TIME_ATTACK);
 			break;
 		case SceneNum::SCORE_ATTACK_STAGE:
-			sound_->OnPlayBGM(SoundManager::BGM::BGM_TIME_ATTACK);
+			//sound_->OnPlayBGM(SoundManager::BGM::BGM_TIME_ATTACK);
 			break;
 		default:
 			break;
@@ -66,26 +66,6 @@ void SceneChange::Update2() {
 	if (frameCount_ >= float(transitionFrame_ / 2.0f) && !isMoveIn_) {
 		isMoveIn_ = true;
 		*pScene_ = nextScene_;
-
-		switch (nextScene_) {
-		case SceneNum::TITLE:
-			sound_->AllStopSound();
-			sound_->OnPlayBGM(SoundManager::BGM::BGM_TITLE);
-			break;
-		case SceneNum::STAGE_SELECT:
-			break;
-		case SceneNum::TIME_ATTACK_STAGE:
-			sound_->AllStopSound();
-			//sound_->OnPlayBGM(SoundManager::BGM::BGM_TIME_ATTACK);
-			break;
-		case SceneNum::SCORE_ATTACK_STAGE:
-			sound_->AllStopSound();
-			//sound_->OnPlayBGM(SoundManager::BGM::BGM_TIME_ATTACK);
-			break;
-		default:
-			sound_->AllStopSound();
-			break;
-		}
 		gameScene_->SceneInitialize();
 		return;
 	}

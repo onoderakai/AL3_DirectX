@@ -12,6 +12,9 @@ SoundManager::SoundManager() {
 	seSelectRBLBData_ = audio_->LoadWave("Sounds/se_select_RB_LB.wav");
 	seExplainData_ = audio_->LoadWave("Sounds/se_explain.wav");
 	seFinishData_ = audio_->LoadWave("Sounds/se_finish.wav");
+	seConfirmData_ = audio_->LoadWave("Sounds/se_confirm.wav");
+	seLineUpData = audio_->LoadWave("Sounds/se_line_up.wav");
+	seResultData = audio_->LoadWave("Sounds/se_result.wav");
 }
 
 SoundManager::~SoundManager() {}
@@ -44,6 +47,15 @@ void SoundManager::OnPlaySound(const Sound& soundType) {
 	case Sound::SE_FINISH:
 		audio_->PlayWave(seFinishData_);
 		break;
+	case Sound::SE_CONFIRM:
+		audio_->PlayWave(seConfirmData_);
+		break;
+	case Sound::SE_LINE_UP:
+		audio_->PlayWave(seLineUpData);
+		break;
+	case Sound::SE_RESULT:
+		audio_->PlayWave(seResultData);
+		break;
 	default:
 		break;
 	}
@@ -64,14 +76,17 @@ void SoundManager::OnPlayBGM(const BGM& bgmType) {
 	}
 }
 
-void SoundManager::AllStopSound() {
-	audio_->StopWave(seDarumaBreakData_);
-	audio_->StopWave(seMissTouchData_);
-	audio_->StopWave(bgmTitleData_);
-	audio_->StopWave(bgmStageData_);
-	audio_->StopWave(seIchatchCountData_);
-	audio_->StopWave(seIchatchStartData_);
-	audio_->StopWave(seSelectRBLBData_);
-	audio_->StopWave(seExplainData_);
-	audio_->StopWave(seFinishData_);
-}
+//void SoundManager::AllStopSound() {
+//	audio_->StopWave(seDarumaBreakData_);
+//	audio_->StopWave(seMissTouchData_);
+//	audio_->StopWave(bgmTitleData_);
+//	audio_->StopWave(bgmStageData_);
+//	audio_->StopWave(seIchatchCountData_);
+//	audio_->StopWave(seIchatchStartData_);
+//	audio_->StopWave(seSelectRBLBData_);
+//	audio_->StopWave(seExplainData_);
+//	audio_->StopWave(seFinishData_);
+//	audio_->StopWave(seConfirmData_);
+//	audio_->StopWave(seLineUpData);
+//	audio_->StopWave(seResultData);
+//}

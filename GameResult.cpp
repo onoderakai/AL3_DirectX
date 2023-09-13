@@ -4,6 +4,7 @@
 GameResult::GameResult() {
 	input_ = Input::GetInstance();
 	resultScore_ = new Score();
+	sound_ = SoundManager::GetInstance();
 
 	resultTex_[0] = TextureManager::Load("mode.png");
 	resultTex_[1] = TextureManager::Load("result.png");
@@ -48,6 +49,7 @@ GameResult::~GameResult() {
 void GameResult::Initialize(SceneNum* pScene) {
 	pScene_ = pScene;
 	isScoreDraw_ = true;
+	isSound_ = false;
 	drawCount_ = kMaxDrawCount_;
 	resultScore_->Initialize();
 }
@@ -58,14 +60,18 @@ void GameResult::Update() {
 	Input::GetInstance()->GetJoystickStatePrevious(0, preJoyState_);
 
 	// SPACEかAボタンで前のシーンに遷移する
-	if (input_->PushKey(DIK_SPACE) || (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
-	                                   (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0)) {
+	if (input_->TriggerKey(DIK_SPACE) || input_->TriggerKey(DIK_A) ||
+	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
+	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0)) {
+		sound_->OnPlaySound(SoundManager::Sound::SE_CONFIRM);
 		SceneChange::GetInstance()->Change(preScene_, pScene_);
 	}
 	// RETURNかBボタンでTITLEシーンに遷移する
 	else if (
-	    input_->PushKey(DIK_RETURN) || (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
-	                                    (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0)) {
+	    input_->TriggerKey(DIK_RETURN) || input_->TriggerKey(DIK_B) ||
+	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
+	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0)) {
+		sound_->OnPlaySound(SoundManager::Sound::SE_CONFIRM);
 		SceneChange::GetInstance()->Change(SceneNum::TITLE, pScene_);
 	}
 
@@ -92,13 +98,18 @@ void GameResult::Update() {
 
 void GameResult::TimeAttackDraw(const uint32_t& score) {
 	resultSprite_[3]->SetTextureHandle(resultTex_[3]);
+	// 音を鳴らす
+	if (!isSound_) {
+		isSound_ = true;
+		sound_->OnPlaySound(SoundManager::Sound::SE_RESULT);
+	}
 
 	backGround_->Draw();
 	for (uint32_t i = 0; i < 4; i++) {
 		resultSprite_[i]->Draw();
 	}
 
-	resultScore_->DrawScoreUIResult(score, isScoreDraw_);
+	resultScore_->DrawScoreTimeUI(score, isScoreDraw_);
 	if (resultScore_->GetIsScoreDecision()) {
 		if (isScoreDraw_) {
 			drawCount_--;
@@ -116,6 +127,11 @@ void GameResult::TimeAttackDraw(const uint32_t& score) {
 
 void GameResult::ScoreAttackDraw(const uint32_t& score) {
 	resultSprite_[3]->SetTextureHandle(resultTex_[4]);
+	// 音を鳴らす
+	if (!isSound_) {
+		isSound_ = true;
+		sound_->OnPlaySound(SoundManager::Sound::SE_RESULT);
+	}
 
 	backGround_->Draw();
 	for (uint32_t i = 0; i < 4; i++) {

@@ -18,10 +18,13 @@ StageSelect::StageSelect() {
 	// 操作説明画像
 	uint32_t explain1TextureHandle = TextureManager::Load("left_explain.png");
 	explainSprite_[0] = Sprite::Create(
-	    explain1TextureHandle, Vector2{640.0f, 360.0f - 150.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	    explain1TextureHandle, Vector2{640.0f, 360.0f - 160.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
 	uint32_t explain2TextureHandle = TextureManager::Load("right_explain.png");
 	explainSprite_[1] = Sprite::Create(
-	    explain2TextureHandle, Vector2{640.0f, 360.0f + 150.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	    explain2TextureHandle, Vector2{640.0f, 360.0f + 140.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	uint32_t explain3TextureHandle = TextureManager::Load("explain_cat.png");
+	explainSprite_[2] =
+	    Sprite::Create(explain3TextureHandle, Vector2{640.0f, 350.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
 	// 操作説明背景
 	uint32_t bgTex = TextureManager::Load("white1x1.png");
 	backGround_ = Sprite::Create(bgTex, Vector2{0.0f, 0.0f}, Vector4{0.0f, 0.0f, 0.0f, 0.9f});
@@ -56,7 +59,7 @@ StageSelect::~StageSelect() {
 	delete arrowLeftSprite_;
 	delete pushNextSprite_;
 	delete pushExplainSprite_;
-	for (uint32_t i = 0; i < 2; i++) {
+	for (uint32_t i = 0; i < 3; i++) {
 		delete explainSprite_[i];
 	}
 	delete backGround_;
@@ -78,11 +81,11 @@ void StageSelect::Update() {
 
 	// SPACEかAボタンで選択したシーンに遷移する
 	if (!isExplain_) {
-		if ((input_->TriggerKey(DIK_SPACE) ||
+		if ((input_->TriggerKey(DIK_SPACE) || input_->TriggerKey(DIK_A) ||
 		     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
 		      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0)) &&
 		    !isEase_) {
-			sound_->OnPlaySound(SoundManager::Sound::SE_EXPLAIN);
+			sound_->OnPlaySound(SoundManager::Sound::SE_CONFIRM);
 			if (stageNum_ == 0) {
 				SceneChange::GetInstance()->Change(SceneNum::TIME_ATTACK_STAGE, pScene_);
 			} else if (stageNum_ == 1) {
@@ -94,27 +97,27 @@ void StageSelect::Update() {
 	}
 
 	// XボタンかENTERで操作説明を開く
-	if (!isExplain_ && (input_->TriggerKey(DIK_RETURN) ||
-	                   (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
-	                    (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0))) {
+	if (!isExplain_ && (input_->TriggerKey(DIK_RETURN) || input_->TriggerKey(DIK_X) ||
+	                    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
+	                     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0))) {
 		sound_->OnPlaySound(SoundManager::Sound::SE_EXPLAIN);
 		isExplain_ = true;
 	} else if (
-	    input_->TriggerKey(DIK_RETURN) ||
-	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
-	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0) ||
-	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
-	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0) ||
-	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
-	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0) ||
-	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
-	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) {
+	    isExplain_ && (input_->TriggerKey(DIK_RETURN) || input_->TriggerKey(DIK_X) ||
+	                   (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
+	                    (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0) ||
+	                   (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
+	                    (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0) ||
+	                   (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
+	                    (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0) ||
+	                   (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
+	                    (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0))) {
 		sound_->OnPlaySound(SoundManager::Sound::SE_EXPLAIN);
 		isExplain_ = false;
 	}
 
 	if (!isEase_ && !SceneChange::GetInstance()->GetIsLoading()) {
-		if ((input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_D) ||
+		if ((input_->PushKey(DIK_RIGHT) ||
 		     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER &&
 		      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) == 0)) &&
 		    stageNum_ < maxStageNum_ - 1) {
@@ -126,7 +129,7 @@ void StageSelect::Update() {
 			end = stageSprite_[stageNum_]->GetPosition();
 
 		} else if (
-		    (input_->PushKey(DIK_LEFT) || input_->PushKey(DIK_A) ||
+		    (input_->PushKey(DIK_LEFT) ||
 		     (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER &&
 		      (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) == 0)) &&
 		    stageNum_ > 0) {
@@ -159,7 +162,7 @@ void StageSelect::DrawBackground() {
 	// 説明画面が出てるときだけ
 	if (isExplain_) {
 		backGround_->Draw();
-		for (uint32_t i = 0; i < 2; i++) {
+		for (uint32_t i = 0; i < 3; i++) {
 			explainSprite_[i]->Draw();
 		}
 	}

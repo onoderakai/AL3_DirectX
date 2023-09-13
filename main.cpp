@@ -20,7 +20,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// ゲームウィンドウの作成
 	win = WinApp::GetInstance();
-	win->CreateGameWindow(L"FALL☆きゃとるま！");
+	win->CreateGameWindow(L"6003_FALL☆きゃとるま！");
 
 	// DirectX初期化処理
 	dxCommon = DirectXCommon::GetInstance();

@@ -20,6 +20,8 @@ public:
 
 	void DrawScoreUI(int score);
 
+	void DrawScoreTimeUI(int score, const bool& isDraw);
+
 	void DrawTimeUI(int score);
 
 	void DrawScoreUIResult(int score, const bool& isDraw);

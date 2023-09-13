@@ -78,7 +78,7 @@ void Title::Update() {
 	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0) ||
 	    (joyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y &&
 	     (preJoyState_.Gamepad.wButtons & XINPUT_GAMEPAD_Y) == 0)) {
-		sound_->OnPlaySound(SoundManager::Sound::SE_EXPLAIN);
+		sound_->OnPlaySound(SoundManager::Sound::SE_CONFIRM);
 		SceneChange::GetInstance()->Change(SceneNum::STAGE_SELECT, pScene_);
 	}
 

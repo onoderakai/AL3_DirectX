@@ -19,6 +19,7 @@ void Daruma::Initialize(Model* model, const Vector3& pos, const DarumaType& type
 	world_.translation_ = pos;
 	movePos_ = pos;
 	type_ = type;
+	world_.rotation_.y = float(rand() % 1000 - 500) / 500.0f;
 	world_.scale_ = {5.0f, 5.0f, 5.0f};
 	arrayNum_ = 0;
 	isBreak_ = false;
@@ -72,10 +73,6 @@ void Daruma::InputUpdate() {
 		penaltyTime_--;
 	}
 
-	ImGui::Begin("a");
-	ImGui::Text("%d", penaltyTime_);
-	ImGui::End();
-
 	switch (type_) {
 	case DarumaType::GREEN:
 		UpdateGreen(joyState_, preJoyState_);
@@ -114,7 +111,7 @@ Vector3 Daruma::GetWorldPosition() {
 
 void Daruma::UpdateGreen(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	if (!shake_->GetIsShake() &&
-	    (input_->TriggerKey(DIK_G) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
+	    (input_->TriggerKey(DIK_A) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0))) {
 		isBreak_ = true;
 		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
@@ -124,7 +121,7 @@ void Daruma::UpdateGreen(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 		para.type_ = Particle::Type::RIGHT_PARTICLE;
 		particleSystem_->Generate(para, 10);
 	} else if (
-	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_Y) ||
+	    input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_X) || input_->TriggerKey(DIK_Y) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
@@ -139,7 +136,7 @@ void Daruma::UpdateGreen(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 
 void Daruma::UpdateRed(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	if (!shake_->GetIsShake() &&
-	    (input_->TriggerKey(DIK_R) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
+	    (input_->TriggerKey(DIK_B) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0))) {
 		isBreak_ = true;
 		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
@@ -149,7 +146,7 @@ void Daruma::UpdateRed(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 		para.type_ = Particle::Type::RIGHT_PARTICLE;
 		particleSystem_->Generate(para, 10);
 	} else if (
-	    input_->TriggerKey(DIK_G) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_Y) ||
+	    input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_X) || input_->TriggerKey(DIK_Y) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) == 0) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
@@ -164,7 +161,7 @@ void Daruma::UpdateRed(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 
 void Daruma::UpdateBlue(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 	if (!shake_->GetIsShake() &&
-	    (input_->TriggerKey(DIK_B) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
+	    (input_->TriggerKey(DIK_X) || (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X &&
 	                                   (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) == 0))) {
 		isBreak_ = true;
 		sound_->OnPlaySound(SoundManager::Sound::SE_DARUMA_BREAK);
@@ -175,7 +172,7 @@ void Daruma::UpdateBlue(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 		particleSystem_->Generate(para, 10);
 
 	} else if (
-	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_G) || input_->TriggerKey(DIK_Y) ||
+	    input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_Y) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A &&
@@ -200,7 +197,7 @@ void Daruma::UpdateYellow(XINPUT_STATE& joyState, XINPUT_STATE& preJoyState) {
 		para.type_ = Particle::Type::RIGHT_PARTICLE;
 		particleSystem_->Generate(para, 10);
 	} else if (
-	    input_->TriggerKey(DIK_R) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_G) ||
+	    input_->TriggerKey(DIK_A) || input_->TriggerKey(DIK_B) || input_->TriggerKey(DIK_X) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
 	     (preJoyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) == 0) ||
 	    (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X &&

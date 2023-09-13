@@ -24,12 +24,12 @@ Score::Score() {
 	    TextureManager::Load("num/8.png"), TextureManager::Load("num/9.png"),
 	};
 
-	float posX = 170.0f;
+	float posX = 165.0f;
 	float posXResult = 930.0f;
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 10; j++) {
 			sprite2DNum_[i][j] =
-			    Sprite::Create(textureNum[j], {posX, 100}, {1, 1, 1, 1}, {(0.0f), (0.0f)});
+			    Sprite::Create(textureNum[j], {posX, 130}, {1, 1, 1, 1}, {(0.0f), (0.0f)});
 			sprite2DTime_[i][j] =
 			    Sprite::Create(textureNum[j], {posX, 25}, {1, 1, 1, 1}, {(0.0f), (0.0f)});
 			sprite2DNumResult_[i][j] =
@@ -61,6 +61,8 @@ void Score::Initialize() {
 	isScoreDecision_ = false;
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 10; j++) {
+			sprite2DNumResult_[i][j]->SetSize(spriteSize_[i][j]);
+			sprite2DNumResult_[i][j]->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
 			easing_[i][j]->Initialize();
 			isEase_[i][j] = true;
 		}
@@ -114,6 +116,79 @@ void Score::DrawScoreUI(int score) {
 	sprite2DNum_[3][eachNumber[0]]->Draw();
 }
 
+void Score::DrawScoreTimeUI(int score, const bool& isDraw) {
+	if (score >= 10000) {
+		score = 9999;
+	}
+	if (score <= 0) {
+		isScoreDecision_ = true;
+	}
+
+	if (preScore_ != score) {
+		addTmpScore_ = (score - tmpScore_) / 30;
+	}
+
+	preScore_ = score;
+	if (tmpScore_ < score) {
+		tmpScore_ += addTmpScore_;
+		if (tmpScore_ >= score) {
+			tmpScore_ = score;
+			isScoreDecision_ = true;
+		}
+	}
+
+	int32_t scoreCount = tmpScore_;
+
+	int eachNumber[4]{};
+	int digit = 1000;
+	for (int i = 0; i < 4; i++) {
+		eachNumber[i] = scoreCount / digit;
+		scoreCount -= eachNumber[i] * digit;
+		digit /= 10;
+	}
+
+	if (isScoreDecision_) {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 10; j++) {
+				sprite2DNumResult_[i][j]->SetSize(easing_[i][j]->EaseOutElastic(
+				    sprite2DNumResult_[i][j]->GetSize(), Vector2{1.0f, 1.0f}, spriteSize_[i][j], 60,
+				    isEase_[i][j]));
+			}
+		}
+	}
+
+	if (!isDraw) {
+		return;
+	}
+
+	if (tmpScore_ <= 600) {
+		sprite2DNumResult_[0][eachNumber[3]]->SetColor(Vector4{0.7f, 0.0f, 0.7f, 1.0f});
+		sprite2DNumResult_[1][eachNumber[2]]->SetColor(Vector4{0.0f, 0.0f, 0.7f, 1.0f});
+		sprite2DNumResult_[2][eachNumber[1]]->SetColor(Vector4{0.7f, 0.7f, 0.0f, 1.0f});
+		sprite2DNumResult_[3][eachNumber[0]]->SetColor(Vector4{0.7f, 0.0f, 0.0f, 1.0f});
+	} else if (tmpScore_ <= 1000) {
+		sprite2DNumResult_[0][eachNumber[3]]->SetColor(Vector4{1.0f, 1.0f, 0.5f, 1.0f});
+		sprite2DNumResult_[1][eachNumber[2]]->SetColor(Vector4{1.0f, 1.0f, 0.5f, 1.0f});
+		sprite2DNumResult_[2][eachNumber[1]]->SetColor(Vector4{1.0f, 1.0f, 0.5f, 1.0f});
+		sprite2DNumResult_[3][eachNumber[0]]->SetColor(Vector4{1.0f, 1.0f, 0.5f, 1.0f});
+	} else if (tmpScore_ <= 1222) {
+		sprite2DNumResult_[0][eachNumber[3]]->SetColor(Vector4{0.5f, 0.5f, 1.0f, 1.0f});
+		sprite2DNumResult_[1][eachNumber[2]]->SetColor(Vector4{0.5f, 0.5f, 1.0f, 1.0f});
+		sprite2DNumResult_[2][eachNumber[1]]->SetColor(Vector4{0.5f, 0.5f, 1.0f, 1.0f});
+		sprite2DNumResult_[3][eachNumber[0]]->SetColor(Vector4{0.5f, 0.5f, 1.0f, 1.0f});
+	} else {
+		sprite2DNumResult_[0][eachNumber[3]]->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+		sprite2DNumResult_[1][eachNumber[2]]->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+		sprite2DNumResult_[2][eachNumber[1]]->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+		sprite2DNumResult_[3][eachNumber[0]]->SetColor(Vector4{1.0f, 1.0f, 1.0f, 1.0f});
+	}
+
+	sprite2DNumResult_[0][eachNumber[3]]->Draw();
+	sprite2DNumResult_[1][eachNumber[2]]->Draw();
+	sprite2DNumResult_[2][eachNumber[1]]->Draw();
+	sprite2DNumResult_[3][eachNumber[0]]->Draw();
+}
+
 void Score::DrawScoreUIResult(int score, const bool& isDraw) {
 	if (score >= 10000) {
 		score = 9999;
@@ -157,6 +232,25 @@ void Score::DrawScoreUIResult(int score, const bool& isDraw) {
 
 	if (!isDraw) {
 		return;
+	}
+
+	if (tmpScore_ >= 3000) {
+		sprite2DNumResult_[0][eachNumber[3]]->SetColor(Vector4{0.5f, 0.5f, 1.0f, 1.0f});
+		sprite2DNumResult_[1][eachNumber[2]]->SetColor(Vector4{0.5f, 0.5f, 1.0f, 1.0f});
+		sprite2DNumResult_[2][eachNumber[1]]->SetColor(Vector4{0.5f, 0.5f, 1.0f, 1.0f});
+		sprite2DNumResult_[3][eachNumber[0]]->SetColor(Vector4{0.5f, 0.5f, 1.0f, 1.0f});
+	}
+	if (tmpScore_ >= 5000) {
+		sprite2DNumResult_[0][eachNumber[3]]->SetColor(Vector4{1.0f, 1.0f, 0.5f, 1.0f});
+		sprite2DNumResult_[1][eachNumber[2]]->SetColor(Vector4{1.0f, 1.0f, 0.5f, 1.0f});
+		sprite2DNumResult_[2][eachNumber[1]]->SetColor(Vector4{1.0f, 1.0f, 0.5f, 1.0f});
+		sprite2DNumResult_[3][eachNumber[0]]->SetColor(Vector4{1.0f, 1.0f, 0.5f, 1.0f});
+	}
+	if (tmpScore_ >= 9999) {
+		sprite2DNumResult_[0][eachNumber[3]]->SetColor(Vector4{0.7f, 0.0f, 0.7f, 1.0f});
+		sprite2DNumResult_[1][eachNumber[2]]->SetColor(Vector4{0.0f, 0.0f, 0.7f, 1.0f});
+		sprite2DNumResult_[2][eachNumber[1]]->SetColor(Vector4{0.7f, 0.7f, 0.0f, 1.0f});
+		sprite2DNumResult_[3][eachNumber[0]]->SetColor(Vector4{0.7f, 0.0f, 0.0f, 1.0f});
 	}
 	sprite2DNumResult_[0][eachNumber[3]]->Draw();
 	sprite2DNumResult_[1][eachNumber[2]]->Draw();
